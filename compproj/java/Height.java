@@ -27,8 +27,8 @@ class Height {
         } else if (exp instanceof Int) {
             Int e = (Int) exp;
             res = 0;
-        } else if (exp instanceof Bool) {
-            Bool e = (Bool) exp;
+        } else if (exp instanceof Float) {
+            Float e = (Float) exp;
             res = 0;
         } else if (exp instanceof Not) {
             Not e = (Not) exp;
