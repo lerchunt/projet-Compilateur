@@ -1,6 +1,4 @@
-import java_cup.runtime.*;
-import java.io.*;
-import java.util.*;
+import java.io.FileReader;
 
 public class Main {
   static public void main(String argv[]) {    
@@ -11,6 +9,10 @@ public class Main {
 
       System.out.println("------ AST ------");
       expression.accept(new PrintVisitor());
+      System.out.println();
+      
+      System.out.println("------ ASML ------");
+      expression.accept(new GenerationASML());
       System.out.println();
 
       System.out.println("------ Height of the AST ----");

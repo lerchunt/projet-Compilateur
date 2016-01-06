@@ -1,4 +1,5 @@
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 class PrintVisitor implements Visitor {
     public void visit(Unit e) {
@@ -72,6 +73,14 @@ class PrintVisitor implements Visitor {
         System.out.print("(");
         e.e1.accept(this);
         System.out.print(" *. ");
+        e.e2.accept(this);
+        System.out.print(")");
+    }
+    
+    public void visit(Mul e) {
+        System.out.print("(");
+        e.e1.accept(this);
+        System.out.print(" * ");
         e.e2.accept(this);
         System.out.print(")");
     }

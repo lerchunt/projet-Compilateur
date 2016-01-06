@@ -1,4 +1,3 @@
-import java.util.*;
 
 interface Visitor {
 
@@ -14,6 +13,7 @@ interface Visitor {
     void visit(FAdd e);
     void visit(FSub e);
     void visit(FMul e);
+    void visit(Mul e);
     void visit(FDiv e);
     void visit(Eq e);
     void visit(LE e);

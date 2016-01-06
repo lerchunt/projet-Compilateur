@@ -12,6 +12,7 @@ interface ObjVisitor<E> {
     E visit(FAdd e);
     E visit(FSub e);
     E visit(FMul e);
+    E visit(Mul e);
     E visit(FDiv e);
     E visit(Eq e);
     E visit(LE e);
