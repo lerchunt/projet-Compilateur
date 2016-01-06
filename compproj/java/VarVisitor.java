@@ -68,6 +68,13 @@ class VarVisitor implements ObjVisitor<Set<String>> {
         fv1.addAll(fv2);
         return fv1;
     }
+    
+    public Set<String> visit(Mul e) {
+        Set<String> fv1 = e.e1.accept(this);
+        Set<String> fv2 = e.e2.accept(this);
+        fv1.addAll(fv2);
+        return fv1;
+    }
 
     public Set<String> visit(FDiv e){
         Set<String> fv1 = e.e1.accept(this);
