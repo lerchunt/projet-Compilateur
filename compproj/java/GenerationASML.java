@@ -11,15 +11,15 @@ public class GenerationASML implements Visitor {
     }
 
     public void visit(Bool e) {
-       
+        System.out.print(e.b);
     }
 
     public void visit(Int e) {
-        
+        System.out.print(e.i);
     }
 
     public void visit(Float e) {
-        
+    	/* definition des float au debut du programme*/
     }
 
     public void visit(Not e) {
@@ -31,7 +31,10 @@ public class GenerationASML implements Visitor {
     }
 
     public void visit(Add e) {
-        
+		System.out.print(" add ");
+		e.e1.accept(this);
+		System.out.print(" ");
+		e.e2.accept(this);
     }
 
     public void visit(Sub e) {
@@ -71,7 +74,13 @@ public class GenerationASML implements Visitor {
     }
 
     public void visit(Let e) {
-        
+    	System.out.print("\t let ");
+        System.out.print(e.id);
+        System.out.print(" = ");
+        e.e1.accept(this);
+        System.out.print(" in ");
+        e.e2.accept(this);
+        System.out.println("");
     }
 
     public void visit(Var e){
@@ -111,6 +120,7 @@ public class GenerationASML implements Visitor {
     public void visit(App e){
         System.out.print("\t call _min_caml_");
         e.e.accept(this);
+        System.out.print(" ");
         printInfix2(e.es, " ");
     }
 
