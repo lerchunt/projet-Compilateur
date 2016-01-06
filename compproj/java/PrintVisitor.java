@@ -1,4 +1,5 @@
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 class PrintVisitor implements Visitor {
     public void visit(Unit e) {

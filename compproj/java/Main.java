@@ -1,6 +1,4 @@
-import java_cup.runtime.*;
-import java.io.*;
-import java.util.*;
+import java.io.FileReader;
 
 public class Main {
   static public void main(String argv[]) {    
