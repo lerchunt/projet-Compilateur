@@ -4,6 +4,7 @@ abstract class Exp {
     abstract void accept(Visitor v);
 
     abstract <E> E accept(ObjVisitor<E> v);
+    
 }
 
 class Unit extends Exp {
@@ -181,6 +182,23 @@ class FMul extends Exp {
     final Exp e2;
 
     FMul(Exp e1, Exp e2) {
+        this.e1 = e1;
+        this.e2 = e2;
+    }
+
+    <E> E accept(ObjVisitor<E> v) {
+        return v.visit(this);
+    }
+    void accept(Visitor v) {
+        v.visit(this);
+    }
+}
+
+class Mul extends Exp {
+    final Exp e1;
+    final Exp e2;
+
+    Mul(Exp e1, Exp e2) {
         this.e1 = e1;
         this.e2 = e2;
     }

@@ -75,6 +75,14 @@ class PrintVisitor implements Visitor {
         e.e2.accept(this);
         System.out.print(")");
     }
+    
+    public void visit(Mul e) {
+        System.out.print("(");
+        e.e1.accept(this);
+        System.out.print(" * ");
+        e.e2.accept(this);
+        System.out.print(")");
+    }
 
     public void visit(FDiv e){
         System.out.print("(");
