@@ -51,13 +51,13 @@ class Lexer implements java_cup.runtime.Scanner {
   private static final int [] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-    "\1\0\1\1\1\2\1\3\1\4\1\5\1\1\1\6"+
-    "\6\4\1\7\1\10\1\4\1\11\1\1\1\12\1\13"+
-    "\1\14\1\15\1\16\1\1\1\17\1\0\1\20\1\0"+
-    "\1\21\10\4\1\22\1\23\1\24\1\25\1\26\1\27"+
-    "\1\30\1\31\1\32\4\0\2\4\1\33\1\4\1\34"+
-    "\1\4\1\35\1\36\3\0\1\37\1\40\1\41\1\4"+
-    "\2\0\1\2\1\42\3\0\1\20\5\0\1\43";
+    "\1\0\1\1\1\2\1\3\1\4\1\5\1\6\1\7"+
+    "\6\4\1\10\1\11\1\4\1\12\1\1\1\13\1\14"+
+    "\1\15\1\16\1\17\1\1\1\20\1\0\1\21\1\0"+
+    "\1\22\10\4\1\23\1\24\1\25\1\26\1\27\1\30"+
+    "\1\31\1\32\1\33\4\0\2\4\1\34\1\4\1\35"+
+    "\1\4\1\36\1\37\3\0\1\40\1\41\1\42\1\4"+
+    "\2\0\1\2\1\43\3\0\1\21\5\0\1\44";
 
   private static int [] zzUnpackAction() {
     int [] result = new int[80];
@@ -687,143 +687,147 @@ class Lexer implements java_cup.runtime.Scanner {
         case 1: 
           { throw new Error("Illegal character <"+yytext()+">");
           }
-        case 36: break;
+        case 37: break;
         case 2: 
           { 
           }
-        case 37: break;
+        case 38: break;
         case 3: 
           { return symbol(sym.INT, new Integer(yytext()));
           }
-        case 38: break;
+        case 39: break;
         case 4: 
           { return symbol(sym.IDENT, new Id(yytext()));
           }
-        case 39: break;
+        case 40: break;
         case 5: 
           { return symbol(sym.LPAREN);
           }
-        case 40: break;
-        case 6: 
-          { return symbol(sym.RPAREN);
-          }
         case 41: break;
-        case 7: 
-          { return symbol(sym.DOT);
+        case 6: 
+          { return symbol(sym.AST);
           }
         case 42: break;
-        case 8: 
-          { return symbol(sym.PLUS);
+        case 7: 
+          { return symbol(sym.RPAREN);
           }
         case 43: break;
-        case 9: 
-          { return symbol(sym.MINUS);
+        case 8: 
+          { return symbol(sym.DOT);
           }
         case 44: break;
-        case 10: 
-          { return symbol(sym.EQUAL);
+        case 9: 
+          { return symbol(sym.PLUS);
           }
         case 45: break;
-        case 11: 
-          { return symbol(sym.LESS);
+        case 10: 
+          { return symbol(sym.MINUS);
           }
         case 46: break;
-        case 12: 
-          { return symbol(sym.GREATER);
+        case 11: 
+          { return symbol(sym.EQUAL);
           }
         case 47: break;
-        case 13: 
-          { return symbol(sym.COMMA);
+        case 12: 
+          { return symbol(sym.LESS);
           }
         case 48: break;
-        case 14: 
-          { return symbol(sym.IDENT, Id.gen());
+        case 13: 
+          { return symbol(sym.GREATER);
           }
         case 49: break;
-        case 15: 
-          { return symbol(sym.SEMICOLON);
+        case 14: 
+          { return symbol(sym.COMMA);
           }
         case 50: break;
-        case 16: 
-          { return symbol(sym.FLOAT, new java.lang.Float(yytext()));
+        case 15: 
+          { return symbol(sym.IDENT, Id.gen());
           }
         case 51: break;
-        case 17: 
-          { return symbol(sym.AST_DOT);
+        case 16: 
+          { return symbol(sym.SEMICOLON);
           }
         case 52: break;
-        case 18: 
-          { return symbol(sym.PLUS_DOT);
+        case 17: 
+          { return symbol(sym.FLOAT, new java.lang.Float(yytext()));
           }
         case 53: break;
-        case 19: 
-          { return symbol(sym.IF);
+        case 18: 
+          { return symbol(sym.AST_DOT);
           }
         case 54: break;
-        case 20: 
-          { return symbol(sym.IN);
+        case 19: 
+          { return symbol(sym.PLUS_DOT);
           }
         case 55: break;
-        case 21: 
-          { return symbol(sym.MINUS_DOT);
+        case 20: 
+          { return symbol(sym.IF);
           }
         case 56: break;
-        case 22: 
-          { return symbol(sym.SLASH_DOT);
+        case 21: 
+          { return symbol(sym.IN);
           }
         case 57: break;
-        case 23: 
-          { return symbol(sym.LESS_MINUS);
+        case 22: 
+          { return symbol(sym.MINUS_DOT);
           }
         case 58: break;
-        case 24: 
-          { return symbol(sym.LESS_EQUAL);
+        case 23: 
+          { return symbol(sym.SLASH_DOT);
           }
         case 59: break;
-        case 25: 
-          { return symbol(sym.LESS_GREATER);
+        case 24: 
+          { return symbol(sym.LESS_MINUS);
           }
         case 60: break;
-        case 26: 
-          { return symbol(sym.GREATER_EQUAL);
+        case 25: 
+          { return symbol(sym.LESS_EQUAL);
           }
         case 61: break;
-        case 27: 
-          { return symbol(sym.REC);
+        case 26: 
+          { return symbol(sym.LESS_GREATER);
           }
         case 62: break;
-        case 28: 
-          { return symbol(sym.EOF);
+        case 27: 
+          { return symbol(sym.GREATER_EQUAL);
           }
         case 63: break;
-        case 29: 
-          { return symbol(sym.LET);
+        case 28: 
+          { return symbol(sym.REC);
           }
         case 64: break;
-        case 30: 
-          { return symbol(sym.NOT);
+        case 29: 
+          { return symbol(sym.EOF);
           }
         case 65: break;
-        case 31: 
-          { return symbol(sym.BOOL, true);
+        case 30: 
+          { return symbol(sym.LET);
           }
         case 66: break;
-        case 32: 
-          { return symbol(sym.THEN);
+        case 31: 
+          { return symbol(sym.NOT);
           }
         case 67: break;
-        case 33: 
-          { return symbol(sym.ELSE);
+        case 32: 
+          { return symbol(sym.BOOL, true);
           }
         case 68: break;
-        case 34: 
-          { return symbol(sym.BOOL, false);
+        case 33: 
+          { return symbol(sym.THEN);
           }
         case 69: break;
-        case 35: 
-          { return symbol(sym.ARRAY_CREATE);
+        case 34: 
+          { return symbol(sym.ELSE);
           }
         case 70: break;
+        case 35: 
+          { return symbol(sym.BOOL, false);
+          }
+        case 71: break;
+        case 36: 
+          { return symbol(sym.ARRAY_CREATE);
+          }
+        case 72: break;
         default: 
           if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
             zzAtEOF = true;

@@ -72,6 +72,12 @@ public class ClosureConversion implements ObjVisitor<Exp> {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public Exp visit(Mul e) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
 	public Exp visit(FDiv e) {

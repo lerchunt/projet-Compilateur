@@ -27,7 +27,7 @@ terminal boolean BOOL;
 terminal int INT;
 terminal float FLOAT;
 terminal Id IDENT;
-terminal NOT, MINUS, PLUS, MINUS_DOT, PLUS_DOT, AST_DOT, SLASH_DOT, EQUAL,
+terminal NOT, MINUS, PLUS, MINUS_DOT, PLUS_DOT, AST_DOT,AST, SLASH_DOT, EQUAL,
  LESS_GREATER, LESS_EQUAL, GREATER_EQUAL, LESS, GREATER, IF, THEN, ELSE,
  LET, IN, REC, COMMA, ARRAY_CREATE, DOT, LESS_MINUS, SEMICOLON, LPAREN, RPAREN;
 terminal prec_let, prec_if, prec_unary_minus, prec_app;
@@ -47,7 +47,7 @@ precedence right LESS_MINUS;
 precedence left  COMMA;
 precedence left  EQUAL, LESS_GREATER, LESS, GREATER, LESS_EQUAL, GREATER_EQUAL;
 precedence left  PLUS, MINUS, PLUS_DOT, MINUS_DOT;
-precedence left  AST_DOT, SLASH_DOT;
+precedence left  AST_DOT, SLASH_DOT,AST;
 precedence right prec_unary_minus;
 precedence left  prec_app;
 precedence left  DOT;
@@ -93,6 +93,7 @@ exp ::=
 | exp:e1 PLUS_DOT exp:e2    {: RESULT = new FAdd(e1, e2); :}
 | exp:e1 MINUS_DOT exp:e2    {: RESULT = new FSub(e1, e2); :}
 | exp:e1 AST_DOT exp:e2    {: RESULT = new FMul(e1, e2); :}
+| exp:e1 AST exp:e2    {: RESULT = new Mul(e1, e2); :}
 | exp:e1 SLASH_DOT exp:e2    {: RESULT = new FDiv(e1, e2); :}
 | LET IDENT:id EQUAL exp:e1 IN exp:e2  {: RESULT = new Let(id, Type.gen(), e1, e2); :}
 %prec prec_let

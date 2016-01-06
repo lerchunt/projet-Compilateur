@@ -60,6 +60,11 @@ class HeightVisitor implements ObjVisitor<Integer> {
         int res2 = e.e2.accept(this);
         return Math.max(res1, res2) + 1 ;
      }
+    public Integer visit(Mul e) {
+        int res1 = e.e1.accept(this);
+        int res2 = e.e2.accept(this);
+        return Math.max(res1, res2) + 1 ;
+     }
 
     public Integer visit(FDiv e){
         int res1 = e.e1.accept(this);

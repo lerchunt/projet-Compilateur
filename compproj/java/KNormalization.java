@@ -1,6 +1,10 @@
 
 public class KNormalization implements ObjVisitor<Exp> {
-
+	int numero_var;
+	
+	public KNormalization(){
+		numero_var=0;
+	}
 	@Override
 	public Exp visit(Unit e) {
 		// TODO Auto-generated method stub
@@ -72,6 +76,11 @@ public class KNormalization implements ObjVisitor<Exp> {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override
+	public Exp visit(Mul e) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
 	public Exp visit(FDiv e) {
@@ -99,7 +108,7 @@ public class KNormalization implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Let e) {
-		// TODO Auto-generated method stub
+		System.out.println("let");
 		return null;
 	}
 

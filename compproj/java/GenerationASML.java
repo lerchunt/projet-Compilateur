@@ -53,6 +53,10 @@ public class GenerationASML implements Visitor {
     public void visit(FMul e) {
         
     }
+    
+    public void visit(Mul e) {
+        
+    }
 
     public void visit(FDiv e){
         
