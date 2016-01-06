@@ -11,31 +11,39 @@ public class GenerationASML implements Visitor {
     }
 
     public void visit(Bool e) {
-       
+        System.out.print(e.b);
     }
 
     public void visit(Int e) {
-        
+        System.out.print(e.i);
     }
 
     public void visit(Float e) {
-        
+    	/* definition des float au debut du programme*/
     }
 
     public void visit(Not e) {
-        
+    	System.out.print("not ");
+        e.e.accept(this);
     }
 
     public void visit(Neg e) {
-        
+    	System.out.print("-");
+        e.e.accept(this);
     }
 
     public void visit(Add e) {
-        
+		System.out.print(" add ");
+		e.e1.accept(this);
+		System.out.print(" ");
+		e.e2.accept(this);
     }
 
     public void visit(Sub e) {
-       
+    	System.out.print(" sub ");
+		e.e1.accept(this);
+		System.out.print(" ");
+		e.e2.accept(this);
     }
 
     public void visit(FNeg e){
@@ -63,19 +71,35 @@ public class GenerationASML implements Visitor {
     }
 
     public void visit(Eq e){
-        
+        e.e1.accept(this);
+        System.out.print(" = ");
+        e.e2.accept(this);
     }
 
     public void visit(LE e){
-        
+    	e.e1.accept(this);
+        System.out.print(" <= ");
+        e.e2.accept(this);
     }
 
     public void visit(If e){
-   
+    	System.out.print("if ");
+        e.e1.accept(this);
+        System.out.print(" then ( ");
+        e.e2.accept(this);
+        System.out.print(" ) else ( ");
+        e.e3.accept(this);
+        System.out.print(" ) ");
     }
 
     public void visit(Let e) {
-        
+    	System.out.print("let ");
+        System.out.print(e.id);
+        System.out.print(" = ");
+        e.e1.accept(this);
+        System.out.print(" in ");
+        e.e2.accept(this);
+        System.out.println("");
     }
 
     public void visit(Var e){
@@ -113,8 +137,9 @@ public class GenerationASML implements Visitor {
     }
 
     public void visit(App e){
-        System.out.print("\t call _min_caml_");
+        System.out.print("call _min_caml_");
         e.e.accept(this);
+        System.out.print(" ");
         printInfix2(e.es, " ");
     }
 
