@@ -44,6 +44,7 @@ public class Backend {
 			buffer.close(); 
 			
 			int numLigne = 0;
+
 			int nbRegVar=4;
 			for (String[] l : strMinCaml){
 				int longueur = l[1].length();
@@ -90,12 +91,11 @@ public class Backend {
 			}
 			retour = String.format("%s\t%s\n", retour, "bl\tmin_caml_exit");
 			
-			System.out.println(retour);
-			/*
-			PrintWriter w = new PrintWriter( new BufferedWriter( new FileWriter(this.pathFolder+this.nameFolder+".s")));
+
+			/*PrintWriter w = new PrintWriter( new BufferedWriter( new FileWriter(this.pathFolder+this.nameFolder+".s")));
 			w.print(retour);
-			w.close();
-			*/
+			w.close();*/
+			System.out.println(retour);
 		}		
 		catch (Exception e){
 			System.out.println(e.toString());
@@ -110,6 +110,7 @@ public class Backend {
 		}
 		System.out.print("\n");
 	}
+
 
 	
 	private void affectRegistre(String Var, String num,int nb){
@@ -142,3 +143,4 @@ public class Backend {
 	}
 	
 }
+
