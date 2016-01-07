@@ -1,5 +1,4 @@
 
-
 import java.io.*;
 import java.util.LinkedList;
 
@@ -33,7 +32,7 @@ public class Backend {
 			String ligne;
 			while ((ligne=buffer.readLine())!=null){
 				ligne = ligne.trim();
-				String[] tmp = ligne.split(" ", '\t');
+				String[] tmp = ligne.split(" ");
 				strMinCaml.add(tmp);
 				
 				// debug
@@ -72,7 +71,7 @@ public class Backend {
 			}
 			retour = String.format("%s\t%s\n", retour, "bl\tmin_caml_exit");
 			
-			PrintWriter w = new PrintWriter( new BufferedWriter( new FileWriter(this.pathFolder+this.nameFolder+".s")));
+			PrintWriter w = new PrintWriter( new BufferedWriter( new FileWriter(Main.Path+Main.OutName+".s")));
 			w.print(retour);
 			w.close();
 			

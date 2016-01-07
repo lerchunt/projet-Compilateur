@@ -138,7 +138,7 @@ public class GenerationASML implements Visitor {
     }
 
     public void visit(App e){
-        GenerationASML.asml += "\t call _min_caml_";
+        GenerationASML.asml += "\tcall _min_caml_";
         e.e.accept(this);
         GenerationASML.asml += " ";
         printInfix2(e.es, " ");
