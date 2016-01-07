@@ -8,15 +8,17 @@ public class Backend {
 	String nameFolder;
 	
 	public Backend (String path) { 
+
 		String[] tabPath = path.split("/");
 		nameFolder = tabPath[tabPath.length -1];
 		int tailleName = nameFolder.length();
 		nameFolder = nameFolder.split("\\.")[0];
 		this.pathFolder = path.substring(0, path.length()-tailleName);
 		
-		System.out.println("path : "+path);
-		System.out.println("pathFolder : "+pathFolder);
-		System.out.println("nameFolder : "+nameFolder);
+		convert(path);
+	}
+	
+	public void convert(String path) {
 		 
 		
 		String retour;

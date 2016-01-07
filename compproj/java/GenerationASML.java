@@ -1,21 +1,22 @@
 import java.util.*;
 
 public class GenerationASML implements Visitor {
+	static String asml;
 	
 	public GenerationASML()
 	{
-		System.out.println("let _ = ");
+		GenerationASML.asml = "let _ = \n";
 	}
     public void visit(Unit e) {
         
     }
 
     public void visit(Bool e) {
-        System.out.print(e.b);
+    	GenerationASML.asml += e.b ;
     }
 
     public void visit(Int e) {
-        System.out.print(e.i);
+    	GenerationASML.asml += e.i ;
     }
 
     public void visit(Float e) {
@@ -23,26 +24,26 @@ public class GenerationASML implements Visitor {
     }
 
     public void visit(Not e) {
-    	System.out.print("not ");
+    	GenerationASML.asml += "not ";
         e.e.accept(this);
     }
 
     public void visit(Neg e) {
-    	System.out.print("-");
+    	GenerationASML.asml += "-";
         e.e.accept(this);
     }
 
     public void visit(Add e) {
-		System.out.print(" add ");
+    	GenerationASML.asml += " add ";
 		e.e1.accept(this);
-		System.out.print(" ");
+		GenerationASML.asml += " ";
 		e.e2.accept(this);
     }
 
     public void visit(Sub e) {
-    	System.out.print(" sub ");
+    	GenerationASML.asml += " sub ";
 		e.e1.accept(this);
-		System.out.print(" ");
+		GenerationASML.asml += " ";
 		e.e2.accept(this);
     }
 
@@ -72,38 +73,38 @@ public class GenerationASML implements Visitor {
 
     public void visit(Eq e){
         e.e1.accept(this);
-        System.out.print(" = ");
+        GenerationASML.asml += " = ";
         e.e2.accept(this);
     }
 
     public void visit(LE e){
     	e.e1.accept(this);
-        System.out.print(" <= ");
+    	GenerationASML.asml += " <= ";
         e.e2.accept(this);
     }
 
     public void visit(If e){
-    	System.out.print("if ");
+    	GenerationASML.asml += "if ";
         e.e1.accept(this);
-        System.out.print(" then ( ");
+        GenerationASML.asml += " then ( ";
         e.e2.accept(this);
-        System.out.print(" ) else ( ");
+        GenerationASML.asml += " ) else ( ";
         e.e3.accept(this);
-        System.out.print(" ) ");
+        GenerationASML.asml += " ) ";
     }
 
     public void visit(Let e) {
-    	System.out.print("let ");
-        System.out.print(e.id);
-        System.out.print(" = ");
+    	GenerationASML.asml += "\tlet ";
+        GenerationASML.asml += e.id;
+        GenerationASML.asml += " = ";
         e.e1.accept(this);
-        System.out.print(" in ");
+        GenerationASML.asml += " in ";
         e.e2.accept(this);
-        System.out.println("");
+        GenerationASML.asml += "\n";
     }
 
     public void visit(Var e){
-        System.out.print(e.id);
+        GenerationASML.asml += e.id;
     }
 
 
@@ -113,9 +114,9 @@ public class GenerationASML implements Visitor {
             return;
         }
         Iterator<E> it = l.iterator();
-        System.out.print(it.next());
+        GenerationASML.asml += it.next();
         while (it.hasNext()) {
-            System.out.print(op + it.next());
+            GenerationASML.asml += op + it.next();
         }
     }
 
@@ -127,7 +128,7 @@ public class GenerationASML implements Visitor {
         Iterator<Exp> it = l.iterator();
         it.next().accept(this);
         while (it.hasNext()) {
-            System.out.print(op);
+            GenerationASML.asml += op;
             it.next().accept(this);
         }
     }
@@ -137,9 +138,9 @@ public class GenerationASML implements Visitor {
     }
 
     public void visit(App e){
-        System.out.print("call _min_caml_");
+        GenerationASML.asml += "\t call _min_caml_";
         e.e.accept(this);
-        System.out.print(" ");
+        GenerationASML.asml += " ";
         printInfix2(e.es, " ");
     }
 
