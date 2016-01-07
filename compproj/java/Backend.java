@@ -1,11 +1,13 @@
 
 
 import java.io.*;
+import java.util.Hashtable;
 import java.util.LinkedList;
 
 public class Backend {
 	String pathFolder;
 	String nameFolder;
+	Hashtable<String,String> variables = new Hashtable<String,String>();
 	
 	public Backend (String path) { 
 
@@ -42,7 +44,8 @@ public class Backend {
 			buffer.close(); 
 			
 			int numLigne = 0;
-			int numReg=3;
+
+			int nbRegVar=3;
 			for (String[] l : strMinCaml){
 				// vérification 1ère ligne
 				if (numLigne == 0) {
@@ -52,28 +55,42 @@ public class Backend {
 					retour = String.format("%s\t%s\n%s\n", retour, ".global _start", "_start:");
 				} else {
 					String toWrite="";
-					// cas print_new_line
 					switch (l[0]) {
-						case "call":
-							if (l[1].substring(0, 9).equals("_min_caml")) {
-								toWrite = l[1].substring(1);
-								if (toWrite.equals("min_caml_print_newline()")){
+						case "call":	
+							if (l[1].length() >=9 ) {
+								if (l[1].substring(0, 9).equals("_min_caml")) {
 									int lenght = l[1].length();
-									if (l[1].substring(lenght-2, lenght).equals("()")) {
-										toWrite = toWrite.substring(0, lenght-3);
+									if(l[1].substring(9, 19).equals("_print_int")){
+										String var = l[2];
+										String registre = variables.get(var);
+										toWrite = "\tmov\t"+"r0"+","+registre+"\n";
 									}
-								}
+
+									toWrite += "\tbl\t" +l[1].substring(1);
+									
+									lenght = l[1].length();
+									if (l[1].substring(lenght-2, lenght).equals("()")) {
+										toWrite = toWrite.substring(0, toWrite.length()-2);
+									}
+									
+									
+								} 
 							}
-							retour = String.format("%s\tbl\t%s\n", retour, toWrite );
+							retour = String.format("%s%s\n", retour, toWrite );
+							toWrite = "";
 							break;
+						 case "let":
+							String Var = l[1];
+							nbRegVar++;
+							String num = l[3];
+							String registre = String.format("r%d", nbRegVar);
+							this.variables.put(Var, registre);
 							
-						case "let":
-							toWrite=l[3];
-							numReg++;
-							String registre = String.format("r%d", numReg);
-							retour = String.format("%s\tmov\t%s,#%s\n", retour, registre, toWrite);
+							toWrite = "mov\tr"+nbRegVar+",#"+num;
+						
+							retour = String.format("%s\t%s\n", retour, toWrite );
+							toWrite = "";
 							break;
-							
 						default:
 					}
 					
@@ -92,5 +109,14 @@ public class Backend {
 		catch (Exception e){
 			System.out.println(e.toString());
 		}
+	}
+	
+	private void Affiche(String[] l){
+		System.out.print(l.length);
+		for (int i =0; i<l.length; i++) {
+			System.out.print(l[i]);
+			
+		}
+		System.out.print("\n");
 	}
 }
