@@ -20,9 +20,15 @@ public class Main {
       expression.accept(new PrintVisitor());
       System.out.println();
       
+      System.out.println("------ Front End ------");
+      FrontEnd f = new FrontEnd(expression);
+      System.out.println();
+      
       System.out.println("------ ASML ------");
       expression.accept(new GenerationASML());
       System.out.println();
+      
+
       
       String pathAsml = pathFolder+nameFolder+".asml";
       
