@@ -337,6 +337,7 @@ public class GenerationASML implements ObjVisitor<String> {
       return GenerationASML.asml;
     }
 
+
     public String visit(App e){
     	if(!def){
     		GenerationASML.asml += "\t call _min_caml_";
