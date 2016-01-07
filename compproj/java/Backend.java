@@ -42,6 +42,7 @@ public class Backend {
 			buffer.close(); 
 			
 			int numLigne = 0;
+			int numReg=3;
 			for (String[] l : strMinCaml){
 				// vérification 1ère ligne
 				if (numLigne == 0) {
@@ -50,18 +51,29 @@ public class Backend {
 					assert(l[2] == "=");
 					retour = String.format("%s\t%s\n%s\n", retour, ".global _start", "_start:");
 				} else {
+					String toWrite="";
 					// cas print_new_line
 					switch (l[0]) {
 						case "call":
-							String toWrite="";
 							if (l[1].substring(0, 9).equals("_min_caml")) {
 								toWrite = l[1].substring(1);
-								int lenght = l[1].length();
-								if (l[1].substring(lenght-2, lenght).equals("()")) {
-									toWrite = toWrite.substring(0, lenght-3);
+								if (toWrite.equals("min_caml_print_newline()")){
+									int lenght = l[1].length();
+									if (l[1].substring(lenght-2, lenght).equals("()")) {
+										toWrite = toWrite.substring(0, lenght-3);
+									}
 								}
-							} 
+							}
 							retour = String.format("%s\tbl\t%s\n", retour, toWrite );
+							break;
+							
+						case "let":
+							toWrite=l[3];
+							numReg++;
+							String registre = String.format("r%d", numReg);
+							retour = String.format("%s\tmov\t%s,#%s\n", retour, registre, toWrite);
+							break;
+							
 						default:
 					}
 					
@@ -72,10 +84,10 @@ public class Backend {
 			}
 			retour = String.format("%s\t%s\n", retour, "bl\tmin_caml_exit");
 			
-			PrintWriter w = new PrintWriter( new BufferedWriter( new FileWriter(this.pathFolder+this.nameFolder+".s")));
+			/*PrintWriter w = new PrintWriter( new BufferedWriter( new FileWriter(this.pathFolder+this.nameFolder+".s")));
 			w.print(retour);
-			w.close();
-			
+			w.close();*/
+			System.out.println(retour);
 		}		
 		catch (Exception e){
 			System.out.println(e.toString());
