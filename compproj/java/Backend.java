@@ -56,7 +56,7 @@ public class Backend {
 				} else {
 					String toWrite="";
 					switch (l[0]) {
-						case "call":	
+						case "call":
 							if (l[1].length() >=9 ) {
 								if (l[1].substring(0, 9).equals("_min_caml")) {
 									int lenght = l[1].length();
@@ -68,28 +68,45 @@ public class Backend {
 
 									toWrite += "\tbl\t" +l[1].substring(1);
 									
+									//cas du print_newline
 									lenght = l[1].length();
 									if (l[1].substring(lenght-2, lenght).equals("()")) {
 										toWrite = toWrite.substring(0, toWrite.length()-2);
 									}
-									
-									
 								} 
-							}
 							retour = String.format("%s%s\n", retour, toWrite );
 							toWrite = "";
+							}
 							break;
-						 case "let":
-							String Var = l[1];
-							nbRegVar++;
-							String num = l[3];
-							String registre = String.format("r%d", nbRegVar);
-							this.variables.put(Var, registre);
 							
-							toWrite = "mov\tr"+nbRegVar+",#"+num;
-						
-							retour = String.format("%s\t%s\n", retour, toWrite );
-							toWrite = "";
+						 case "let":
+							 if(l[3].equals("call")){
+								 if (l[4].length() >=9 ) {
+										if (l[4].substring(0, 9).equals("_min_caml")) {
+											int lenght = l[4].length();
+											if(l[4].substring(9, 19).equals("_print_int")){
+												String var = l[5];
+												String registre = variables.get(var);
+												toWrite = "\tmov\t"+"r0"+","+registre+"\n";
+											}
+											toWrite += "\tbl\t" +l[4].substring(1);
+										}
+								 }
+								 retour = String.format("%s%s\n", retour, toWrite );
+								 toWrite = "";
+							 }
+							 else{
+								String Var = l[1];
+								nbRegVar++;
+								String num = l[3];
+								String registre = String.format("r%d", nbRegVar);
+								this.variables.put(Var, registre);
+								
+								toWrite = "mov\tr"+nbRegVar+",#"+num;
+							
+								retour = String.format("%s\t%s\n", retour, toWrite );
+								toWrite = "";
+							 }
 							break;
 						default:
 					}
@@ -101,15 +118,16 @@ public class Backend {
 			}
 			retour = String.format("%s\t%s\n", retour, "bl\tmin_caml_exit");
 			
-			/*PrintWriter w = new PrintWriter( new BufferedWriter( new FileWriter(this.pathFolder+this.nameFolder+".s")));
+			PrintWriter w = new PrintWriter( new BufferedWriter( new FileWriter(this.pathFolder+this.nameFolder+".s")));
 			w.print(retour);
-			w.close();*/
+			w.close();
 			System.out.println(retour);
 		}		
 		catch (Exception e){
 			System.out.println(e.toString());
 		}
 	}
+	
 	
 	private void Affiche(String[] l){
 		System.out.print(l.length);
