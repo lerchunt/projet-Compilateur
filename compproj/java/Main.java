@@ -30,7 +30,7 @@ public class Main {
 		w.print(GenerationASML.asml);
 		w.close();
 
-		new Backend(pathAsml);
+		new Backend(pathAsml).startBackEnd();
 		
       System.out.println("------ Height of the AST ----");
       int height = Height.computeHeight(expression);
