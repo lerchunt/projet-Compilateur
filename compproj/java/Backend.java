@@ -44,8 +44,9 @@ public class Backend {
 			buffer.close(); 
 			
 			int numLigne = 0;
-			int nbRegVar=3;
+			int nbRegVar=4;
 			for (String[] l : strMinCaml){
+				int longueur = l[1].length();
 				// vérification 1ère ligne
 				if (numLigne == 0) {
 					assert(l[0] == "let");
@@ -55,41 +56,30 @@ public class Backend {
 				} else {
 					String toWrite="";
 					switch (l[0]) {
-						case "call":	
-							if (l[1].length() >=9 ) {
-								if (l[1].substring(0, 9).equals("_min_caml")) {
-									int lenght = l[1].length();
-									if(l[1].substring(9, 19).equals("_print_int")){
-										String var = l[2];
-										String registre = variables.get(var);
-										toWrite = "\tmov\t"+"r0"+","+registre+"\n";
-									}
-
-									toWrite += "\tbl\t" +l[1].substring(1);
-									
-									lenght = l[1].length();
-									if (l[1].substring(lenght-2, lenght).equals("()")) {
-										toWrite = toWrite.substring(0, toWrite.length()-2);
-									}
-									
-									
-								} 
-							}
+						case "call":
+							
+							toWrite = print_ligne(1,l[1].substring(9, longueur),l);
 							retour = String.format("%s%s\n", retour, toWrite );
 							toWrite = "";
 							break;
-						 case "let":
-							String Var = l[1];
-							nbRegVar++;
-							String num = l[3];
-							String registre = String.format("r%d", nbRegVar);
-							this.variables.put(Var, registre);
 							
-							toWrite = "mov\tr"+nbRegVar+",#"+num;
-						
-							retour = String.format("%s\t%s\n", retour, toWrite );
-							toWrite = "";
+						 case "let":
+							 if (l[3].equals("call")){
+								toWrite = print_ligne(4,l[4].substring(9, 19),l);
+								retour = String.format("%s%s\n", retour, toWrite );
+								toWrite = "";
+							 } else {
+								affectRegistre(l[1],l[3],nbRegVar);
+								toWrite = "mov\tr"+nbRegVar+",#"+l[3];
+								retour = String.format("%s\t%s\n", retour, toWrite );
+								toWrite = "";
+								
+								nbRegVar++;
+							 }
+								
+								
 							break;
+							
 						default:
 					}
 					
@@ -100,10 +90,12 @@ public class Backend {
 			}
 			retour = String.format("%s\t%s\n", retour, "bl\tmin_caml_exit");
 			
+			System.out.println(retour);
+			/*
 			PrintWriter w = new PrintWriter( new BufferedWriter( new FileWriter(this.pathFolder+this.nameFolder+".s")));
 			w.print(retour);
 			w.close();
-			
+			*/
 		}		
 		catch (Exception e){
 			System.out.println(e.toString());
@@ -118,4 +110,35 @@ public class Backend {
 		}
 		System.out.print("\n");
 	}
+
+	
+	private void affectRegistre(String Var, String num,int nb){
+		String registre = String.format("r%d", nb);
+		this.variables.put(Var, registre);
+	}
+	
+	
+	private String print_ligne(int col, String methode, String[] l){
+		String toWrite="";
+		if (l[col].length() >=9 ) {
+			if (l[col].substring(0, 9).equals("_min_caml")) {
+				int lenght = l[col].length();
+				if(l[col].substring(9, l[col].length()).equals(methode)){
+					String var = l[col+1];
+					
+					String registre = variables.get(var);
+					toWrite = "\tmov\t"+"r0"+","+registre+"\n";
+				}
+
+				toWrite += "\tbl\t" +l[col].substring(1);
+				
+				lenght = l[col].length();
+				if (l[col].substring(lenght-2, lenght).equals("()")) {
+					toWrite = toWrite.substring(0, toWrite.length()-2);
+				}
+			} 		
+		}
+		return toWrite;
+	}
+	
 }
