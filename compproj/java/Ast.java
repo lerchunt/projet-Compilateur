@@ -9,6 +9,16 @@ abstract class Exp {
     {
     	return false ;
     }
+
+    public boolean isAdd()
+    {
+    	return false ;
+    }
+    
+    public boolean isLet()
+    {
+    	return false ;
+    }
     
 }
 
@@ -112,6 +122,12 @@ class Add extends Exp {
     Add(Exp e1, Exp e2) {
         this.e1 = e1;
         this.e2 = e2;
+    }
+    
+    @Override
+    public boolean isAdd()
+    {
+    	return true ;
     }
 
     <E> E accept(ObjVisitor<E> v) {
@@ -305,6 +321,12 @@ class Let extends Exp {
         this.e2 = e2;
     }
 
+    @Override
+    public boolean isLet()
+    {
+    	return true ;
+    }
+    
     <E> E accept(ObjVisitor<E> v) {
         return v.visit(this);
     }
