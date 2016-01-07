@@ -44,6 +44,7 @@ public class Backend {
 			buffer.close(); 
 			
 			int numLigne = 0;
+
 			int nbRegVar=3;
 			for (String[] l : strMinCaml){
 				// vérification 1ère ligne
@@ -100,10 +101,10 @@ public class Backend {
 			}
 			retour = String.format("%s\t%s\n", retour, "bl\tmin_caml_exit");
 			
-			PrintWriter w = new PrintWriter( new BufferedWriter( new FileWriter(this.pathFolder+this.nameFolder+".s")));
+			/*PrintWriter w = new PrintWriter( new BufferedWriter( new FileWriter(this.pathFolder+this.nameFolder+".s")));
 			w.print(retour);
-			w.close();
-			
+			w.close();*/
+			System.out.println(retour);
 		}		
 		catch (Exception e){
 			System.out.println(e.toString());
