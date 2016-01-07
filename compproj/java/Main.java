@@ -53,6 +53,7 @@ public class Main {
 		String[] tabPath = argv[argv.length-1].split("/");
 		String nameFolder = tabPath[tabPath.length -1];
 		int tailleName = nameFolder.length();
+
 		InName = nameFolder.split("\\.")[0];
 		if (OutName == ""){
 			OutName=InName;
