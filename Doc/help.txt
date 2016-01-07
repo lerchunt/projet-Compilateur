@@ -1,0 +1,13 @@
+run :
+	// instruction to run
+	java -cp java-cup-11b-runtime.jar:.  Main /home/apollinaire/Bureau/ProjetCompile/high5/compproj/minml/print_newline.ml
+
+
+options : 
+	-o <File> : to give have the out put in File.s
+		( give an other name of the input file. )
+	-h : to print help
+	-v : the version ( 1 = 1er rendu
+			   2 = 2eme rendu )
+	-t : to stop after the type checking
+	-asml : to print the asml file.

@@ -1,5 +1,4 @@
 
-
 import java.io.*;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -31,7 +30,7 @@ public class Backend {
 			String ligne;
 			while ((ligne=buffer.readLine())!=null){
 				ligne = ligne.trim();
-				String[] tmp = ligne.split(" ", '\t');
+				String[] tmp = ligne.split(" ");
 				strMinCaml.add(tmp);
 				
 				// debug
@@ -40,8 +39,7 @@ public class Backend {
 			buffer.close(); 
 			
 			String retour = convert(strMinCaml);
-
-			PrintWriter w = new PrintWriter( new BufferedWriter( new FileWriter(this.pathFolder+this.nameFolder+".s")));
+			PrintWriter w = new PrintWriter( new BufferedWriter( new FileWriter(Main.Path+Main.OutName+".s")));
 			w.print(retour);
 			w.close();
 			//System.out.println(retour);
