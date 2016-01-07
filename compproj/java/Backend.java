@@ -61,7 +61,7 @@ public class Backend {
 							toWrite = print_ligne(1,l[1].substring(9, longueur),l);
 							retour = String.format("%s%s\n", retour, toWrite );
 							toWrite = "";
-							}
+							
 							break;
 							
 						 case "let":
@@ -69,7 +69,11 @@ public class Backend {
 								toWrite = print_ligne(4,l[4].substring(9, 19),l);
 								retour = String.format("%s%s\n", retour, toWrite );
 								toWrite = "";
-							 } else {
+							 } 
+							 else if(l[3].equals("add") || l[3].equals("sub") || l[3].equals("mul")){
+								 
+							 }
+							 else {
 								affectRegistre(l[1],l[3],nbRegVar);
 								toWrite = "mov\tr"+nbRegVar+",#"+l[3];
 								retour = String.format("%s\t%s\n", retour, toWrite );
@@ -113,6 +117,12 @@ public class Backend {
 	private void affectRegistre(String Var, String num,int nb){
 		String registre = String.format("r%d", nb);
 		this.variables.put(Var, registre);
+	}
+	
+	private String opArithm(String operateur, String r1, String r2){
+		String toWrite="";
+		toWrite = String.format("\t%s\tr0,%s,%s\n",operateur, r1, r2);
+		return toWrite;
 	}
 	
 	
