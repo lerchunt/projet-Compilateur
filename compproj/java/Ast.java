@@ -5,6 +5,11 @@ abstract class Exp {
 
     abstract <E> E accept(ObjVisitor<E> v);
     
+    public boolean isFloat()
+    {
+    	return false ;
+    }
+    
 }
 
 class Unit extends Exp {
@@ -54,6 +59,12 @@ class Float extends Exp {
 
     Float(float f) {
         this.f = f;
+    }
+    
+    @Override
+    public boolean isFloat()
+    {
+    	return true ;
     }
 
     <E> E accept(ObjVisitor<E> v) {

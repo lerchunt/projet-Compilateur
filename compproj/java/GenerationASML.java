@@ -2,7 +2,6 @@ import java.util.*;
 
 public class GenerationASML implements Visitor {
 	static String asml;
-	
 	public GenerationASML()
 	{
 		GenerationASML.asml = "let _ = \n";
@@ -20,7 +19,9 @@ public class GenerationASML implements Visitor {
     }
 
     public void visit(Float e) {
-    	/* definition des float au debut du programme*/
+    	String s = String.format("%.2f", e.f);
+    	s=s.replace(',','.');
+    	GenerationASML.asml += s ;
     }
 
     public void visit(Not e) {
@@ -52,23 +53,38 @@ public class GenerationASML implements Visitor {
     }
 
     public void visit(FAdd e){
-        
+    	GenerationASML.asml += " fadd ";
+		e.e1.accept(this);
+		GenerationASML.asml += " ";
+		e.e2.accept(this);      
     }
 
     public void visit(FSub e){
-        
+    	GenerationASML.asml += " fsub ";
+		e.e1.accept(this);
+		GenerationASML.asml += " ";
+		e.e2.accept(this); 
     }
 
     public void visit(FMul e) {
-        
+    	GenerationASML.asml += " fmul ";
+		e.e1.accept(this);
+		GenerationASML.asml += " ";
+		e.e2.accept(this);
     }
     
     public void visit(Mul e) {
-        
+    	GenerationASML.asml += " mul ";
+		e.e1.accept(this);
+		GenerationASML.asml += " ";
+		e.e2.accept(this);
     }
 
     public void visit(FDiv e){
-        
+    	GenerationASML.asml += " fdiv ";
+		e.e1.accept(this);
+		GenerationASML.asml += " ";
+		e.e2.accept(this);
     }
 
     public void visit(Eq e){
@@ -94,14 +110,31 @@ public class GenerationASML implements Visitor {
     }
 
     public void visit(Let e) {
-    	GenerationASML.asml += "\tlet ";
-        GenerationASML.asml += e.id;
-        GenerationASML.asml += " = ";
-        e.e1.accept(this);
-        GenerationASML.asml += " in ";
-        e.e2.accept(this);
-        GenerationASML.asml += "\n";
+    	String haut ="";
+        if((e.e1).isFloat())
+        {
+        	haut = "let _" +e.id;
+        	String s = String.format("%.2f",((Float)e.e1).f);
+        	s=s.replace(',','.');
+            haut += " = " + s + "\n";
+            GenerationASML.asml = haut + GenerationASML.asml ;
+            GenerationASML.asml += "\tlet ";
+        	GenerationASML.asml += e.id;
+            GenerationASML.asml += " = _" + e.id;
+            GenerationASML.asml += " in ";
+            e.e2.accept(this);
+            GenerationASML.asml += "\n";
+        } else {
+        	GenerationASML.asml += "\tlet ";
+        	GenerationASML.asml += e.id;
+            GenerationASML.asml += " = ";
+            e.e1.accept(this);
+            GenerationASML.asml += " in ";
+            e.e2.accept(this);
+            GenerationASML.asml += "\n";
+        } 
     }
+        
 
     public void visit(Var e){
         GenerationASML.asml += e.id;
@@ -109,15 +142,18 @@ public class GenerationASML implements Visitor {
 
 
     // print sequence of identifiers 
-    static <E> void printInfix(List<E> l, String op) {
+    static <E> String printInfix(List<E> l, String op) {
         if (l.isEmpty()) {
-            return;
+            return "";
         }
+        String t = "" ;
         Iterator<E> it = l.iterator();
-        GenerationASML.asml += it.next();
+        t += it.next();
         while (it.hasNext()) {
-            GenerationASML.asml += op + it.next();
+            t += op + it.next();
         }
+        return t ;
+        
     }
 
     // print sequence of Exp
@@ -134,7 +170,13 @@ public class GenerationASML implements Visitor {
     }
 
     public void visit(LetRec e){
-       
+      /*String haut = "let _" + e.fd.id + " = \n";
+      haut += printInfix(e.fd.args, " ");
+	  e.fd.e.accept(this);
+	  haut += " in ";
+	  e.e.accept(this);
+      GenerationASML.asml = haut + GenerationASML.asml;
+      System.out.print(haut);*/
     }
 
     public void visit(App e){
