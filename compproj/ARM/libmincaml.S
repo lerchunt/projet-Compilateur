@@ -129,9 +129,8 @@ stringofint:
 	.word	-214748364
 	.size	stringofint, .-stringofint
         .align	2
-
-
         .globl min_caml_print_int
+	
 min_caml_print_int:
 	stmfd	sp!, {lr}
 	bl	stringofint
@@ -139,3 +138,5 @@ min_caml_print_int:
 	ldmfd	sp!, {lr}
         bx	lr
         .size min_caml_print_int, .-min_caml_print_int
+
+

@@ -1,10 +1,14 @@
+import java.util.Hashtable;
+
 
 public class GenerationS implements ObjVisitor<String> {
 	static String asml;
+	static Hashtable<String,String> variables = new Hashtable<String,String>();
+	private int nbReg=4;
 	
 	public GenerationS()
 	{
-		GenerationS.asml = "\t.text\n\t.global _start\n_start:";
+		//GenerationS.asml = "\t.text\n\t.global _start\n_start:";
 	}
 	
 	@Override
@@ -14,7 +18,7 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Int e) {
-		return "";
+		return String.format("#%d\n", e.i);
 	}
 
 	@Override
@@ -113,9 +117,14 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Let e) {
-		e.e1.accept(this);
-		e.e2.accept(this);
-		return null;
+		/*System.out.println("pb let");
+		String retour="";
+		String var = String.format("%s", e.id);
+		affectRegistre(var, nbReg);
+		retour = "\tmov\tr"+nbReg+","+e.e1.accept(this);
+        nbReg++;*/
+        
+		return e.e1.accept(this);
 	}
 
 	@Override
@@ -131,8 +140,13 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(App e) {
-		GenerationS.asml += String.format("%s\nbl\tmin_caml_%s",GenerationS.asml,e.e.accept(this));
-		return GenerationS.asml;
+		String retour="";
+		for (Exp param : e.es) {
+			retour += String.format("\tmov\tr%d , %s", nbReg,param.accept(this));
+			retour += String.format("\tmov\tr0,r%d\n", nbReg);
+			nbReg++;
+		}
+		return String.format("%s\tbl\tmin_caml_%s",retour,e.e.accept(this));
 	}
 
 	@Override
@@ -175,5 +189,6 @@ public class GenerationS implements ObjVisitor<String> {
 		
 		return null;
 	}
+	
 
 }
