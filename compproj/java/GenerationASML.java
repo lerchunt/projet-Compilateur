@@ -116,7 +116,6 @@ public class GenerationASML implements ObjVisitor<String> {
     		txt += e.e2.accept(this);
     		return txt;
     	}
-
     }
 
     public String visit(FSub e){
@@ -253,7 +252,7 @@ public class GenerationASML implements ObjVisitor<String> {
                 e.e2.accept(this);
                 GenerationASML.asml += "\n";
             } else {
-            	GenerationASML.asml += "\t let ";
+            	GenerationASML.asml += "\n\t let ";
             	GenerationASML.asml += e.id;
                 GenerationASML.asml += " = ";
                 e.e1.accept(this);

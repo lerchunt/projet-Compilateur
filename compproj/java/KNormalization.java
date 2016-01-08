@@ -187,58 +187,72 @@ public class KNormalization implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Let e) {
-
-		/*e.e1.accept(new KNormalization());
-		e.e2.accept(new KNormalization());
-		// Vérifier si Add/sub/mul/Fmul/Fdiv
-		if(e.e1 instanceof Add || e.e1 instanceof Sub || e.e1 instanceof Mul || e.e1 instanceof FAdd || e.e1 instanceof FDiv || e.e1 instanceof FMul){
-			
-		}*/
         
 	      // on crée un nombre de variable = nb de valeurs hard codées dans l'op +1
 	      if (e.e1.isOpBin() && isNormalizable((OpBin) e.e1)) {
-	    	  int NbVarTemp = 3;
-	    	  if (((OpBin) e.e1).e1.isVar() || ((OpBin) e.e1).e2.isVar()) {
-	    		  NbVarTemp = 2;
-	    	  }
-	    	  LinkedList<Id> listId = new LinkedList<Id>();
-	    	  for (int i = 1; i<= NbVarTemp; i++) {
-	    		  listId.add(new Id(String.format("v%d", i)));
-	    	  }
 
-	    	  OpBin newOp = ((OpBin)e.e1);
-	    	  Exp Var1value = ((OpBin)e.e1).e1;
-	    	  Exp Var2value = ((OpBin)e.e1).e2;
-	    	  
-	    	  Exp VarOp = new Var(listId.getLast());
-	    	  Exp Var1 = Var1value;
-	    	  Exp Var2 = Var2value;
-	    	  if (!Var1value.isVar()) {
-	    		 Var1 = new Var(listId.getFirst());
-		    	  if (!Var2value.isVar()) {
-		    		  Var2 = new Var(listId.get(1));
+	    	  int nbVar = 1;
+	    	  OpBin newOp = (OpBin)((OpBin)e.e1).clone();
+	    	  while (e.e1.isOpBin()) {
+	    		  int NbVarTemp = 3;
+		    	  if (((OpBin) e.e1).e1.isVar() || ((OpBin) e.e1).e2.isVar()) {
+		    		  NbVarTemp = 2;
 		    	  }
-	    	  } else {
-	    		 Var2= new Var(listId.getFirst());
-	    	  }
-
-	    	  newOp.e1 = Var1;
-	    	  newOp.e2 = Var2;
-	    	  Exp newExp = new Let(listId.getLast(), e.t, newOp, VarOp);
-	    	  if (NbVarTemp == 3) {
-		    	  newExp = new Let(listId.get(1), e.t, Var2value, newExp);
-		    	  newExp = new Let(listId.getFirst(), e.t, Var1value, newExp);
-	    	  } else {
-	    		  if (Var1value.isVar()) {
-			    	  newExp = new Let(listId.getFirst(), e.t, Var2value, newExp);
-	    		  } else  {
-	    			  newExp = new Let(listId.getFirst(), e.t, Var1value, newExp);
+		    	  
+		    	  Exp parent = e;
+		    	  OpBin cour = (OpBin) e.e1;
+	    		  while (cour.e1.isOpBin()) {
+		    		  parent = cour;
+		    		  cour = (OpBin) cour.e1;
 	    		  }
+    			  newOp = (OpBin)cour.clone();
+    			  Exp Var1value = cour.e1;
+    	    	  Exp Var2value = cour.e2;
+    	    	  
+    	    	  Exp Var1 = Var1value;
+    	    	  Id Var1Id = new Id("default");
+    	    	  Exp Var2 = Var2value;
+    	    	  Id Var2Id = new Id("default");
+    	    	  
+    	    	  if (!Var1value.isVar()) {
+    	    		  Var1Id = new Id(String.format("v%d", nbVar));
+    	    		  Var1 = new Var(Var1Id);
+    	    		  nbVar++;
+    	    		  if (!Var2value.isVar()) {
+        	    		  Var2Id = new Id(String.format("v%d", nbVar));
+			    		  Var2 = new Var(Var2Id);
+		    	    	  nbVar++;
+			    	  }
+		    	  } else {
+    	    		  Var2Id = new Id(String.format("v%d", nbVar));
+		    		  Var2 = new Var(Var2Id);
+	    	    	  nbVar++;
+		    	  }
+    	    	  Id VarOpId = new Id(String.format("v%d", nbVar));
+    	    	  Exp VarOp = new Var(VarOpId);
+    	    	  nbVar++;
+
+    	    	  newOp.e1 = Var1;
+    	    	  newOp.e2 = Var2;
+    	    	  
+    	    	  Exp newExp = new Let(VarOpId, e.t, newOp, VarOp);
+    	    	  if (NbVarTemp == 3) {
+    		    	  newExp = new Let(Var2Id, e.t, Var2value, newExp);
+    		    	  newExp = new Let(Var1Id, e.t, Var1value, newExp);
+    	    	  } else {
+    	    		  if (Var1value.isVar()) {
+    			    	  newExp = new Let(Var2Id, e.t, Var2value, newExp);
+    	    		  } else  {
+    	    			  newExp = new Let(Var1Id, e.t, Var1value, newExp);
+    	    		  }
+    	    	  }
+    	    	  if (parent.isOpBin()) {
+    	    		  ((OpBin)parent).e1 = newExp;
+    	    	  } else {
+    	    		  ((Let)parent).e1 = newExp;
+    	    	  }
 	    	  }
-	    	  newExp = newExp.accept(this);
-	    	  return newExp;
 	      }
-	      
 			e.e1 = e.e1.accept(this);
 	        e.e2 = e.e2.accept(this);
 		return e;
