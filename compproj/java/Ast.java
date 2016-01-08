@@ -10,6 +10,14 @@ abstract class Exp {
     	return false ;
     }
 
+    public boolean isOpBin() {
+    	return false;
+    }
+
+    public boolean isOpUn() {
+    	return false;
+    }
+    
     public boolean isAdd()
     {
     	return false ;
@@ -20,6 +28,42 @@ abstract class Exp {
     	return false ;
     }
     
+}
+
+/**
+ * opération binaire
+ * @author apollinaire
+ *
+ */
+abstract class OpBin extends Exp {
+	Exp e1;
+    Exp e2;
+
+    OpBin(Exp e1, Exp e2) {
+        this.e1 = e1;
+        this.e2 = e2;
+    }
+    
+    @Override
+    public boolean isOpBin() {
+    	return true;
+    }
+}
+
+/**
+ * operation unaire
+ */
+abstract class OpUn extends Exp {
+	Exp e;
+
+    OpUn(Exp e) {
+        this.e = e;
+    }
+
+    @Override
+    public boolean isOpUn() {
+    	return true;
+    }
 }
 
 class Unit extends Exp {
@@ -33,7 +77,7 @@ class Unit extends Exp {
 }
 
 class Bool extends Exp {
-    final boolean b;
+    boolean b;
 
     Bool(boolean b) {
         this.b = b;
@@ -50,7 +94,7 @@ class Bool extends Exp {
     }
 
 class Int extends Exp {
-    final int i;
+    int i;
 
     Int(int i) {
         this.i = i;
@@ -85,11 +129,9 @@ class Float extends Exp {
     }
 }
 
-class Not extends Exp {
-    final Exp e;
-
+class Not extends OpUn {
     Not(Exp e) {
-        this.e = e;
+        super(e);
     }
 
     <E> E accept(ObjVisitor<E> v) {
@@ -100,11 +142,9 @@ class Not extends Exp {
     }
 }
 
-class Neg extends Exp {
-    final Exp e;
-
+class Neg extends OpUn {
     Neg(Exp e) {
-        this.e = e;
+        super(e);
     }
 
     <E> E accept(ObjVisitor<E> v) {
@@ -115,13 +155,10 @@ class Neg extends Exp {
     }
 }
 
-class Add extends Exp {
-    final Exp e1;
-    final Exp e2;
-
+class Add extends OpBin {
+	
     Add(Exp e1, Exp e2) {
-        this.e1 = e1;
-        this.e2 = e2;
+        super(e1,e2);
     }
     
     @Override
@@ -138,13 +175,12 @@ class Add extends Exp {
     }
 }
 
-class Sub extends Exp {
-    final Exp e1;
-    final Exp e2;
+class Sub extends OpBin {
+    Exp e1;
+    Exp e2;
 
     Sub(Exp e1, Exp e2) {
-        this.e1 = e1;
-        this.e2 = e2;
+        super(e1,e2);
     }
 
     <E> E accept(ObjVisitor<E> v) {
@@ -155,11 +191,11 @@ class Sub extends Exp {
     }
 }
 
-class FNeg extends Exp {
-    final Exp e;
+class FNeg extends OpUn {
+    Exp e;
 
     FNeg(Exp e) {
-        this.e = e;
+        super(e);
     }
 
     <E> E accept(ObjVisitor<E> v) {
@@ -170,13 +206,12 @@ class FNeg extends Exp {
     }
 }
 
-class FAdd extends Exp {
-    final Exp e1;
-    final Exp e2;
+class FAdd extends OpBin {
+    Exp e1;
+    Exp e2;
 
     FAdd(Exp e1, Exp e2) {
-        this.e1 = e1;
-        this.e2 = e2;
+        super(e1,e2);
     }
 
     <E> E accept(ObjVisitor<E> v) {
@@ -187,13 +222,12 @@ class FAdd extends Exp {
     }
 }
 
-class FSub extends Exp {
-    final Exp e1;
-    final Exp e2;
+class FSub extends OpBin {
+    Exp e1;
+    Exp e2;
 
     FSub(Exp e1, Exp e2) {
-        this.e1 = e1;
-        this.e2 = e2;
+        super(e1,e2);
     }
 
     <E> E accept(ObjVisitor<E> v) {
@@ -204,13 +238,12 @@ class FSub extends Exp {
     }
 }
 
-class FMul extends Exp {
-    final Exp e1;
-    final Exp e2;
+class FMul extends OpBin {
+    Exp e1;
+    Exp e2;
 
     FMul(Exp e1, Exp e2) {
-        this.e1 = e1;
-        this.e2 = e2;
+        super(e1,e2);
     }
 
     <E> E accept(ObjVisitor<E> v) {
@@ -221,13 +254,12 @@ class FMul extends Exp {
     }
 }
 
-class Mul extends Exp {
-    final Exp e1;
-    final Exp e2;
+class Mul extends OpBin {
+    Exp e1;
+    Exp e2;
 
     Mul(Exp e1, Exp e2) {
-        this.e1 = e1;
-        this.e2 = e2;
+    	super(e1,e2);
     }
 
     <E> E accept(ObjVisitor<E> v) {
@@ -238,13 +270,12 @@ class Mul extends Exp {
     }
 }
 
-class FDiv extends Exp {
-    final Exp e1;
-    final Exp e2;
+class FDiv extends OpBin {
+    Exp e1;
+    Exp e2;
 
     FDiv(Exp e1, Exp e2) {
-        this.e1 = e1;
-        this.e2 = e2;
+    	super(e1,e2);
     }
 
     <E> E accept(ObjVisitor<E> v) {
@@ -255,13 +286,12 @@ class FDiv extends Exp {
     }
 }
 
-class Eq extends Exp { 
-    final Exp e1;
-    final Exp e2;
+class Eq extends OpBin { 
+    Exp e1;
+    Exp e2;
 
     Eq(Exp e1, Exp e2) {
-        this.e1 = e1;
-        this.e2 = e2;
+    	super(e1,e2);
     }
 
     <E> E accept(ObjVisitor<E> v) {
@@ -272,13 +302,12 @@ class Eq extends Exp {
     }
 }
 
-class LE extends Exp { 
-    final Exp e1;
-    final Exp e2;
+class LE extends OpBin { 
+    Exp e1;
+    Exp e2;
 
     LE(Exp e1, Exp e2) {
-        this.e1 = e1;
-        this.e2 = e2;
+    	super(e1,e2);
     }
 
     <E> E accept(ObjVisitor<E> v) {
@@ -290,9 +319,9 @@ class LE extends Exp {
 }
 
 class If extends Exp {
-    final Exp e1;
-    final Exp e2;
-    final Exp e3;
+    Exp e1;
+    Exp e2;
+    Exp e3;
 
     If(Exp e1, Exp e2, Exp e3) {
         this.e1 = e1;
@@ -309,10 +338,10 @@ class If extends Exp {
 }
 
 class Let extends Exp {
-    final Id id;
-    final Type t;
-    final Exp e1;
-    final Exp e2;
+    Id id;
+    Type t;
+    Exp e1;
+    Exp e2;	
 
     Let(Id id, Type t, Exp e1, Exp e2) {
         this.id = id;
@@ -336,7 +365,7 @@ class Let extends Exp {
 }
 
 class Var extends Exp {
-    final Id id;
+    Id id;
 
     Var(Id id) {
         this.id = id;
@@ -351,8 +380,8 @@ class Var extends Exp {
 }
 
 class LetRec extends Exp {
-    final FunDef fd;
-    final Exp e;
+    FunDef fd;
+    Exp e;
 
     LetRec(FunDef fd, Exp e) {
         this.fd = fd;
@@ -368,8 +397,8 @@ class LetRec extends Exp {
 }
 
 class App extends Exp {
-    final Exp e;
-    final List<Exp> es;
+    Exp e;
+    List<Exp> es;
 
     App(Exp e, List<Exp> es) {
         this.e = e;
@@ -385,7 +414,7 @@ class App extends Exp {
 }
 
 class Tuple extends Exp {
-    final List<Exp> es;
+    List<Exp> es;
 
     Tuple(List<Exp> es) {
         this.es = es;
@@ -401,10 +430,10 @@ class Tuple extends Exp {
 }
 
 class LetTuple extends Exp {
-    final List<Id> ids;
-    final List<Type> ts;
-    final Exp e1;
-    final Exp e2;
+    List<Id> ids;
+    List<Type> ts;
+    Exp e1;
+    Exp e2;
 
     LetTuple(List<Id> ids, List<Type> ts, Exp e1, Exp e2) {
         this.ids = ids;
@@ -422,8 +451,8 @@ class LetTuple extends Exp {
 }
 
 class Array extends Exp {
-    final Exp e1;
-    final Exp e2;
+    Exp e1;
+    Exp e2;
 
     Array(Exp e1, Exp e2) {
         this.e1 = e1;
@@ -439,8 +468,8 @@ class Array extends Exp {
 }
 
 class Get extends Exp {
-    final Exp e1;
-    final Exp e2;
+    Exp e1;
+    Exp e2;
 
     Get(Exp e1, Exp e2) {
         this.e1 = e1;
@@ -457,9 +486,9 @@ class Get extends Exp {
 }
 
 class Put extends Exp {
-    final Exp e1;
-    final Exp e2;
-    final Exp e3;
+    Exp e1;
+    Exp e2;
+    Exp e3;
 
     Put(Exp e1, Exp e2, Exp e3) {
         this.e1 = e1;
@@ -477,10 +506,10 @@ class Put extends Exp {
 }
 
 class FunDef {
-    final Id id;
-    final Type type;
-    final List<Id> args;
-    final Exp e;
+    Id id;
+    Type type;
+    List<Id> args;
+    Exp e;
 
     FunDef(Id id, Type t, List<Id> args, Exp e) {
         this.id = id;

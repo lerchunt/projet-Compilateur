@@ -253,7 +253,7 @@ public class GenerationASML implements ObjVisitor<String> {
                 e.e2.accept(this);
                 GenerationASML.asml += "\n";
             } else {
-            	GenerationASML.asml += "\tlet ";
+            	GenerationASML.asml += "\n\tlet ";
             	GenerationASML.asml += e.id;
                 GenerationASML.asml += " = ";
                 e.e1.accept(this);

@@ -72,6 +72,7 @@ public class Main {
 	      // Type Checking
 	      if (!stopAfterTypeChecking) {
 		      System.out.println("------ ASML ------");
+		      expression.accept(new KNormalization());
 		      expression.accept(new GenerationASML());
 		      System.out.println();
 		      
