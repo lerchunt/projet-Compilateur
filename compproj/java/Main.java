@@ -89,7 +89,7 @@ public class Main {
 				
 				new Backend(pathAsml);
 				// supprimer le fichier asml créé.
-				new File(pathAsml).delete();
+				//new File(pathAsml).delete();
 	      }
 	      System.out.println("------ Height of the AST ----");
 	      int height = Height.computeHeight(expression);

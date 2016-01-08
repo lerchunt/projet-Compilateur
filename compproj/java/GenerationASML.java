@@ -253,7 +253,7 @@ public class GenerationASML implements ObjVisitor<String> {
                 e.e2.accept(this);
                 GenerationASML.asml += "\n";
             } else {
-            	GenerationASML.asml += "\n\tlet ";
+            	GenerationASML.asml += "\t let ";
             	GenerationASML.asml += e.id;
                 GenerationASML.asml += " = ";
                 e.e1.accept(this);
@@ -333,9 +333,7 @@ public class GenerationASML implements ObjVisitor<String> {
 	  haut += e.fd.e.accept(this);
 	  haut += e.e.accept(this);
 	  def = false ;
-	  haut += "\n";
       GenerationASML.asml = haut + GenerationASML.asml;
-      System.out.print(GenerationASML.asml);
       return GenerationASML.asml;
     }
 

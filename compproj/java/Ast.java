@@ -17,17 +17,6 @@ abstract class Exp {
     public boolean isOpUn() {
     	return false;
     }
-    
-    public boolean isAdd()
-    {
-    	return false ;
-    }
-    
-    public boolean isLet()
-    {
-    	return false ;
-    }
-    
 }
 
 /**
@@ -159,12 +148,6 @@ class Add extends OpBin {
 	
     Add(Exp e1, Exp e2) {
         super(e1,e2);
-    }
-    
-    @Override
-    public boolean isAdd()
-    {
-    	return true ;
     }
 
     <E> E accept(ObjVisitor<E> v) {
@@ -348,12 +331,6 @@ class Let extends Exp {
         this.t = t;
         this.e1 = e1;
         this.e2 = e2;
-    }
-
-    @Override
-    public boolean isLet()
-    {
-    	return true ;
     }
     
     <E> E accept(ObjVisitor<E> v) {
