@@ -14,7 +14,7 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Int e) {
-		return null;
+		return "";
 	}
 
 	@Override
