@@ -109,15 +109,15 @@ class Bool extends Exp {
     }
     
     @Override
-    public boolean isVIFB()
+    public boolean isBool()
     {
     	return true ;
     }
     
     @Override
-    public boolean isBool()
+    public String toString()
     {
-    	return true ;
+    	return Boolean.toString(b);
     }
     
     <E> E accept(ObjVisitor<E> v) {
@@ -138,15 +138,15 @@ class Int extends Exp {
     }
     
     @Override
-    public boolean isVIFB()
+    public boolean isInt()
     {
     	return true ;
     }
     
     @Override
-    public boolean isInt()
+    public String toString()
     {
-    	return true ;
+    	return Integer.toString(i);
     }
 
     <E> E accept(ObjVisitor<E> v) {
@@ -171,11 +171,12 @@ class Float extends Exp {
     }
     
     @Override
-    public boolean isVIFB()
+    public String toString()
     {
-    	return true ;
+    	return String.valueOf(f);
     }
-
+    
+    
     <E> E accept(ObjVisitor<E> v) {
         return v.visit(this);
     }
@@ -380,6 +381,12 @@ class Let extends Exp {
         this.t = t;
         this.e1 = e1;
         this.e2 = e2;
+    }
+    
+    @Override
+    public boolean isVIFB()
+    {
+    	return true ;
     }
     
     <E> E accept(ObjVisitor<E> v) {
