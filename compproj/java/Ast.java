@@ -9,6 +9,11 @@ abstract class Exp {
     {
     	return false ;
     }
+    
+    public boolean isVar()
+    {
+    	return false ;
+    }
 
     public boolean isOpBin() {
     	return false;
@@ -353,6 +358,12 @@ class Var extends Exp {
     }
     void accept(Visitor v) {
         v.visit(this);
+    }
+    
+    @Override
+    public boolean isVar()
+    {
+    	return true ;
     }
 }
 

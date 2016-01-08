@@ -194,32 +194,62 @@ public class KNormalization implements ObjVisitor<Exp> {
 		if(e.e1 instanceof Add || e.e1 instanceof Sub || e.e1 instanceof Mul || e.e1 instanceof FAdd || e.e1 instanceof FDiv || e.e1 instanceof FMul){
 			
 		}*/
-		e.e1 = e.e1.accept(this);
-        e.e2 = e.e2.accept(this);
         
-	      // on crée un nombre de variable = height + 2 
-	      if (e.e1.isOpBin()) {
+	      // on crée un nombre de variable = nb de valeurs hard codées dans l'op +1
+	      if (e.e1.isOpBin() && isNormalizable((OpBin) e.e1)) {
+	    	  int NbVarTemp = 3;
+	    	  if (((OpBin) e.e1).e1.isVar() || ((OpBin) e.e1).e2.isVar()) {
+	    		  NbVarTemp = 2;
+	    	  }
 	    	  LinkedList<Id> listId = new LinkedList<Id>();
-	    	  for (int i = 1; i<= 3; i++) {
+	    	  for (int i = 1; i<= NbVarTemp; i++) {
 	    		  listId.add(new Id(String.format("v%d", i)));
 	    	  }
-	    	  Exp VarOp = new Var(listId.getLast());
-	    	  Exp Var1 = new Var(listId.getFirst());
-	    	  Exp Var2 = new Var(listId.get(1));
+
 	    	  OpBin newOp = ((OpBin)e.e1);
 	    	  Exp Var1value = ((OpBin)e.e1).e1;
 	    	  Exp Var2value = ((OpBin)e.e1).e2;
 	    	  
+	    	  Exp VarOp = new Var(listId.getLast());
+	    	  Exp Var1 = Var1value;
+	    	  Exp Var2 = Var2value;
+	    	  if (!Var1value.isVar()) {
+	    		 Var1 = new Var(listId.getFirst());
+		    	  if (!Var2value.isVar()) {
+		    		  Var2 = new Var(listId.get(1));
+		    	  }
+	    	  } else {
+	    		 Var2= new Var(listId.getFirst());
+	    	  }
+
 	    	  newOp.e1 = Var1;
 	    	  newOp.e2 = Var2;
 	    	  Exp newExp = new Let(listId.getLast(), e.t, newOp, VarOp);
-	    	  newExp = new Let(listId.get(1), e.t, Var2value, newExp);
-	    	  newExp = new Let(listId.getFirst(), e.t, Var1value, newExp);
+	    	  if (NbVarTemp == 3) {
+		    	  newExp = new Let(listId.get(1), e.t, Var2value, newExp);
+		    	  newExp = new Let(listId.getFirst(), e.t, Var1value, newExp);
+	    	  } else {
+	    		  if (Var1value.isVar()) {
+			    	  newExp = new Let(listId.getFirst(), e.t, Var2value, newExp);
+	    		  } else  {
+	    			  newExp = new Let(listId.getFirst(), e.t, Var1value, newExp);
+	    		  }
+	    	  }
+	    	  newExp = newExp.accept(this);
 	    	  return newExp;
 	      }
+	      
+			e.e1 = e.e1.accept(this);
+	        e.e2 = e.e2.accept(this);
 		return e;
 	}
 
+	private boolean isNormalizable(OpBin e) {
+		if (!e.e1.isVar() || !e.e1.isVar()) {
+			return true;
+		}
+		return false;
+	}
 	@Override
 	public Exp visit(Var e) {
 
