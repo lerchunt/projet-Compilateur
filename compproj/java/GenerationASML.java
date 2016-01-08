@@ -331,12 +331,13 @@ public class GenerationASML implements ObjVisitor<String> {
       haut += "\t let " +  printInfix(e.fd.args, " ") + " = ";
       def = true ; 
 	  haut += e.fd.e.accept(this);
+	  haut += e.e.accept(this);
 	  def = false ;
 	  haut += "\n";
       GenerationASML.asml = haut + GenerationASML.asml;
+      System.out.print(GenerationASML.asml);
       return GenerationASML.asml;
     }
-
 
     public String visit(App e){
     	if(!def){
