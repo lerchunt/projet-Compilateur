@@ -4,12 +4,7 @@ abstract class Exp implements Cloneable {
     abstract void accept(Visitor v);
 
     abstract <E> E accept(ObjVisitor<E> v);
-    
-    public boolean isFloat()
-    {
-    	return false ;
-    }
-    
+     
     @Override
     public Object clone() {
     	Object o = null;
@@ -26,7 +21,27 @@ abstract class Exp implements Cloneable {
 	    return o;
   	}
     
+    public boolean isVIFB()
+    {
+    	return false ;
+    }
+    
     public boolean isVar()
+    {
+    	return false ;
+    }
+    
+    public boolean isInt()
+    {
+    	return false ;
+    }
+    
+    public boolean isFloat()
+    {
+    	return false ;
+    } 
+    
+    public boolean isBool()
     {
     	return false ;
     }
@@ -93,6 +108,18 @@ class Bool extends Exp {
         this.b = b;
     }
     
+    @Override
+    public boolean isVIFB()
+    {
+    	return true ;
+    }
+    
+    @Override
+    public boolean isBool()
+    {
+    	return true ;
+    }
+    
     <E> E accept(ObjVisitor<E> v) {
         return v.visit(this);
     }
@@ -111,7 +138,13 @@ class Int extends Exp {
     }
     
     @Override
-    public boolean isVar()
+    public boolean isVIFB()
+    {
+    	return true ;
+    }
+    
+    @Override
+    public boolean isInt()
     {
     	return true ;
     }
@@ -133,6 +166,12 @@ class Float extends Exp {
     
     @Override
     public boolean isFloat()
+    {
+    	return true ;
+    }
+    
+    @Override
+    public boolean isVIFB()
     {
     	return true ;
     }
