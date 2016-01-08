@@ -240,12 +240,12 @@ public class GenerationASML implements ObjVisitor<String> {
                 e.e1.accept(this);
                 GenerationASML.asml += " then (\n\t";
                 e.e2.accept(this);
-                if(e.e2.isVar()){
+                if(!e.e2.isVIFB()){
                     GenerationASML.asml += " \n\t";
                 }
                 GenerationASML.asml += ") else (\n\t";
                 e.e3.accept(this);
-                if(e.e3.isVar()){
+                if(!e.e3.isVIFB()){
                     GenerationASML.asml += " \n\t)";
                 } else {
                 	GenerationASML.asml += ") ";
@@ -271,12 +271,12 @@ public class GenerationASML implements ObjVisitor<String> {
 	    		String txt = "if ";
 	    		txt += e.e1.accept(this) + " then ( \n\t";
 	    		txt += e.e2.accept(this) ;
-	    		if(e.e2.isVar()){
+	    		if(!e.e2.isVIFB()){
 	                txt += " \n\t";
 	            }
 	    		txt += " ) else (\n\t ";
 	    		txt += e.e3.accept(this) ;
-	    		if(e.e3.isVar()){
+	    		if(!e.e3.isVIFB()){
 	                txt += " \n\t)";
 	            } else {
 	            	txt += ") ";
@@ -300,7 +300,7 @@ public class GenerationASML implements ObjVisitor<String> {
             	GenerationASML.asml += e.id;
                 GenerationASML.asml += " = _" + e.id;
                 GenerationASML.asml += " in ";
-                if(e.e2.isVar())
+                if(!e.e2.isVIFB())
                 {
                 	e.e2.accept(this);
                     GenerationASML.asml += " \n\t";
@@ -312,9 +312,12 @@ public class GenerationASML implements ObjVisitor<String> {
             	GenerationASML.asml += "let ";
             	GenerationASML.asml += e.id;
                 GenerationASML.asml += " = ";
+                if(!e.e1.isVIFB()){
+                	GenerationASML.asml += "\n\t";
+                }
                 e.e1.accept(this);
                 GenerationASML.asml += " in ";
-                if(e.e2.isVar())
+                if(!e.e2.isVIFB())
                 {
                 	e.e2.accept(this);
                     GenerationASML.asml += " \n\t";
@@ -347,7 +350,7 @@ public class GenerationASML implements ObjVisitor<String> {
             	txt += "let " + e.id +" = ";
                 txt += e.e1.accept(this);
                 txt += " in " ;
-                if(e.e2.isVar())
+                if(!e.e2.isVIFB())
                 {
                 	e.e2.accept(this);
                     txt += " \n\t ";
@@ -409,7 +412,7 @@ public class GenerationASML implements ObjVisitor<String> {
       haut += "\tlet " +  printInfix(e.fd.args, " ") + " = ";
       def = true ; 
 	  haut += e.fd.e.accept(this);
-	  if(!e.e.isVar()) 
+	  if(!e.e.isVIFB()) 
 	  {
 		  haut += e.e.accept(this);
 	  }
