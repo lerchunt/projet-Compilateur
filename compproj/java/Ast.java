@@ -164,8 +164,6 @@ class Add extends OpBin {
 }
 
 class Sub extends OpBin {
-    Exp e1;
-    Exp e2;
 
     Sub(Exp e1, Exp e2) {
         super(e1,e2);
@@ -180,7 +178,6 @@ class Sub extends OpBin {
 }
 
 class FNeg extends OpUn {
-    Exp e;
 
     FNeg(Exp e) {
         super(e);
@@ -195,8 +192,6 @@ class FNeg extends OpUn {
 }
 
 class FAdd extends OpBin {
-    Exp e1;
-    Exp e2;
 
     FAdd(Exp e1, Exp e2) {
         super(e1,e2);
@@ -211,8 +206,6 @@ class FAdd extends OpBin {
 }
 
 class FSub extends OpBin {
-    Exp e1;
-    Exp e2;
 
     FSub(Exp e1, Exp e2) {
         super(e1,e2);
@@ -227,8 +220,6 @@ class FSub extends OpBin {
 }
 
 class FMul extends OpBin {
-    Exp e1;
-    Exp e2;
 
     FMul(Exp e1, Exp e2) {
         super(e1,e2);
@@ -243,8 +234,6 @@ class FMul extends OpBin {
 }
 
 class Mul extends OpBin {
-    Exp e1;
-    Exp e2;
 
     Mul(Exp e1, Exp e2) {
     	super(e1,e2);
@@ -259,8 +248,6 @@ class Mul extends OpBin {
 }
 
 class FDiv extends OpBin {
-    Exp e1;
-    Exp e2;
 
     FDiv(Exp e1, Exp e2) {
     	super(e1,e2);
@@ -275,8 +262,6 @@ class FDiv extends OpBin {
 }
 
 class Eq extends OpBin { 
-    Exp e1;
-    Exp e2;
 
     Eq(Exp e1, Exp e2) {
     	super(e1,e2);
@@ -291,8 +276,6 @@ class Eq extends OpBin {
 }
 
 class LE extends OpBin { 
-    Exp e1;
-    Exp e2;
 
     LE(Exp e1, Exp e2) {
     	super(e1,e2);
