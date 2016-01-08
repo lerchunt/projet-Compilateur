@@ -2,10 +2,12 @@ import java.util.*;
 
 public class GenerationASML implements ObjVisitor<String> {
 	static String asml;
+	static int cp ; 
 	static boolean def = false ; 
 	public GenerationASML()
 	{
-		GenerationASML.asml = "let _ = \n";
+		GenerationASML.asml = "\nlet _ = \n\t";
+		cp = 0 ;
 	}
     public String visit(Unit e) {
 		return GenerationASML.asml;
@@ -75,7 +77,7 @@ public class GenerationASML implements ObjVisitor<String> {
     	} else {
     		String txt = " add ";
     		txt += e.e1.accept(this) + " ";
-    		txt += e.e2.accept(this);
+    		txt += e.e2.accept(this) + "\n";
     		return txt;
     	} 	
     }
@@ -219,20 +221,69 @@ public class GenerationASML implements ObjVisitor<String> {
     public String visit(If e){
     	if(!def)
     	{
-    		GenerationASML.asml += "if ";
-            e.e1.accept(this);
-            GenerationASML.asml += " then ( ";
-            e.e2.accept(this);
-            GenerationASML.asml += " ) else ( ";
-            e.e3.accept(this);
-            GenerationASML.asml += " ) ";
-    		return GenerationASML.asml;
+    		if (e.e2.isFloat()){
+    			String haut = "let_z" + cp++  ;
+    			String s = e.e2.accept(this);
+                haut += " = " + s + "\n";
+                haut += "let_z" + cp  ;
+    			s = e.e3.accept(this);
+                haut += " = " + s + "\n";
+                GenerationASML.asml = haut + GenerationASML.asml ;
+    			GenerationASML.asml += "if " ;
+                e.e1.accept(this);
+                cp--;
+                GenerationASML.asml += " then ( \n\t_z" + cp++ + "\n\t";
+                GenerationASML.asml += ") else (\n\t _z" + cp++ +" \n\t) ";
+        		return GenerationASML.asml;
+    		}else
+    		{
+    			GenerationASML.asml += "if ";
+                e.e1.accept(this);
+                GenerationASML.asml += " then (\n\t";
+                e.e2.accept(this);
+                if(e.e2.isVar()){
+                    GenerationASML.asml += " \n\t";
+                }
+                GenerationASML.asml += ") else (\n\t";
+                e.e3.accept(this);
+                if(e.e3.isVar()){
+                    GenerationASML.asml += " \n\t)";
+                } else {
+                	GenerationASML.asml += ") ";
+                }
+        		return GenerationASML.asml;
+    		}
     	} else {
-    		String txt = "if ";
-    		txt += e.e1.accept(this) + " then ( ";
-    		txt += e.e2.accept(this) + " ) else ( ";
-    		txt += e.e3.accept(this) + " ) ";
-    		return txt;
+    		if (e.e2.isFloat()){
+    			String haut = "let_z" + cp++  ;
+    			String s = e.e2.accept(this);
+                haut += " = " + s + "\n";
+                haut += "let_z" + cp  ;
+    			s = e.e3.accept(this);
+                haut += " = " + s + "\n";
+                String txt = haut + GenerationASML.asml ;
+    			txt += "if " ;
+                e.e1.accept(this);
+                cp-- ;
+                txt += " then ( \n\t_z" + cp++ + "\n\t";
+                txt += ") else (\n\t _z" + cp++ +" \n\t) ";
+        		return txt ;
+    		}else {
+	    		String txt = "if ";
+	    		txt += e.e1.accept(this) + " then ( \n\t";
+	    		txt += e.e2.accept(this) ;
+	    		if(e.e2.isVar()){
+	                txt += " \n\t";
+	            }
+	    		txt += " ) else (\n\t ";
+	    		txt += e.e3.accept(this) ;
+	    		if(e.e3.isVar()){
+	                txt += " \n\t)";
+	            } else {
+	            	txt += ") ";
+	            }
+	    		return txt;
+    		}
     	}
     	
     }
@@ -246,20 +297,32 @@ public class GenerationASML implements ObjVisitor<String> {
             	String s = e.e1.accept(this);
                 haut += " = " + s + "\n";
                 GenerationASML.asml = haut + GenerationASML.asml ;
-                GenerationASML.asml += "\tlet ";
+                GenerationASML.asml += "let ";
             	GenerationASML.asml += e.id;
                 GenerationASML.asml += " = _" + e.id;
                 GenerationASML.asml += " in ";
-                e.e2.accept(this);
-                GenerationASML.asml += "\n";
+                if(e.e2.isVar())
+                {
+                	e.e2.accept(this);
+                    GenerationASML.asml += " \n\t";
+                } else {
+                    GenerationASML.asml += " \n\t";
+                	e.e2.accept(this);
+                }
             } else {
-            	GenerationASML.asml += "\t let ";
+            	GenerationASML.asml += "let ";
             	GenerationASML.asml += e.id;
                 GenerationASML.asml += " = ";
                 e.e1.accept(this);
                 GenerationASML.asml += " in ";
-                e.e2.accept(this);
-                GenerationASML.asml += "\n";
+                if(e.e2.isVar())
+                {
+                	e.e2.accept(this);
+                    GenerationASML.asml += " \n\t";
+                } else {
+                    GenerationASML.asml += " \n\t";
+                	e.e2.accept(this);
+                }
             } 
     		return GenerationASML.asml;
         } else {
@@ -270,13 +333,29 @@ public class GenerationASML implements ObjVisitor<String> {
             	String s = e.e1.accept(this);
                 haut += " = " + s + "\n";
                 txt = haut ;
-                txt += "\tlet "+ e.id;
+                txt += "let "+ e.id;
                 txt += " = _" + e.id;
-                txt += " in " + e.e2.accept(this)+ "\n";
+                txt += " in " ;
+                if(e.e2.isVar())
+                {
+                	e.e2.accept(this);
+                    txt += " \n\t ";
+                } else {
+                    txt += " \n\t ";
+                	e.e2.accept(this);
+                }
             } else {
-            	txt += "\tlet " + e.id +" = ";
+            	txt += "let " + e.id +" = ";
                 txt += e.e1.accept(this);
-                txt += " in " + e.e2.accept(this)+ "\n";
+                txt += " in " ;
+                if(e.e2.isVar())
+                {
+                	e.e2.accept(this);
+                    txt += " \n\t ";
+                } else {
+                    txt += " \n\t ";
+                	e.e2.accept(this);
+                }
             } 
     		return txt;
         }
@@ -328,10 +407,13 @@ public class GenerationASML implements ObjVisitor<String> {
       String haut = "let _" + e.fd.id ;
 	  haut += " " +printInfix(e.fd.args, " ");
       haut += " = \n";
-      haut += "\t let " +  printInfix(e.fd.args, " ") + " = ";
+      haut += "\tlet " +  printInfix(e.fd.args, " ") + " = ";
       def = true ; 
 	  haut += e.fd.e.accept(this);
-	  haut += e.e.accept(this);
+	  if(!e.e.isVar()) 
+	  {
+		  haut += e.e.accept(this);
+	  }
 	  def = false ;
       GenerationASML.asml = haut + GenerationASML.asml;
       return GenerationASML.asml;
@@ -339,7 +421,7 @@ public class GenerationASML implements ObjVisitor<String> {
 
     public String visit(App e){
     	if(!def){
-    		GenerationASML.asml += "\t call _min_caml_";
+    		GenerationASML.asml += "call _min_caml_";
             e.e.accept(this);
             GenerationASML.asml += " ";
             printInfix2(e.es, " ");
