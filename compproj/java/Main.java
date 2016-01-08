@@ -53,6 +53,7 @@ public class Main {
 		String[] tabPath = argv[argv.length-1].split("/");
 		String nameFolder = tabPath[tabPath.length -1];
 		int tailleName = nameFolder.length();
+
 		InName = nameFolder.split("\\.")[0];
 		if (OutName == ""){
 			OutName=InName;
@@ -71,6 +72,7 @@ public class Main {
 	      // Type Checking
 	      if (!stopAfterTypeChecking) {
 		      System.out.println("------ ASML ------");
+		      expression.accept(new KNormalization());
 		      expression.accept(new GenerationASML());
 		      System.out.println();
 		      

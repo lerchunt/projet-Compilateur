@@ -1,6 +1,5 @@
 
 interface ObjVisitor<E> {
-    E visit(Unit e);
     E visit(Bool e);
     E visit(Int e);
     E visit(Float e);
@@ -26,6 +25,7 @@ interface ObjVisitor<E> {
     E visit(Array e);
     E visit(Get e);
     E visit(Put e);
+	E visit(Unit unit);
 }
 
 

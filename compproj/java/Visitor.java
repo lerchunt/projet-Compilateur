@@ -1,6 +1,5 @@
 
 interface Visitor {
-
     void visit(Unit e);
     void visit(Bool e);
     void visit(Int e);
