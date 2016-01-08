@@ -109,6 +109,12 @@ class Int extends Exp {
     Int(int i) {
         this.i = i;
     }
+    
+    @Override
+    public boolean isVar()
+    {
+    	return true ;
+    }
 
     <E> E accept(ObjVisitor<E> v) {
         return v.visit(this);
