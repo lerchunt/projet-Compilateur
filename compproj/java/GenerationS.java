@@ -2,14 +2,9 @@ import java.util.Hashtable;
 
 
 public class GenerationS implements ObjVisitor<String> {
-	static String s;
+	
 	static Hashtable<String,String> variables = new Hashtable<String,String>();
 	private int nbReg = 4;
-	
-	public GenerationS()
-	{
-		//GenerationS.s = "\t.text\n\t.global _start\n_start:";
-	}
 	
 	@Override
 	public String visit(Bool e) {
@@ -138,8 +133,8 @@ public class GenerationS implements ObjVisitor<String> {
     		if(param.isInt()){
 	    		retour+=String.format("\tmov\tr%d,%s\n", nbReg,param.accept(this));
 	    		retour+=String.format("\tmov\tr0,r%d\n", nbReg);
-	    		nbReg++; //Je pense qu'on peut aussi garder R4 pour chaque registre ici
 	    		retour = String.format("%s\tbl\tmin_caml_%s\n",retour,e.e.accept(this));
+	    		nbReg++; //Je pense qu'on peut aussi garder R4 pour chaque registre ici
     		}
     	}
 		return retour;
