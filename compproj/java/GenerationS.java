@@ -176,4 +176,10 @@ public class GenerationS implements ObjVisitor<String> {
 		return null;
 	}
 
+	@Override
+	public String visit(FunDef e) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

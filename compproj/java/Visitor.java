@@ -26,6 +26,7 @@ interface Visitor {
     void visit(Array e);
     void visit(Get e);
     void visit(Put e);
+	void visit(FunDef e);
 }
 
 

@@ -51,15 +51,6 @@ public class KNormalization implements ObjVisitor<Exp> {
 	public Exp visit(Add e) {
 		e.e1 = e.e1.accept(this);
         e.e2 = e.e2.accept(this);
-		/*FrontEnd.nb_var++;
-		Id id1=new Id("var"+FrontEnd.nb_var);
-		FrontEnd.nb_var++;
-		Id id2=new Id("var"+FrontEnd.nb_var);
-		FrontEnd.nb_var++;
-		Id id3=new Id("var"+FrontEnd.nb_var);
-
-		Let exp=new Let(id1,null,e.e1,new Let(id2,null,e.e2,new Let(id3,null,new Add(new Var(id1),new Var(id2)), null)));
-		return exp;*/
 		
 		return e;
 
@@ -71,14 +62,6 @@ public class KNormalization implements ObjVisitor<Exp> {
 		e.e1 = e.e1.accept(this);
         e.e2 = e.e2.accept(this);
         
-		/*FrontEnd.nb_var++;
-		Id id1=new Id("var"+FrontEnd.nb_var);
-		FrontEnd.nb_var++;
-		Id id2=new Id("var"+FrontEnd.nb_var);
-		FrontEnd.nb_var++;
-		Id id3=new Id("var"+FrontEnd.nb_var);
-
-		Let exp=new Let(id1,null,e.e1,new Let(id2,null,e.e2,new Let(id3,null,new Sub(new Var(id1),new Var(id2)), null)));*/
 		return e;
 	}
 
@@ -91,14 +74,6 @@ public class KNormalization implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(FAdd e) {
-		/*FrontEnd.nb_var++;
-		Id id1=new Id("var"+FrontEnd.nb_var);
-		FrontEnd.nb_var++;
-		Id id2=new Id("var"+FrontEnd.nb_var);
-		FrontEnd.nb_var++;
-		Id id3=new Id("var"+FrontEnd.nb_var);
-
-		Let exp=new Let(id1,null,e.e1,new Let(id2,null,e.e2,new Let(id3,null,new FAdd(new Var(id1),new Var(id2)), null)));*/
 
 		e.e1 = e.e1.accept(this);
         e.e2 = e.e2.accept(this);
@@ -115,29 +90,13 @@ public class KNormalization implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(FMul e) {
-		/*FrontEnd.nb_var++;
-		Id id1=new Id("var"+FrontEnd.nb_var);
-		FrontEnd.nb_var++;
-		Id id2=new Id("var"+FrontEnd.nb_var);
-		FrontEnd.nb_var++;
-		Id id3=new Id("var"+FrontEnd.nb_var);
-
-		Let exp=new Let(id1,null,e.e1,new Let(id2,null,e.e2,new Let(id3,null,new FMul(new Var(id1),new Var(id2)), null)));*/
-
+		
 		e.e1 = e.e1.accept(this);
         e.e2 = e.e2.accept(this);
 		return e;
 	}
 	@Override
 	public Exp visit(Mul e) {
-		/*FrontEnd.nb_var++;
-		Id id1=new Id("var"+FrontEnd.nb_var);
-		FrontEnd.nb_var++;
-		Id id2=new Id("var"+FrontEnd.nb_var);
-		FrontEnd.nb_var++;
-		Id id3=new Id("var"+FrontEnd.nb_var);
-
-		Let exp=new Let(id1,null,e.e1,new Let(id2,null,e.e2,new Let(id3,null,new Mul(new Var(id1),new Var(id2)),null)));*/
 
 		e.e1 = e.e1.accept(this);
         e.e2 = e.e2.accept(this);
@@ -146,14 +105,6 @@ public class KNormalization implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(FDiv e) {
-		/*FrontEnd.nb_var++;
-		Id id1=new Id("var"+FrontEnd.nb_var);
-		FrontEnd.nb_var++;
-		Id id2=new Id("var"+FrontEnd.nb_var);
-		FrontEnd.nb_var++;
-		Id id3=new Id("var"+FrontEnd.nb_var);
-
-		Let exp=new Let(id1,null,e.e1,new Let(id2,null,e.e2,new Let(id3,null,new FDiv(new Var(id1),new Var(id2)), null)));*/
 
 		e.e1 = e.e1.accept(this);
         e.e2 = e.e2.accept(this);
@@ -188,18 +139,18 @@ public class KNormalization implements ObjVisitor<Exp> {
 	@Override
 	public Exp visit(Let e) {
         
-	      // on crée un nombre de variable = nb de valeurs hard codées dans l'op +1
+		// on crée un nombre de variable = nb de valeurs hard codées dans l'op +1
 	      if (e.e1.isOpBin() && isNormalizable((OpBin) e.e1)) {
 
 	    	  int nbVar = 1;
 	    	  OpBin newOp = (OpBin)((OpBin)e.e1).clone();
 	    	  while (e.e1.isOpBin()) {
+		    	  Exp parent = e;
 	    		  int NbVarTemp = 3;
 		    	  if (((OpBin) e.e1).e1.isVar() || ((OpBin) e.e1).e2.isVar()) {
 		    		  NbVarTemp = 2;
 		    	  }
 		    	  
-		    	  Exp parent = e;
 		    	  OpBin cour = (OpBin) e.e1;
 	    		  while (cour.e1.isOpBin()) {
 		    		  parent = cour;
@@ -213,6 +164,13 @@ public class KNormalization implements ObjVisitor<Exp> {
     	    	  Id Var1Id = new Id("default");
     	    	  Exp Var2 = Var2value;
     	    	  Id Var2Id = new Id("default");
+    	    	  
+    	    	  if (Var1.isVar()) {
+    	    		  Var1Id = ((Var)Var1).id;
+    	    	  }
+    	    	  if (Var2.isVar()) {
+    	    		  Var2Id = ((Var)Var2).id;
+    	    	  }
     	    	  
     	    	  if (!Var1value.isVar()) {
     	    		  Var1Id = new Id(String.format("v%d", nbVar));
@@ -252,6 +210,7 @@ public class KNormalization implements ObjVisitor<Exp> {
     	    		  ((Let)parent).e1 = newExp;
     	    	  }
 	    	  }
+	    	  return e.e1;
 	      }
 			e.e1 = e.e1.accept(this);
 	        e.e2 = e.e2.accept(this);
@@ -259,7 +218,7 @@ public class KNormalization implements ObjVisitor<Exp> {
 	}
 
 	private boolean isNormalizable(OpBin e) {
-		if (!e.e1.isVar() || !e.e1.isVar()) {
+		if (!e.e1.isVar() || !e.e2.isVar()) {
 			return true;
 		}
 		return false;
@@ -272,7 +231,81 @@ public class KNormalization implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(LetRec e) {
-		// TODO Auto-generated method stub
+		
+		// on crée un nombre de variable = nb de valeurs hard codées dans l'op +1
+	      if (e.fd.e.isOpBin() && isNormalizable((OpBin) e.fd.e)) {
+
+	    	  int nbVar = 1;
+	    	  OpBin newOp = (OpBin)((OpBin)e.fd.e).clone();
+	    	  while (e.fd.e.isOpBin()) {
+		    	  Exp parent = e.fd;
+	    		  int NbVarTemp = 3;
+		    	  if (((OpBin) e.fd.e).e1.isVar() || ((OpBin) e.fd.e).e2.isVar()) {
+		    		  NbVarTemp = 2;
+		    	  }
+		    	  
+		    	  OpBin cour = (OpBin) e.fd.e;
+	    		  while (cour.e1.isOpBin()) {
+		    		  parent = cour;
+		    		  cour = (OpBin) cour.e1;
+	    		  }
+    			  newOp = (OpBin)cour.clone();
+    			  Exp Var1value = cour.e1;
+    	    	  Exp Var2value = cour.e2;
+    	    	  
+    	    	  Exp Var1 = Var1value;
+    	    	  Id Var1Id = new Id("default");
+    	    	  Exp Var2 = Var2value;
+    	    	  Id Var2Id = new Id("default");
+    	    	  
+    	    	  if (Var1.isVar()) {
+    	    		  Var1Id = ((Var)Var1).id;
+    	    	  }
+    	    	  if (Var2.isVar()) {
+    	    		  Var2Id = ((Var)Var2).id;
+    	    	  }
+    	    	  
+    	    	  if (!Var1value.isVar()) {
+    	    		  Var1Id = new Id(String.format("v%d", nbVar));
+    	    		  Var1 = new Var(Var1Id);
+    	    		  nbVar++;
+    	    		  if (!Var2value.isVar()) {
+        	    		  Var2Id = new Id(String.format("v%d", nbVar));
+			    		  Var2 = new Var(Var2Id);
+		    	    	  nbVar++;
+			    	  }
+		    	  } else {
+    	    		  Var2Id = new Id(String.format("v%d", nbVar));
+		    		  Var2 = new Var(Var2Id);
+	    	    	  nbVar++;
+		    	  }
+    	    	  Id VarOpId = new Id(String.format("v%d", nbVar));
+    	    	  Exp VarOp = new Var(VarOpId);
+    	    	  nbVar++;
+
+    	    	  newOp.e1 = Var1;
+    	    	  newOp.e2 = Var2;
+    	    	  
+    	    	  Exp newExp = new Let(VarOpId, e.fd.type, newOp, VarOp);
+    	    	  if (NbVarTemp == 3) {
+    		    	  newExp = new Let(Var2Id, e.fd.type, Var2value, newExp);
+    		    	  newExp = new Let(Var1Id, e.fd.type, Var1value, newExp);
+    	    	  } else {
+    	    		  if (Var1value.isVar()) {
+    			    	  newExp = new Let(Var2Id, e.fd.type, Var2value, newExp);
+    	    		  } else  {
+    	    			  newExp = new Let(Var1Id, e.fd.type, Var1value, newExp);
+    	    		  }
+    	    	  }
+    	    	  if (parent.isOpBin()) {
+    	    		  ((OpBin)parent).e1 = newExp;
+    	    	  } else {
+    	    		  ((FunDef)parent).e = newExp;
+    	    	  }
+	    	  }
+	    	  return e.fd.e;
+	      }
+		
 		e.e = e.e.accept(this);
 		return e;
 	}
@@ -326,6 +359,11 @@ public class KNormalization implements ObjVisitor<Exp> {
 		e.e1 = e.e1.accept(this);
         e.e2 = e.e2.accept(this);
 		e.e3 = e.e3.accept(this);
+		return e;
+	}
+	@Override
+	public Exp visit(FunDef e) {
+		e.e.accept(this);
 		return e;
 	}
 
