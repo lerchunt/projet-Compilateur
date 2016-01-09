@@ -29,6 +29,7 @@ public class TestGenerateS {
 			Exp expression = (Exp) p.parse().value;
 		    String retour = "\t.text\n\t.global _start\n_start:\n";
 			retour += expression.accept(new GenerationS());
+			retour += "\tbl\tmin_caml_exit";
 		    System.out.println(retour);    
 	    } catch (Exception e) {
 			e.printStackTrace();

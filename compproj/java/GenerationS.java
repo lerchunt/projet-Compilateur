@@ -18,7 +18,7 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Int e) {
-		return String.format("#%d\n",e.i);
+		return String.format("#%d",e.i);
 	}
 
 	@Override
@@ -133,12 +133,16 @@ public class GenerationS implements ObjVisitor<String> {
 	@Override
 	public String visit(App e) {
     	String retour="";
+    	
     	for(Exp param : e.es){
-    		retour+=String.format("\tmov\tr%d,%s", nbReg,param.accept(this));
-    		retour+=String.format("\tmov\tr0,r%d\n", nbReg);
-    		nbReg++;
+    		if(param.isInt()){
+	    		retour+=String.format("\tmov\tr%d,%s\n", nbReg,param.accept(this));
+	    		retour+=String.format("\tmov\tr0,r%d\n", nbReg);
+	    		nbReg++; //Je pense qu'on peut aussi garder R4 pour chaque registre ici
+	    		retour = String.format("%s\tbl\tmin_caml_%s\n",retour,e.e.accept(this));
+    		}
     	}
-		return String.format("%s\tbl\tmin_caml_%s",retour,e.e.accept(this));
+		return retour;
 		
 	}
 
