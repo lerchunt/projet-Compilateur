@@ -1,4 +1,3 @@
-import java.util.LinkedList;
 
 
 public class KNormalization implements ObjVisitor<Exp> {

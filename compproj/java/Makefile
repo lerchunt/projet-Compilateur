@@ -1,8 +1,9 @@
 
 SRC= Lexer.java Parser.java 
+SRC_FILES = $(filter-out TestGenerateS.java, $(wildcard *.java))
 
 all: ${SRC} 
-	javac -cp java-cup-11b-runtime.jar:. *.java
+	javac -cp java-cup-11b-runtime.jar:. ${SRC_FILES}
 
 Lexer.java: Lexer.flex
 	jflex/bin/jflex Lexer.flex 
