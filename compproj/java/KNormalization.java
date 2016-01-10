@@ -1,3 +1,7 @@
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 
 
 public class KNormalization implements ObjVisitor<Exp> {
@@ -150,12 +154,43 @@ public class KNormalization implements ObjVisitor<Exp> {
 	@Override
 	public Exp visit(App e) {
 		e.e = e.e.accept(this);
+		Exp newExp = e;
+		List<Exp> newEs = new LinkedList<Exp>();
+		Collections.reverse(e.es);
 		for (Exp exp : e.es) {
-			exp = exp.accept(this);
+			Exp argOpt = exp.accept(this);
+			if (exp.isOpBin()) {
+				if (argOpt instanceof Let) {
+					Let cour = (Let) argOpt;
+					while (cour.e2 instanceof Let) {
+						cour = (Let)cour.e2;
+					}
+					Let newExp2 = (Let)argOpt.clone();
+					argOpt = cour.e2;
+					cour = newExp2;
+					while (cour.e2 instanceof Let) {
+						cour = (Let)cour.e2;
+					}
+					cour.e2 = newExp;
+					newExp = newExp2;
+				} else if (argOpt instanceof OpBin){
+					Id newId = Id.gen();
+					Type t = new TInt();
+					if (((OpBin)argOpt).e1 instanceof Float) {
+						t = new TFloat();
+					}
+					Var newVar = new Var(newId);
+					newExp = new Let(newId,t,argOpt,newExp);
+					argOpt = newVar;
+				}
+			}
+			newEs.add(argOpt);
 		}
-		return e;
+		e.es = newEs;
+		Collections.reverse(e.es);
+		return newExp;
 	}
-
+	
 	@Override
 	public Exp visit(Tuple e) {
 		for (Exp exp : e.es) {
@@ -328,4 +363,5 @@ public class KNormalization implements ObjVisitor<Exp> {
 		}
 		return e;
 	}
+	
 }
