@@ -77,7 +77,7 @@ public class GenerationASML implements ObjVisitor<String> {
     	} else {
     		String txt = " add ";
     		txt += e.e1.accept(this) + " ";
-    		txt += e.e2.accept(this) + "\n";
+    		txt += e.e2.accept(this) ;//+ "\n";
     		return txt;
     	} 	
     }
