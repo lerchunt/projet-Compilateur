@@ -13,3 +13,6 @@ Parser.java: Parser.cup
 
 clean:
 	rm -rf *.class rm sym.java Lexer.java Parser.java *~
+	
+test:
+	./test.sh ${ARGS}
