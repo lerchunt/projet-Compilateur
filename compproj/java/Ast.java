@@ -403,6 +403,13 @@ class Var extends Exp {
     Var(Id id) {
         this.id = id;
     }
+    
+    @Override
+    public String toString()
+    {
+    	return id.toString();
+    }
+    
 
     <E> E accept(ObjVisitor<E> v) {
         return v.visit(this);

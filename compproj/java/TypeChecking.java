@@ -245,6 +245,5 @@ public class TypeChecking implements ObjVisitor<Type> {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }
 

@@ -303,9 +303,9 @@ public class GenerationASML implements ObjVisitor<String> {
                 if(!e.e2.isVIFB())
                 {
                 	e.e2.accept(this);
-                    GenerationASML.asml += " \n\t";
+                    GenerationASML.asml += "\n\t";
                 } else {
-                    GenerationASML.asml += " \n\t";
+                    GenerationASML.asml += "\n\t";
                 	e.e2.accept(this);
                 }
             } else {
@@ -328,7 +328,7 @@ public class GenerationASML implements ObjVisitor<String> {
             } 
     		return GenerationASML.asml;
         } else {
-        	String txt = " ";
+        	String txt = "";
         	if((e.e1).isFloat())
             {
             	haut = "let _" +e.id;
@@ -341,9 +341,9 @@ public class GenerationASML implements ObjVisitor<String> {
                 if(e.e2.isVar())
                 {
                 	e.e2.accept(this);
-                    txt += " \n\t ";
+                    txt += " \n\t";
                 } else {
-                    txt += " \n\t ";
+                    txt += " \n\t";
                 	e.e2.accept(this);
                 }
             } else {
@@ -352,11 +352,11 @@ public class GenerationASML implements ObjVisitor<String> {
                 txt += " in " ;
                 if(!e.e2.isVIFB())
                 {
-                	e.e2.accept(this);
-                    txt += " \n\t ";
+                	txt += e.e2.accept(this);
+                    txt += " \n\t";
                 } else {
-                    txt += " \n\t ";
-                	e.e2.accept(this);
+                    txt += " \n\t";
+                	txt += e.e2.accept(this);
                 }
             } 
     		return txt;
@@ -410,6 +410,10 @@ public class GenerationASML implements ObjVisitor<String> {
 	  haut += " " +printInfix(e.fd.args, " ");
       haut += " = \n";
       haut += "\tlet " +  printInfix(e.fd.args, " ") + " = ";
+      if(e.fd.e.isVIFB())
+      {
+    	  haut += "\n\t" ;
+      }
       def = true ; 
 	  haut += e.fd.e.accept(this);
 	  if(!e.e.isVIFB()) 
@@ -429,7 +433,7 @@ public class GenerationASML implements ObjVisitor<String> {
             printInfix2(e.es, " ");
     		return GenerationASML.asml;
     	} else {
-    		String txt = "\t call _min_caml_";
+    		String txt = "call _min_caml_";
             txt += e.e.accept(this) + " ";
             txt += printInfix(e.es, " ");
     		return txt;
