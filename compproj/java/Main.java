@@ -71,7 +71,7 @@ public class Main {
 	      
 	      // Type Checking
 	      if (!stopAfterTypeChecking) {
-		      expression.accept(new KNormalization());
+		      expression  = expression.accept(new KNormalization());
 		      System.out.println("------ AST Knorm ------");
 		      expression.accept(new PrintVisitor());
 		      System.out.println();
