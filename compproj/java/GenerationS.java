@@ -35,16 +35,12 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Add e) {
-		e.e1.accept(this);
-		e.e2.accept(this);
-		return null;
+		return String.format("\tadd\tr0,%s,%s",e.e1.accept(this),e.e2.accept(this));
 	}
 
 	@Override
 	public String visit(Sub e) {
-		e.e1.accept(this);
-		e.e2.accept(this);
-		return null;
+		return String.format("\tsub\tr0,%s,%s",e.e1.accept(this),e.e2.accept(this));
 	}
 
 	@Override
@@ -76,9 +72,7 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Mul e) {
-		e.e1.accept(this);
-		e.e2.accept(this);
-		return null;
+		return String.format("\tmul\tr0,%s,%s",e.e1.accept(this),e.e2.accept(this));
 	}
 
 	@Override
@@ -130,11 +124,13 @@ public class GenerationS implements ObjVisitor<String> {
     	String retour="";
     	
     	for(Exp param : e.es){
-    		if(param.isInt()){
+    		if(param.accept(this)==null){
+    			retour += String.format("\tbl\tmin_caml_%s\n",e.e.accept(this));
+    		} else if(param.isInt()){
 	    		retour+=String.format("\tmov\tr%d,%s\n", nbReg,param.accept(this));
 	    		retour+=String.format("\tmov\tr0,r%d\n", nbReg);
 	    		retour = String.format("%s\tbl\tmin_caml_%s\n",retour,e.e.accept(this));
-	    		nbReg++; //Je pense qu'on peut aussi garder R4 pour chaque registre ici
+	    		nbReg++;
     		}
     	}
 		return retour;
@@ -187,4 +183,6 @@ public class GenerationS implements ObjVisitor<String> {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	
 }
