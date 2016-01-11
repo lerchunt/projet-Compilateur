@@ -312,7 +312,7 @@ public class GenerationASML implements ObjVisitor<String> {
             	GenerationASML.asml += "let ";
             	GenerationASML.asml += e.id;
                 GenerationASML.asml += " = ";
-                if(!e.e1.isVIFB()){
+                if(e.e1.isVIFB()){
                 	GenerationASML.asml += "\n\t";
                 }
                 e.e1.accept(this);
