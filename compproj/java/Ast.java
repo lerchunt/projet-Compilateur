@@ -64,6 +64,8 @@ abstract class OpBin extends Exp {
 	Exp e1;
     Exp e2;
 
+    String registreDeRetour;
+    
     OpBin(Exp e1, Exp e2) {
         this.e1 = e1;
         this.e2 = e2;
@@ -81,6 +83,8 @@ abstract class OpBin extends Exp {
 abstract class OpUn extends Exp {
 	Exp e;
 
+    String registreDeRetour;
+    
     OpUn(Exp e) {
         this.e = e;
     }
