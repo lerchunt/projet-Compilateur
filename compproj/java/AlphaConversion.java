@@ -157,10 +157,4 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 		return null;
 	}
 
-	@Override
-	public Exp visit(FunDef e) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
