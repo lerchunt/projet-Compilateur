@@ -2,10 +2,7 @@ import java.util.Hashtable;
 
 
 public class GenerationS implements ObjVisitor<String> {
-<<<<<<< HEAD
-	static String s;
-=======
-	
+
 	static Hashtable<String,String> variables = new Hashtable<String,String>();
 	private int nbReg = 4;
 	
@@ -113,7 +110,7 @@ public class GenerationS implements ObjVisitor<String> {
 		String registre = variables.get(e.e2.accept(this));
 		String retour = String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		retour += String.format("\tmov\tr0,%s\n", registre);
-		return retour += String.format("\tbl\tmin_caml_exit\n");
+		return retour;
 	}
 
 	@Override
@@ -185,17 +182,15 @@ public class GenerationS implements ObjVisitor<String> {
 		
 		return null;
 	}	
+
+	@Override
+	public String visit(FunDef e) {
+		return null;
+	}
 	
 	private void affectRegistre(String Var, int nb){
 		String registre = String.format("r%d", nb);
 		this.variables.put(Var, registre);
-	}
-	}
-
-	@Override
-	public String visit(FunDef e) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 }
