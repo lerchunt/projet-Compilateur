@@ -399,6 +399,8 @@ class Let extends Exp {
 
 class Var extends Exp {
     Id id;
+    
+    int nbOccurence = 0;
 
     Var(Id id) {
         this.id = id;
@@ -408,6 +410,14 @@ class Var extends Exp {
     public String toString()
     {
     	return id.toString();
+    }
+    
+    public void inc() {
+    	this.nbOccurence ++;
+    }
+    
+    public void dec() {
+    	this.nbOccurence --;
     }
     
 
