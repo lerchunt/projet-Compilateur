@@ -3,19 +3,42 @@ import java.util.LinkedList;
 
 public class RegistreAllocation implements Visitor {
 	
+	public RegistreAllocation() {
+		for (int i=4; i<12; i++) {
+			String nom = String.format("r%d", i);
+			tabReg.add(new Registre(nom));
+		}
+	}
+	
 	private class Registre {
 		public String nom;
-		public Var var;
+		public Var var = null;
+		
+		public Registre(String nom) {
+			this.nom = nom;
+		}
 	}
 	
 	static LinkedList<Registre> tabReg= new LinkedList<>();
 	
 	static String getRegistre(Var v) {
-		return "TO DO";
+		for (Registre r : tabReg) {
+			if (r.var.equals(v)) {
+				return r.nom;
+			}
+		}
+		return allocRegistre(v);
 	}
 	
-	static String allocRegistre(Var v) {
-		return "TO DO";
+	static private String allocRegistre(Var v) {
+		for (Registre r : tabReg) {
+			if (r.var == null) {
+				v.dec();
+				r.var = v;
+			}
+			return r.nom;
+		}
+		return null;
 	}
 
 	@Override
