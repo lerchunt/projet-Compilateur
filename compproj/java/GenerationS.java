@@ -113,15 +113,13 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Let e) {
+		String retour="";
 		affectRegistre(e.e2.accept(this),nbReg);
 		String registre = variables.get(e.e2.accept(this));
-		String retour = String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
+		retour = String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		retour += String.format("\tmov\tr0,%s\n", registre);
-<<<<<<< HEAD
-=======
 		//nbReg++;
 		//System.out.println(retour);
->>>>>>> 74881f0e1ff9b3ffb8d3f9bda825c45686c1db3e
 		return retour;
 	}
 
@@ -194,17 +192,6 @@ public class GenerationS implements ObjVisitor<String> {
 		
 		return null;
 	}	
-	
-<<<<<<< HEAD
-	@Override
-	public String visit(FunDef e) {
-		return null;
-=======
-	private void affectRegistre(String Var, int nb){
-		String registre = String.format("r%d", nb);
-		this.variables.put(Var, registre);
->>>>>>> 74881f0e1ff9b3ffb8d3f9bda825c45686c1db3e
-	}
 	
 	private void affectRegistre(String Var, int nb){
 		String registre = String.format("r%d", nb);
