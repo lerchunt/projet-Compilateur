@@ -3,7 +3,6 @@ import java.util.Hashtable;
 
 public class GenerationS implements ObjVisitor<String> {
 
-	static Hashtable<String,String> variables = new Hashtable<String,String>();
 	private int nbReg = 4;
 	
 	@Override
@@ -35,15 +34,16 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Add e) {
-		affectRegistre(e.e1.accept(this),nbReg);
-		
+
+		/*affectRegistre(e.e1.accept(this),nbReg);
 		String registre1 = variables.get(e.e1.accept(this));
     	String retour = String.format("\tmov\t%s,%s\n", registre1,e.e1.accept(this));
     	nbReg++;
     	affectRegistre(e.e2.accept(this),nbReg);
 		String registre2 = variables.get(e.e2.accept(this));
     	retour += String.format("\tmov\t%s,%s\n", registre2,e.e2.accept(this));
-		return retour += String.format("\tadd\tr0,%s,%s\n",registre1,registre2);
+		return retour += String.format("\tadd\tr0,%s,%s\n",registre1,registre2);*/
+		return "";
 	}
 
 	@Override
@@ -114,13 +114,10 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Let e) {
-		String retour="";
-		affectRegistre(e.e2.accept(this),nbReg);
-		String registre = variables.get(e.e2.accept(this));
-		retour = String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
-		retour += String.format("\tmov\tr0,%s\n", registre);
-		//nbReg++;
-		System.out.println(retour);
+
+		String registre = RegistreAllocation.getRegistre(e.id);
+		String retour = String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
+		retour += e.e2.accept(this);
 		return retour;
 	}
 
@@ -192,10 +189,5 @@ public class GenerationS implements ObjVisitor<String> {
 		
 		return null;
 	}	
-	
-	private void affectRegistre(String Var, int nb){
-		String registre = String.format("r%d", nb);
-		this.variables.put(Var, registre);
-	}
 	
 }
