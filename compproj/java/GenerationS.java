@@ -3,8 +3,8 @@ import java.util.Hashtable;
 
 public class GenerationS implements ObjVisitor<String> {
 	static String s;
-	static Hashtable<String,String> variables = new Hashtable<String,String>();
 	private int nbReg = 4;
+	Hashtable<String,String> variables = new Hashtable<String,String>();
 	
 	public GenerationS()
 	{
@@ -18,7 +18,7 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Int e) {
-		return String.format("#%d\n",e.i);
+		return String.format("#%d",e.i);
 	}
 
 	@Override
@@ -117,7 +117,11 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Let e) {
-		return e.e1.accept(this);
+		affectRegistre(e.e2.accept(this),nbReg);
+		String registre = variables.get(e.e2.accept(this));
+		String retour = String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
+		retour += String.format("\tmov\tr0,%s\n", registre);
+		return retour += String.format("\tbl\tmin_caml_exit\n");
 	}
 
 	@Override
@@ -134,11 +138,16 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(App e) {
     	String retour="";
     	for(Exp param : e.es){
-    		retour+=String.format("\tmov\tr%d,%s", nbReg,param.accept(this));
-    		retour+=String.format("\tmov\tr0,r%d\n", nbReg);
-    		nbReg++;
+    		if(param.accept(this)==null){
+    			retour += String.format("\tbl\tmin_caml_%s\n",e.e.accept(this));
+    		}
+    		else{
+		    	retour += String.format("\tmov\tr%d,%s\n", nbReg,param.accept(this));
+		    	retour += String.format("\tmov\tr0,r%d\n", nbReg);
+		    	retour += String.format("\tbl\tmin_caml_%s\n",e.e.accept(this));
+    		}
     	}
-		return String.format("%s\tbl\tmin_caml_%s",retour,e.e.accept(this));
+		return retour += String.format("\tbl\tmin_caml_exit\n");
 		
 	}
 
@@ -182,4 +191,9 @@ public class GenerationS implements ObjVisitor<String> {
 		
 		return null;
 	}	
+	
+	private void affectRegistre(String Var, int nb){
+		String registre = String.format("r%d", nb);
+		this.variables.put(Var, registre);
+	}
 }
