@@ -12,5 +12,23 @@ class Id {
         x++;
         return new Id("?v" + x);
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj==this) {
+            return true;
+        }
+ 
+        if (obj instanceof Id) {
+            Id other = (Id) obj;
+ 
+            if (!this.id.equals(other.id)) {
+                return false; 
+            }
+
+            return true;
+        }
+        return false;
+    }
 
 }
