@@ -29,15 +29,12 @@ public class RegistreAllocation implements Visitor {
 				var = vs;
 			}
 		}
-		if (var == null) {
-			System.err.println("internal error -- registre allocation");
-			System.exit(1);
-			return null;
-		}
 		for (Registre r : tabReg) {
-			if (r.var.equals(v)) {
-				var.dec();
-				return r.nom;
+			if (r.var != null) {
+				if (r.var.equals(v)) {
+					var.dec();
+					return r.nom;
+				}
 			}
 		}
 		return allocRegistre(v);
@@ -128,6 +125,7 @@ public class RegistreAllocation implements Visitor {
 	@Override
 	public void visit(Let e) {
 		tabVar.add(new Var(e.id));
+		e.e2.accept(this);
 	}
 
 	@Override
