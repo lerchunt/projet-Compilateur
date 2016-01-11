@@ -211,14 +211,11 @@ public class GenerationS implements ObjVisitor<String> {
     	for(Exp param : e.es){
     		if(param.accept(this)==null){
     			retour += String.format("\tbl\tmin_caml_%s\n",e.e.accept(this));
-    		} else if(param.isInt()){
-	    		retour+=String.format("\tmov\tr%d,%s\n", nbReg,param.accept(this));
-	    		retour+=String.format("\tmov\tr0,r%d\n", nbReg);
-	    		retour = String.format("%s\tbl\tmin_caml_%s\n",retour,e.e.accept(this));
-	    		nbReg++;
-    			/*registre = RegistreAllocation.getRegistre(((Var)param).id);
-    			System.out.println(registre);*/
-    			//retour = String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
+    		} 
+    		else{
+    			registre = RegistreAllocation.getRegistre(((Var)param).id);
+    			retour +=String.format("\tmov\tr0,%s\n", registre);
+    			retour = String.format("%s\tbl\tmin_caml_%s\n",retour,e.e.accept(this));
     		}
     	}
 		return retour;

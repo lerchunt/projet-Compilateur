@@ -200,6 +200,12 @@ class Not extends OpUn {
     void accept(Visitor v) {
         v.visit(this);
     }
+    
+    @Override
+    public String toString()
+    {
+    	return "not " + e;
+    }
 }
 
 class Neg extends OpUn {
@@ -212,6 +218,12 @@ class Neg extends OpUn {
     }
     void accept(Visitor v) {
         v.visit(this);
+    }
+    
+    @Override
+    public String toString()
+    {
+    	return "-" + e;
     }
 }
 
@@ -339,6 +351,12 @@ class Eq extends OpBin {
     void accept(Visitor v) {
         v.visit(this);
     }
+    
+    @Override
+    public String toString()
+    {
+    	return e1.toString() + " = " + e2.toString();
+    }
 }
 
 class LE extends OpBin { 
@@ -352,6 +370,12 @@ class LE extends OpBin {
     }
     void accept(Visitor v) {
         v.visit(this);
+    }  
+    
+    @Override
+    public String toString()
+    {
+    	return e1.toString() + " <= " + e2.toString();
     }
 }
 
