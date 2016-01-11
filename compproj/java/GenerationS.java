@@ -36,6 +36,7 @@ public class GenerationS implements ObjVisitor<String> {
 	@Override
 	public String visit(Add e) {
 		affectRegistre(e.e1.accept(this),nbReg);
+		
 		String registre1 = variables.get(e.e1.accept(this));
     	String retour = String.format("\tmov\t%s,%s\n", registre1,e.e1.accept(this));
     	nbReg++;
@@ -119,7 +120,7 @@ public class GenerationS implements ObjVisitor<String> {
 		retour = String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		retour += String.format("\tmov\tr0,%s\n", registre);
 		//nbReg++;
-		//System.out.println(retour);
+		System.out.println(retour);
 		return retour;
 	}
 
@@ -140,7 +141,6 @@ public class GenerationS implements ObjVisitor<String> {
     	for(Exp param : e.es){
     		if(param.accept(this)==null){
     			retour += String.format("\tbl\tmin_caml_%s\n",e.e.accept(this));
-
     		} else if(param.isInt()){
 	    		retour+=String.format("\tmov\tr%d,%s\n", nbReg,param.accept(this));
 	    		retour+=String.format("\tmov\tr0,r%d\n", nbReg);
