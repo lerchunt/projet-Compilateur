@@ -217,12 +217,6 @@ class PrintVisitor implements Visitor {
         e.e3.accept(this);
         System.out.print(")");
     }
-
-	@Override
-	public void visit(FunDef e) {
-		// TODO Auto-generated method stub
-		
-	}
 }
 
 
