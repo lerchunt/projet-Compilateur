@@ -22,13 +22,12 @@ class Id {
         if (obj instanceof Id) {
             Id other = (Id) obj;
  
-            if (this.id != other.id) {
+            if (!this.id.equals(other.id)) {
                 return false; 
             }
 
             return true;
         }
- 
         return false;
     }
 

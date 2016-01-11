@@ -22,7 +22,7 @@ public class RegistreAllocation implements Visitor {
 		}
 		for (Registre r : tabReg) {
 			if (r.var != null) {
-				if (r.var.equals(v)) {
+				if (r.var.id.equals(v)) {
 					var.dec();
 					return r.nom;
 				}
