@@ -290,11 +290,5 @@ public class TypeChecking implements ObjVisitor<Type> {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
-	public Type visit(FunDef e) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
 
