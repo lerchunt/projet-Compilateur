@@ -2,9 +2,6 @@ import java.util.Hashtable;
 
 
 public class GenerationS implements ObjVisitor<String> {
-<<<<<<< HEAD
-	static String s;
-=======
 	
 	static Hashtable<String,String> variables = new Hashtable<String,String>();
 	private int nbReg = 4;
@@ -189,7 +186,6 @@ public class GenerationS implements ObjVisitor<String> {
 	private void affectRegistre(String Var, int nb){
 		String registre = String.format("r%d", nb);
 		this.variables.put(Var, registre);
-	}
 	}
 
 	@Override
