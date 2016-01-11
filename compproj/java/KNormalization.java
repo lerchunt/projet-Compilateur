@@ -80,6 +80,7 @@ public class KNormalization implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(FSub e) {
+		
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
 		return KNormOpBin(e, new TFloat());
@@ -149,6 +150,7 @@ public class KNormalization implements ObjVisitor<Exp> {
 		e.fd.e = e.fd.e.accept(this);
 		e.e = e.e.accept(this);
 		return e;
+		
 	}
 	
 	@Override
