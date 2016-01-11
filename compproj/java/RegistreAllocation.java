@@ -176,6 +176,9 @@ public class RegistreAllocation implements Visitor {
 
 	@Override
 	public void visit(LetRec e) {
+		for (Id id : e.fd.args) {
+			tabVar.add(new Var(id));
+		}
 		e.e.accept(this);
 		e.fd.e.accept(this);
 	}
