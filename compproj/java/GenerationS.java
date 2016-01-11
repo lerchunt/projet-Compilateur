@@ -41,7 +41,20 @@ public class GenerationS implements ObjVisitor<String> {
 		String registre2 = variables.get(e.e2.accept(this));
     	retour += String.format("\tmov\t%s,%s\n", registre2,e.e2.accept(this));
 		return retour += String.format("\tadd\tr0,%s,%s\n",registre1,registre2);*/
-		return "";
+		String retour = "";
+		String retour2 = "";
+		if (e.e1 instanceof Var) {
+			String registre = RegistreAllocation.getRegistre(((Var)e.e1).id);
+			//retour2 += String.format(",%s",registre);
+			retour += e.e2.accept(this);
+			retour += String.format("\tadd\tr0%s\n", RegistreAllocation.getRegistre(((Var)e.e1).id), RegistreAllocation.getRegistre(((Var)e.e2).id));
+		} else {
+			System.err.println("internal error -- GenerationS -- add");
+			System.exit(1);
+			return null;
+		}
+		retour += String.format("\tadd\tr0%s\n", retour2);
+		return retour;
 	}
 
 	@Override
