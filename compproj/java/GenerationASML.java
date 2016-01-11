@@ -416,7 +416,7 @@ public class GenerationASML implements ObjVisitor<String> {
       }
       def = true ; 
 	  haut += e.fd.e.accept(this);
-	  if(!e.e.isVIFB()) 
+	  if(e.e.isVIFB()) 
 	  {
 		  haut += e.e.accept(this);
 	  }
