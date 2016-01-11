@@ -197,5 +197,4 @@ public class GenerationS implements ObjVisitor<String> {
 		this.variables.put(Var, registre);
 	}
 	
-	
 }
