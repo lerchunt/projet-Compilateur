@@ -24,6 +24,7 @@ public class RegistreAllocation implements Visitor {
 	static String getRegistre(Var v) {
 		for (Registre r : tabReg) {
 			if (r.var.equals(v)) {
+				v.dec();
 				return r.nom;
 			}
 		}
