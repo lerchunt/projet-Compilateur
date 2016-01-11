@@ -63,10 +63,13 @@ public class Main {
 				Parser p = new Parser(new Lexer(new FileReader(argv[argv.length-1])));
 				Exp expression = (Exp) p.parse().value;      
 				assert (expression != null);
-
+				
 				System.out.println("------ AST ------");
 				expression.accept(new PrintVisitor());
 				System.out.println();
+				System.out.println("------ TYPE CHECKING ------");
+				expression.accept(new TypeChecking());
+				System.out.println("OK");
 
 				// Type Checking
 				if (!stopAfterTypeChecking) {
