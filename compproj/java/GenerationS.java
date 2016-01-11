@@ -134,8 +134,8 @@ public class GenerationS implements ObjVisitor<String> {
 		int nbreg = 0;
 		for (int i=0;i<e.fd.args.size();i++){
 			if (nbreg <4){
-				RegistreAllocation.add(e.fd.args.get(i).id,String.format("%s%d", registre,nbreg));
-				reg = RegistreAllocation.getRegistre(e.fd.args.get(i).id);
+				RegistreAllocation.add(e.fd.args.get(i),String.format("%s%d", registre,nbreg));
+				reg = RegistreAllocation.getRegistre(e.fd.args.get(i));
 				retour += String.format("\tmov\tr%d,%s\n",nbreg,reg);
 				nbreg++;
 			}
@@ -147,10 +147,10 @@ public class GenerationS implements ObjVisitor<String> {
 		e.fd.e.accept(this);
 		
 		for (int i=0;i<e.fd.args.size();i++){
-			RegistreAllocation.sup(e.fd.args.get(i).id);
+			RegistreAllocation.sup(e.fd.args.get(i));
 		}
 		e.e.accept(this);		
-		return();
+		return"";
 	}
 
 	@Override
