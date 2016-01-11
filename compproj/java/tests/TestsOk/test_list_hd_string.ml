@@ -1,0 +1,2 @@
+List.hd [ "High"; "Five"];;
+
