@@ -2,6 +2,7 @@ import java.util.Hashtable;
 
 
 public class GenerationS implements ObjVisitor<String> {
+
 	private int nbReg = 4;
 	
 	@Override
@@ -33,6 +34,7 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Add e) {
+
 		/*affectRegistre(e.e1.accept(this),nbReg);
 		String registre1 = variables.get(e.e1.accept(this));
     	String retour = String.format("\tmov\t%s,%s\n", registre1,e.e1.accept(this));
@@ -112,6 +114,7 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Let e) {
+
 		String registre = RegistreAllocation.getRegistre(e.id);
 		String retour = String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		retour += e.e2.accept(this);
@@ -125,7 +128,29 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(LetRec e) {
-		return(this.visit(e));
+		String registre ="r";
+		String reg="";
+		String retour =String.format("\n%s:\n",e.fd.id);
+		int nbreg = 0;
+		for (int i=0;i<e.fd.args.size();i++){
+			if (nbreg <4){
+				RegistreAllocation.add(e.fd.args.get(i).id,String.format("%s%d", registre,nbreg));
+				reg = RegistreAllocation.getRegistre(e.fd.args.get(i).id);
+				retour += String.format("\tmov\tr%d,%s\n",nbreg,reg);
+				nbreg++;
+			}
+			else{
+				System.err.println(e.fd.id + " : invalid argument number (>3)");
+				System.exit(1);
+			}
+		}
+		e.fd.e.accept(this);
+		
+		for (int i=0;i<e.fd.args.size();i++){
+			RegistreAllocation.sup(e.fd.args.get(i).id);
+		}
+		e.e.accept(this);		
+		return();
 	}
 
 	@Override
@@ -135,7 +160,6 @@ public class GenerationS implements ObjVisitor<String> {
     	for(Exp param : e.es){
     		if(param.accept(this)==null){
     			retour += String.format("\tbl\tmin_caml_%s\n",e.e.accept(this));
-
     		} else if(param.isInt()){
 	    		retour+=String.format("\tmov\tr%d,%s\n", nbReg,param.accept(this));
 	    		retour+=String.format("\tmov\tr0,r%d\n", nbReg);
