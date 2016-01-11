@@ -399,6 +399,8 @@ class Let extends Exp {
 
 class Var extends Exp {
     Id id;
+    
+    int nbOccurence = 0;
 
     Var(Id id) {
         this.id = id;
@@ -408,6 +410,14 @@ class Var extends Exp {
     public String toString()
     {
     	return id.toString();
+    }
+    
+    public void inc() {
+    	this.nbOccurence ++;
+    }
+    
+    public void dec() {
+    	this.nbOccurence --;
     }
     
 
@@ -551,7 +561,7 @@ class Put extends Exp {
     }
 }
 
-class FunDef extends Exp {
+class FunDef{
     Id id;
     Type type;
     List<Id> args;
@@ -564,16 +574,6 @@ class FunDef extends Exp {
         this.args = args;
         this.e = e;
     }
-
-	@Override
-	void accept(Visitor v) {
-         v.visit(this);
-	}
-
-	@Override
-	<E> E accept(ObjVisitor<E> v) {
-		return v.visit(this);
-	}
  
 }
  

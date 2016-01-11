@@ -227,12 +227,6 @@ public class KNormalization implements ObjVisitor<Exp> {
 		e.e3 = e.e3.accept(this);
 		return e;
 	}
-	@Override
-	public Exp visit(FunDef e) {
-		e.e.accept(this);
-		return e;
-	}
-
 
 	private boolean isNormalizable(OpBin e) {
 		if (!e.e1.isVar() || !e.e2.isVar()) {

@@ -464,8 +464,4 @@ public class GenerationASML implements ObjVisitor<String> {
 		return GenerationASML.asml;
 
     }
-	@Override
-	public String visit(FunDef e) {
-		return GenerationASML.asml;
-	}
 }

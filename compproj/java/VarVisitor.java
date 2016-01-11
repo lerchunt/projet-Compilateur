@@ -187,12 +187,6 @@ class VarVisitor implements ObjVisitor<Set<String>> {
         fv1.addAll(fv3);
         return fv1;
     }
-
-	@Override
-	public Set<String> visit(FunDef e) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
 
 

@@ -35,7 +35,14 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Add e) {
-		return String.format("\tadd\tr0,%s,%s",e.e1.accept(this),e.e2.accept(this));
+		affectRegistre(e.e1.accept(this),nbReg);
+		String registre1 = variables.get(e.e1.accept(this));
+    	String retour = String.format("\tmov\t%s,%s\n", registre1,e.e1.accept(this));
+    	nbReg++;
+    	affectRegistre(e.e2.accept(this),nbReg);
+		String registre2 = variables.get(e.e2.accept(this));
+    	retour += String.format("\tmov\t%s,%s\n", registre2,e.e2.accept(this));
+		return retour += String.format("\tadd\tr0,%s,%s\n",registre1,registre2);
 	}
 
 	@Override
@@ -106,7 +113,13 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Let e) {
-		return e.e1.accept(this);
+		affectRegistre(e.e2.accept(this),nbReg);
+		String registre = variables.get(e.e2.accept(this));
+		String retour = String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
+		retour += String.format("\tmov\tr0,%s\n", registre);
+		//nbReg++;
+		//System.out.println(retour);
+		return retour;
 	}
 
 	@Override
@@ -126,6 +139,7 @@ public class GenerationS implements ObjVisitor<String> {
     	for(Exp param : e.es){
     		if(param.accept(this)==null){
     			retour += String.format("\tbl\tmin_caml_%s\n",e.e.accept(this));
+
     		} else if(param.isInt()){
 	    		retour+=String.format("\tmov\tr%d,%s\n", nbReg,param.accept(this));
 	    		retour+=String.format("\tmov\tr0,r%d\n", nbReg);
@@ -176,13 +190,11 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(Unit unit) {
 		
 		return null;
-	}
-
-	@Override
-	public String visit(FunDef e) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	}	
 	
+	private void affectRegistre(String Var, int nb){
+		String registre = String.format("r%d", nb);
+		this.variables.put(Var, registre);
+	}
 	
 }
