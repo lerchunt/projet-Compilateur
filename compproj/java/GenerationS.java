@@ -35,21 +35,44 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Add e) {
-
-		/*affectRegistre(e.e1.accept(this),nbReg);
-		String registre1 = variables.get(e.e1.accept(this));
-    	String retour = String.format("\tmov\t%s,%s\n", registre1,e.e1.accept(this));
-    	nbReg++;
-    	affectRegistre(e.e2.accept(this),nbReg);
-		String registre2 = variables.get(e.e2.accept(this));
-    	retour += String.format("\tmov\t%s,%s\n", registre2,e.e2.accept(this));
-		return retour += String.format("\tadd\tr0,%s,%s\n",registre1,registre2);*/
-		return "";
+		String r1 = "";
+		String r2 = "";
+		if (e.e1 instanceof Var) {
+			r1 = RegistreAllocation.getRegistre(((Var)e.e1).id);
+		} else {
+			System.err.println("internal error -- GenerationS -- add");
+			System.exit(1);
+			return null;
+		}
+		if (e.e2 instanceof Var) {
+			r2 = RegistreAllocation.getRegistre(((Var)e.e2).id);
+		} else {
+			System.err.println("internal error -- GenerationS -- add");
+			System.exit(1);
+			return null;
+		}
+		return String.format("\tadd\t%s, %s, %s\n",e.registreDeRetour, r1, r2);
 	}
 
 	@Override
 	public String visit(Sub e) {
-		return String.format("\tsub\tr0,%s,%s",e.e1.accept(this),e.e2.accept(this));
+		String r1 = "";
+		String r2 = "";
+		if (e.e1 instanceof Var) {
+			r1 = RegistreAllocation.getRegistre(((Var)e.e1).id);
+		} else {
+			System.err.println("internal error -- GenerationS -- add");
+			System.exit(1);
+			return null;
+		}
+		if (e.e2 instanceof Var) {
+			r2 = RegistreAllocation.getRegistre(((Var)e.e2).id);
+		} else {
+			System.err.println("internal error -- GenerationS -- add");
+			System.exit(1);
+			return null;
+		}
+		return String.format("\tsub\t%s, %s, %s\n",e.registreDeRetour, r1, r2);
 	}
 
 	@Override
@@ -81,7 +104,23 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Mul e) {
-		return String.format("\tmul\tr0,%s,%s",e.e1.accept(this),e.e2.accept(this));
+		String r1 = "";
+		String r2 = "";
+		if (e.e1 instanceof Var) {
+			r1 = RegistreAllocation.getRegistre(((Var)e.e1).id);
+		} else {
+			System.err.println("internal error -- GenerationS -- add");
+			System.exit(1);
+			return null;
+		}
+		if (e.e2 instanceof Var) {
+			r2 = RegistreAllocation.getRegistre(((Var)e.e2).id);
+		} else {
+			System.err.println("internal error -- GenerationS -- add");
+			System.exit(1);
+			return null;
+		}
+		return String.format("\tmul\t%s, %s, %s\n",e.registreDeRetour, r1, r2);
 	}
 
 	@Override
@@ -132,14 +171,14 @@ public class GenerationS implements ObjVisitor<String> {
 		String registre ="r";
 		String reg="";
 		String retour = "";
+		int nbreg = 0;
 		retour += e.e.accept(this);
 		defFunc +=String.format("\nmin_caml_%s:\n",e.fd.id);
-		int nbreg = 0;
 		
-		for (int i=0;i<e.fd.args.size();i++){
+		for (Id id : e.fd.args){
 			if (nbreg <4){
-				RegistreAllocation.add(e.fd.args.get(i),String.format("%s%d", registre,nbreg));
-				reg = RegistreAllocation.getRegistre(e.fd.args.get(i));
+				RegistreAllocation.add(id,String.format("%s%d", registre,nbreg));
+				reg = RegistreAllocation.getRegistre(id);
 				defFunc += String.format("\tmov\t%s,r%d\n",reg,nbreg);
 				nbreg++;
 			}
@@ -148,19 +187,27 @@ public class GenerationS implements ObjVisitor<String> {
 				System.exit(1);
 			}
 		}
+		if (e.e instanceof OpBin){
+			System.out.println("oooooo");
+			Id idretour = Id.gen();
+			String regRetour = RegistreAllocation.getRegistre(idretour);
+			((OpBin)e.e).registreDeRetour = regRetour;
+			retour += e.e.accept(this);
+			retour += String.format("\n\tmov\tr0,%s",regRetour);
+		}
 		
 		e.fd.e.accept(this);
 		for (Id id : e.fd.args){
 			RegistreAllocation.sup(id);
 		}
-				
+		e.e.accept(this);	
 		return retour;
 	}
 
 	@Override
 	public String visit(App e) {
     	String retour="";
-    	
+    	String registre="";
     	for(Exp param : e.es){
     		if(param.accept(this)==null){
     			retour += String.format("\tbl\tmin_caml_%s\n",e.e.accept(this));
@@ -169,6 +216,9 @@ public class GenerationS implements ObjVisitor<String> {
 	    		retour+=String.format("\tmov\tr0,r%d\n", nbReg);
 	    		retour = String.format("%s\tbl\tmin_caml_%s\n",retour,e.e.accept(this));
 	    		nbReg++;
+    			/*registre = RegistreAllocation.getRegistre(((Var)param).id);
+    			System.out.println(registre);*/
+    			//retour = String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
     		}
     	}
 		return retour;
