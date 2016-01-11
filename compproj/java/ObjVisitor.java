@@ -26,7 +26,6 @@ interface ObjVisitor<E> {
     E visit(Get e);
     E visit(Put e);
 	E visit(Unit unit);
-	E visit(FunDef e);
 }
 
 
