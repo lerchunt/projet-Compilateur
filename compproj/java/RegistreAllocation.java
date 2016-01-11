@@ -28,14 +28,13 @@ public class RegistreAllocation implements Visitor {
 				return r.nom;
 			}
 		}
-		return allocRegistre(v);
+		return allocRegistre(v.id);
 	}
 	
-	static private String allocRegistre(Var v) {
+	static private String allocRegistre(Id v) {
 		for (Registre r : tabReg) {
 			if (r.var == null) {
-				v.dec();
-				r.var = v;
+				//r.var = v;
 			}
 			return r.nom;
 		}

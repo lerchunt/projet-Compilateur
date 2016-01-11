@@ -561,7 +561,7 @@ class Put extends Exp {
     }
 }
 
-class FunDef extends Exp {
+class FunDef{
     Id id;
     Type type;
     List<Id> args;
@@ -574,16 +574,6 @@ class FunDef extends Exp {
         this.args = args;
         this.e = e;
     }
-
-	@Override
-	void accept(Visitor v) {
-         v.visit(this);
-	}
-
-	@Override
-	<E> E accept(ObjVisitor<E> v) {
-		return v.visit(this);
-	}
  
 }
  
