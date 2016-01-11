@@ -19,24 +19,40 @@ public class RegistreAllocation implements Visitor {
 		}
 	}
 	
+	static LinkedList<Var> tabVar = new LinkedList<>();
 	static LinkedList<Registre> tabReg= new LinkedList<>();
 	
-	static String getRegistre(Var v) {
+	static String getRegistre(Id v) {
+		Var var = null;
+		for (Var vs : tabVar) {
+			if (vs.id.equals(v)) {
+				var = vs;
+			}
+		}
+		if (var == null) {
+			System.err.println("internal error -- registre allocation");
+			System.exit(1);
+			return null;
+		}
 		for (Registre r : tabReg) {
 			if (r.var.equals(v)) {
-				v.dec();
+				var.dec();
 				return r.nom;
 			}
 		}
-		return allocRegistre(v.id);
+		return allocRegistre(v);
 	}
 	
 	static private String allocRegistre(Id v) {
 		for (Registre r : tabReg) {
 			if (r.var == null) {
-				//r.var = v;
+				for (Var var : tabVar) {
+					if (var.id.equals(v)) {
+						r.var = var;
+						return r.nom;
+					}
+				}
 			}
-			return r.nom;
 		}
 		return null;
 	}
@@ -111,11 +127,16 @@ public class RegistreAllocation implements Visitor {
 
 	@Override
 	public void visit(Let e) {
+		tabVar.add(new Var(e.id));
 	}
 
 	@Override
 	public void visit(Var e) {
-		e.inc();
+		for (Var v : tabVar) {
+			if (v.id.equals(e.id)) {
+				v.inc();
+			}
+		}
 	}
 
 	@Override

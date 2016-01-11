@@ -1,5 +1,12 @@
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+
 
 public class TypeChecking implements ObjVisitor<Type> {
+	
+	private Hashtable<String, Type> tabSym = new Hashtable<String, Type>();
 
 	@Override
 	public Type visit(Bool e) {
@@ -182,13 +189,31 @@ public class TypeChecking implements ObjVisitor<Type> {
 
 	@Override
 	public Type visit(Let e) {
-		// TODO Auto-generated method stub
+		if(!e.e1.isVar()) {
+			if(!tabSym.containsKey(e.id.toString())) {
+				Type exp = e.e1.accept(this) ; 
+				tabSym.put(e.id.toString(), exp);
+			} else {
+				tabSym.remove(e.id.toString());
+				Type exp = e.e1.accept(this) ; 
+				tabSym.put(e.id.toString(), exp);
+			}
+		}
+		e.e2.accept(this);
+	//Enumeration r = tabSym.elements();
+	//while (r.hasMoreElements()) System.out.println(r.nextElement().toString());
+		
 		return null;
 	}
 
 	@Override
 	public Type visit(Var e) {
-		// TODO Auto-generated method stub
+		if(!tabSym.containsKey(e.id.toString())) {
+			System.err.println(e.id.toString() + " : doesn't exist");
+			System.exit(1);
+		} else {
+			return tabSym.get(e.id.toString());
+		}
 		return null;
 	}
 
@@ -197,10 +222,36 @@ public class TypeChecking implements ObjVisitor<Type> {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
+	public Type printInfix2(List<Exp> l) {
+        if (l.isEmpty()) {
+            return null;
+        }
+        Iterator<Exp> it = l.iterator();
+        Type t = it.next().accept(this);
+        while (it.hasNext()) {
+            if(it.next().accept(this) != t){
+            	System.err.println(" : expected similar types");
+    			System.exit(1);
+            }
+        }
+        return t ;
+    }
+	
 	@Override
 	public Type visit(App e) {
-		// TODO Auto-generated method stub
+		String ap = ((Var)e.e).id.toString();
+		if(ap.equals("print_int")) {
+			if(!(printInfix2(e.es) instanceof TInt)){
+				System.err.println(" expected a type int");
+    			System.exit(1);
+			}
+		} else if(ap.equals("print_float")) {
+			if(!(printInfix2(e.es) instanceof TFloat)){
+				System.err.println(" expected a type float");
+    			System.exit(1);
+			}
+		}
 		return null;
 	}
 
