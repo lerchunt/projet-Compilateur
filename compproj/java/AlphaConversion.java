@@ -161,9 +161,21 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(LetRec e) {
-		
-		
-		return	e;
+		for(Id i : e.fd.args){
+			stockerId(i);
+			int last_var=0;
+			String valeur=i.toString();
+			for(BindVar bv : variables){
+				if(bv.getIdPrec().equals(valeur)){
+					last_var=variables.indexOf(bv);
+				}
+			}
+			i.id=variables.get(last_var).getIdNew();
+		}
+		e.fd.e.accept(this);
+		e.e.accept(this);
+			
+		return e;
 	}
 
 	@Override
@@ -224,5 +236,4 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 			return this.IdNew;
 		}
 	}
-
 }
