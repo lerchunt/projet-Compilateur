@@ -54,14 +54,14 @@ public class RegistreAllocation implements Visitor {
 	}
 	
 	static void sup(Id v) {
-		for (Registre r : tabReg) {
+		for (Registre r : (LinkedList<Registre>)tabReg.clone()) {
 			if (r.var != null) {
 				if (r.var.id.equals(v)) {
 					tabReg.remove(r);
 				}
 			}
 		}
-		for (Var var : tabVar) {
+		for (Var var : (LinkedList<Var>)tabVar.clone()) {
 			if (var.id.equals(v)) {
 				tabVar.remove(var);
 			}

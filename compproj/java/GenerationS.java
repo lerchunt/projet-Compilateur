@@ -2,8 +2,9 @@ import java.util.Hashtable;
 
 
 public class GenerationS implements ObjVisitor<String> {
-
-	private int nbReg = 4;
+	public static String defFunc = "";
+	public static String defVar = "";
+	public int nbReg;
 	
 	@Override
 	public String visit(Bool e) {
@@ -130,13 +131,16 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(LetRec e) {
 		String registre ="r";
 		String reg="";
-		String retour =String.format("\n%s:\n",e.fd.id);
+		String retour = "";
+		retour += e.e.accept(this);
+		defFunc +=String.format("\nmin_caml_%s:\n",e.fd.id);
 		int nbreg = 0;
+		
 		for (int i=0;i<e.fd.args.size();i++){
 			if (nbreg <4){
 				RegistreAllocation.add(e.fd.args.get(i),String.format("%s%d", registre,nbreg));
 				reg = RegistreAllocation.getRegistre(e.fd.args.get(i));
-				retour += String.format("\tmov\tr%d,%s\n",nbreg,reg);
+				defFunc += String.format("\tmov\t%s,r%d\n",reg,nbreg);
 				nbreg++;
 			}
 			else{
@@ -144,13 +148,13 @@ public class GenerationS implements ObjVisitor<String> {
 				System.exit(1);
 			}
 		}
-		e.fd.e.accept(this);
 		
-		for (int i=0;i<e.fd.args.size();i++){
-			RegistreAllocation.sup(e.fd.args.get(i));
+		e.fd.e.accept(this);
+		for (Id id : e.fd.args){
+			RegistreAllocation.sup(id);
 		}
-		e.e.accept(this);		
-		return"";
+				
+		return retour;
 	}
 
 	@Override
@@ -211,5 +215,7 @@ public class GenerationS implements ObjVisitor<String> {
 		
 		return null;
 	}	
+	
+	
 	
 }
