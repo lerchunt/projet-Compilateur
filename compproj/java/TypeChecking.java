@@ -7,6 +7,7 @@ import java.util.List;
 public class TypeChecking implements ObjVisitor<Type> {
 	
 	private Hashtable<String, Type> tabSym = new Hashtable<String, Type>();
+	private static boolean def = false ; 
 
 	@Override
 	public Type visit(Bool e) {
@@ -25,125 +26,270 @@ public class TypeChecking implements ObjVisitor<Type> {
 
 	@Override
 	public Type visit(Not e) {
-		if(e.e.accept(this) instanceof TBool)
-		{
-			return e.e.accept(this);
+		if(!def){
+			if(e.e.accept(this) instanceof TBool)
+			{
+				return e.e.accept(this);
+			}
+			System.err.println(e.e + " : expected a type boolean");
+			System.exit(1);
+		} else {
+			if(e.e.accept(this) instanceof TUnit){
+				tabSym.remove(e.e.toString());
+				tabSym.put(e.e.toString(),new TBool());
+				return tabSym.get(e.e.toString());
+			} else if (e.e.accept(this) instanceof TBool) {
+				return e.e.accept(this);
+			}
 		}
-		System.err.println(e.e + " : expected a type boolean");
-		System.exit(1);
 		return null;
 	}
 
 	@Override
 	public Type visit(Neg e) {
-		if(e.e.accept(this) instanceof TInt || e.e.accept(this) instanceof TFloat)
-		{
-			return e.e.accept(this);
+		if(!def){
+			if(e.e.accept(this) instanceof TInt || e.e.accept(this) instanceof TFloat)
+			{
+				return e.e.accept(this);
+			}
+			System.err.println(e.e + " : expected a type int or float");
+			System.exit(1);
+		} else {
+				return e.e.accept(this);
 		}
-		System.err.println(e.e + " : expected a type float or int ");
-		System.exit(1);
 		return null;
 	}
 
 	@Override
 	public Type visit(Add e) {
-		if(e.e1.accept(this) instanceof TInt && e.e2.accept(this) instanceof TInt)
-		{
-			return e.e1.accept(this);
+		if(!def){
+			if(e.e1.accept(this) instanceof TInt && e.e2.accept(this) instanceof TInt)
+			{
+				return e.e1.accept(this);
+			}
+			System.err.println(e.e1.toString() + " + " + e.e2.toString() + " : expected a type int ");
+			System.exit(1);
+		} else {
+			if(e.e1.accept(this) instanceof TUnit && e.e2.accept(this) instanceof TInt){
+				tabSym.remove(e.e1.toString());
+				tabSym.put(e.e1.toString(), new TInt());
+				return e.e2.accept(this);
+			} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TInt){
+				tabSym.remove(e.e2.toString());
+				tabSym.put(e.e2.toString(), new TInt());
+				return e.e1.accept(this);
+			} else if(e.e1.accept(this) instanceof TInt && e.e2.accept(this) instanceof TInt)
+			{
+				return e.e1.accept(this);
+			}
+			System.err.println(e.e1.toString() + " + " + e.e2.toString() + " : expected a type int ");
+			System.exit(1);
 		}
-		System.err.println(e.e1.toString() + " + " + e.e2.toString() + " : expected a type int ");
-		System.exit(1);
+		
 		return null ;
 	}
 
 	@Override
-	public Type visit(Sub e) {
+	public Type visit(Sub e) {if(!def){
 		if(e.e1.accept(this) instanceof TInt && e.e2.accept(this) instanceof TInt)
 		{
 			return e.e1.accept(this);
 		}
-		System.err.println(e.e1 + " - " + e.e2 + " : expected a type int ");
+		System.err.println(e.e1.toString() + " - " + e.e2.toString() + " : expected a type int ");
 		System.exit(1);
-		return null ;
+	} else {
+		if(e.e1.accept(this) instanceof TUnit && e.e2.accept(this) instanceof TInt){
+			tabSym.remove(e.e1.toString());
+			tabSym.put(e.e1.toString(), new TInt());
+			return e.e2.accept(this);
+		} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TInt){
+			tabSym.remove(e.e2.toString());
+			tabSym.put(e.e2.toString(), new TInt());
+			return e.e1.accept(this);
+		} else if(e.e1.accept(this) instanceof TInt && e.e2.accept(this) instanceof TInt)
+		{
+			return e.e1.accept(this);
+		}
+		System.err.println(e.e1.toString() + " - " + e.e2.toString() + " : expected a type int ");
+		System.exit(1);
 	}
+	
+	return null ;
+}
 
 	@Override
 	public Type visit(FNeg e) {
-		if(e.e.accept(this) instanceof TFloat )
-		{
-			return e.e.accept(this);
+		if(!def){
+			if(e.e.accept(this) instanceof TFloat)
+			{
+				return e.e.accept(this);
+			}
+			System.err.println(e.e + " : expected a type float");
+			System.exit(1);
+		} else {
+			if(e.e.accept(this) instanceof TUnit){
+				tabSym.remove(e.e.toString());
+				tabSym.put(e.e.toString(),new TFloat());
+				return e.e.accept(this);
+			} else if (e.e.accept(this) instanceof TFloat){
+				return e.e.accept(this);
+			}
+			System.err.println(e.e + " : expected a type float ");
+			System.exit(1);
 		}
-		System.err.println(e.e + " : expected a type float ");
-		System.exit(1);
-		return null ;
+		
+		return null;
 	}
 
 	@Override
 	public Type visit(FAdd e) {
-		if(e.e1.accept(this) instanceof TFloat && e.e2.accept(this) instanceof TFloat)
-		{
-			return e.e1.accept(this);
+		if(!def){
+			if(e.e1.accept(this) instanceof TFloat && e.e2.accept(this) instanceof TFloat)
+			{
+				return e.e1.accept(this);
+			}
+			System.err.println(e.e1 + " +. " + e.e2 + " : expected a type float ");
+			System.exit(1);
+		} else {
+			if(e.e1.accept(this) instanceof TUnit && e.e2.accept(this) instanceof TFloat){
+				tabSym.remove(e.e1.toString());
+				tabSym.put(e.e1.toString(), new TFloat());
+				return e.e2.accept(this);
+			} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TFloat){
+				tabSym.remove(e.e2.toString());
+				tabSym.put(e.e2.toString(), new TFloat());
+				return e.e1.accept(this);
+			}
+			System.err.println(e.e1.toString() + " +. " + e.e2.toString() + " : expected a type float ");
+			System.exit(1);
 		}
-		System.err.println(e.e1 + " +. " + e.e2 + " : expected a type float ");
-		System.exit(1);
 		return null ;
 	}
 
 	@Override
 	public Type visit(FSub e) {
-		if(e.e1.accept(this) instanceof TFloat && e.e2.accept(this) instanceof TFloat)
-		{
-			return e.e1.accept(this);
+		if(!def){
+			if(e.e1.accept(this) instanceof TFloat && e.e2.accept(this) instanceof TFloat)
+			{
+				return e.e1.accept(this);
+			}
+			System.err.println(e.e1 + " -. " + e.e2 + " : expected a type float ");
+			System.exit(1);
+		} else {
+			if(e.e1.accept(this) instanceof TUnit && e.e2.accept(this) instanceof TFloat){
+				tabSym.remove(e.e1.toString());
+				tabSym.put(e.e1.toString(), e.e2.accept(this));
+				return e.e2.accept(this);
+			} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TFloat){
+				tabSym.remove(e.e2.toString());
+				tabSym.put(e.e2.toString(), e.e1.accept(this));
+				return e.e1.accept(this);
+			} else if(e.e1.accept(this) instanceof TFloat && e.e2.accept(this) instanceof TFloat)
+			{
+				return e.e1.accept(this);
+			}
+			System.err.println(e.e1.toString() + " -. " + e.e2.toString() + " : expected a type float ");
+			System.exit(1);
 		}
-		System.err.println(e.e1 + " -. " + e.e2 + " : expected a type float ");
-		System.exit(1);
 		return null ;
 	}
 
 	@Override
 	public Type visit(FMul e) {
-		if(e.e1.accept(this) instanceof TFloat && e.e2.accept(this) instanceof TFloat)
-		{
-			return e.e1.accept(this);
+		if(!def){
+			if(e.e1.accept(this) instanceof TFloat && e.e2.accept(this) instanceof TFloat)
+			{
+				return e.e1.accept(this);
+			}
+			System.err.println(e.e1 + " *. " + e.e2 + " : expected a type float ");
+			System.exit(1);
+		} else {
+			if(e.e1.accept(this) instanceof TUnit && e.e2.accept(this) instanceof TFloat){
+				tabSym.remove(e.e1.toString());
+				tabSym.put(e.e1.toString(), new TFloat());
+				return e.e2.accept(this);
+			} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TFloat){
+				tabSym.remove(e.e2.toString());
+				tabSym.put(e.e2.toString(), new TFloat());
+				return e.e1.accept(this);
+			}
+			System.err.println(e.e1.toString() + " *. " + e.e2.toString() + " : expected a type float ");
+			System.exit(1);
 		}
-		System.err.println(e.e1 + " *. " + e.e2 + " : expected a type float ");
-		System.exit(1);
 		return null ;
 	}
 
 	@Override
 	public Type visit(Mul e) {
-		if(e.e1.accept(this) instanceof TInt && e.e2.accept(this) instanceof TInt)
-		{
-			return e.e1.accept(this);
+		if(!def){
+			if(e.e1.accept(this) instanceof TInt && e.e2.accept(this) instanceof TInt)
+			{
+				return e.e1.accept(this);
+			}
+			System.err.println(e.e1 + " * " + e.e2 + " : expected a type int ");
+			System.exit(1);
+		} else {
+			if(e.e1.accept(this) instanceof TUnit && e.e2.accept(this) instanceof TInt){
+				tabSym.remove(e.e1.toString());
+				tabSym.put(e.e1.toString(), new TInt());
+				return e.e2.accept(this);
+			} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TInt){
+				tabSym.remove(e.e2.toString());
+				tabSym.put(e.e2.toString(), new TInt());
+				return e.e1.accept(this);
+			}
+			System.err.println(e.e1.toString() + " * " + e.e2.toString() + " : expected a type int ");
+			System.exit(1);
 		}
-		System.err.println(e.e1 + " * " + e.e2 + " : expected a type int ");
-		System.exit(1);
+		
 		return null ;
 	}
 
 	@Override
 	public Type visit(FDiv e) {
-		if(e.e1.accept(this) instanceof TFloat && e.e2.accept(this) instanceof TFloat)
-		{
-			return e.e1.accept(this);
+		if(!def){
+			if(e.e1.accept(this) instanceof TFloat && e.e2.accept(this) instanceof TFloat)
+			{
+				return e.e1.accept(this);
+			}
+			System.err.println(e.e1 + " /. " + e.e2 + " : expected a type float ");
+			System.exit(1);
+		} else {
+			if(e.e1.accept(this) instanceof TUnit && e.e2.accept(this) instanceof TFloat){
+				tabSym.remove(e.e1.toString());
+				tabSym.put(e.e1.toString(), new TFloat());
+				return e.e2.accept(this);
+			} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TFloat){
+				tabSym.remove(e.e2.toString());
+				tabSym.put(e.e2.toString(), new TFloat());
+				return e.e1.accept(this);
+			}
+			System.err.println(e.e1.toString() + " /. " + e.e2.toString() + " : expected a type float ");
+			System.exit(1);
 		}
-		System.err.println(e.e1 + " /. " + e.e2 + " : expected a type float ");
-		System.exit(1);
 		return null ;
 	}
 
 	@Override
 	public Type visit(Eq e) {
-		if(e.e1.accept(this) instanceof TFloat && e.e2.accept(this) instanceof TFloat)
-		{
-			return new TBool();
-		} else if (e.e1.accept(this) instanceof TInt && e.e2.accept(this) instanceof TInt)
-		{
-			return new TBool();
-		} else if (e.e1.accept(this) instanceof TBool && e.e2.accept(this) instanceof TBool)
-		{
-			return new TBool();
+		if(!def) {
+			if(e.e1.accept(this) instanceof TFloat && e.e2.accept(this) instanceof TFloat)
+			{
+				return new TBool();
+			} else if (e.e1.accept(this) instanceof TInt && e.e2.accept(this) instanceof TInt)
+			{
+				return new TBool();
+			} else if (e.e1.accept(this) instanceof TBool && e.e2.accept(this) instanceof TBool){
+				return new TBool();
+			} 
+		} else {
+			if(e.e1.accept(this) instanceof TUnit && e.e2.accept(this) instanceof TUnit){
+				tabSym.remove(e.e1.toString());
+				tabSym.put(e.e1.toString(), new TBool());
+				tabSym.remove(e.e2.toString());
+				tabSym.put(e.e2.toString(), new TBool());
+				return tabSym.get(e.e2.toString());
+			}
 		}
 		System.err.println(e.e1 + " = " + e.e2 + " : expected a similar type");
 		System.exit(1);
@@ -152,15 +298,23 @@ public class TypeChecking implements ObjVisitor<Type> {
 
 	@Override
 	public Type visit(LE e) {
-		if(e.e1.accept(this) instanceof TFloat && e.e2.accept(this) instanceof TFloat)
-		{
-			return new TBool();
-		} else if (e.e1.accept(this) instanceof TInt && e.e2.accept(this) instanceof TInt)
-		{
-			return new TBool();
-		} else if (e.e1.accept(this) instanceof TBool && e.e2.accept(this) instanceof TBool)
-		{
-			return new TBool();
+		if(!def){
+			if(e.e1.accept(this) instanceof TFloat && e.e2.accept(this) instanceof TFloat)
+			{
+				return new TBool();
+			} else if (e.e1.accept(this) instanceof TInt && e.e2.accept(this) instanceof TInt)
+			{
+				return new TBool();
+			} else if (e.e1.accept(this) instanceof TBool && e.e2.accept(this) instanceof TBool)
+			{
+				return new TBool();
+			}
+		} else if(e.e1.accept(this) instanceof TUnit && e.e2.accept(this) instanceof TUnit) {
+			tabSym.remove(e.e1.toString());
+			tabSym.put(e.e1.toString(), new TBool());
+			tabSym.remove(e.e2.toString());
+			tabSym.put(e.e2.toString(), new TBool());
+			return tabSym.get(e.e2.toString());
 		}
 		System.err.println(e.e1 + " <= " + e.e2 + " : expected a similar type ");
 		System.exit(1);
@@ -169,17 +323,57 @@ public class TypeChecking implements ObjVisitor<Type> {
 
 	@Override
 	public Type visit(If e) {
-		if(e.e1.accept(this) instanceof TBool)
-		{
-			if(e.e2.accept(this) instanceof TInt && e.e3.accept(this) instanceof TInt)
+		if(!def){
+			if(e.e1.accept(this) instanceof TBool)
 			{
-				return e.e2.accept(this);
-			} else if(e.e2.accept(this) instanceof TFloat && e.e3.accept(this) instanceof TFloat)
+				if(e.e2.accept(this) instanceof TInt && e.e3.accept(this) instanceof TInt)
+				{
+					return e.e2.accept(this);
+				} else if(e.e2.accept(this) instanceof TFloat && e.e3.accept(this) instanceof TFloat)
+				{
+					return e.e2.accept(this);
+				} else if(e.e2.accept(this) instanceof TBool && e.e3.accept(this) instanceof TBool)
+				{
+					return e.e2.accept(this);
+				}
+			}
+		} else {
+			if(e.e1.accept(this) instanceof TBool)
 			{
-				return e.e2.accept(this);
-			} else if(e.e2.accept(this) instanceof TBool && e.e3.accept(this) instanceof TBool)
-			{
-				return e.e2.accept(this);
+				if(e.e2.accept(this) instanceof TUnit && e.e3.accept(this) instanceof TUnit)
+				{
+					return e.e2.accept(this);
+				} else if (e.e2.accept(this) instanceof TUnit && e.e3.accept(this) instanceof TFloat)
+				{
+					tabSym.remove(e.e2.toString());
+					tabSym.put(e.e2.toString(), e.e3.accept(this));
+					return tabSym.get(e.e2.toString());
+				} else if (e.e2.accept(this) instanceof TUnit && e.e3.accept(this) instanceof TInt)
+				{
+					tabSym.remove(e.e2.toString());
+					tabSym.put(e.e2.toString(), e.e3.accept(this));
+					return tabSym.get(e.e2.toString());
+				} else if (e.e2.accept(this) instanceof TUnit && e.e3.accept(this) instanceof TBool)
+				{
+					tabSym.remove(e.e2.toString());
+					tabSym.put(e.e2.toString(), e.e3.accept(this));
+					return tabSym.get(e.e2.toString());
+				} else if (e.e3.accept(this) instanceof TUnit && e.e2.accept(this) instanceof TFloat)
+				{
+					tabSym.remove(e.e3.toString());
+					tabSym.put(e.e3.toString(), e.e2.accept(this));
+					return tabSym.get(e.e3.toString());
+				} else if (e.e3.accept(this) instanceof TUnit && e.e2.accept(this) instanceof TInt)
+				{
+					tabSym.remove(e.e3.toString());
+					tabSym.put(e.e3.toString(), e.e2.accept(this));
+					return tabSym.get(e.e3.toString());
+				} else if (e.e3.accept(this) instanceof TUnit && e.e2.accept(this) instanceof TBool)
+				{
+					tabSym.remove(e.e3.toString());
+					tabSym.put(e.e3.toString(), e.e2.accept(this));
+					return tabSym.get(e.e3.toString());
+				}
 			}
 		}
 		System.err.println("if " + e.e1.toString() + " then " + e.e2.toString() + " else " + e.e3.toString() + " : expected a type bool then similar ");
@@ -200,27 +394,39 @@ public class TypeChecking implements ObjVisitor<Type> {
 			}
 		}
 		e.e2.accept(this);
-	//Enumeration r = tabSym.elements();
-	//while (r.hasMoreElements()) System.out.println(r.nextElement().toString());
-		
 		return null;
 	}
 
 	@Override
 	public Type visit(Var e) {
-		if(!tabSym.containsKey(e.id.toString())) {
-			System.err.println(e.id.toString() + " : doesn't exist");
-			System.exit(1);
+		if(!def){
+			if(!tabSym.containsKey(e.id.toString())) {
+				System.err.println(e.id.toString() + " : doesn't exist");
+				System.exit(1);
+			} else {
+				return tabSym.get(e.id.toString());
+			}
 		} else {
+			tabSym.put(e.id.toString(), new TUnit());
 			return tabSym.get(e.id.toString());
 		}
+		
 		return null;
 	}
 
 	@Override
 	public Type visit(LetRec e) {
-		// TODO Auto-generated method stub
-		return null;
+		def = true ;
+		Type f = e.fd.e.accept(this);
+		tabSym.put(e.fd.id.toString(), f);
+		if(e.e.isVar()){
+			e.e.accept(this);
+			def = false ;
+		} else {
+			def = false ;
+			e.e.accept(this);
+		}
+		return f;
 	}
 	
 	public Type printInfix2(List<Exp> l) {
@@ -241,17 +447,28 @@ public class TypeChecking implements ObjVisitor<Type> {
 	@Override
 	public Type visit(App e) {
 		String ap = ((Var)e.e).id.toString();
-		if(ap.equals("print_int")) {
-			if(!(printInfix2(e.es) instanceof TInt)){
-				System.err.println(" expected a type int");
+		if(!tabSym.containsKey(((Var)e.e).id.toString())) {
+			if(ap.equals("print_int")) {
+				if(!(printInfix2(e.es) instanceof TInt)){
+					System.err.println(" expected a type int in " + ap);
+	    			System.exit(1);
+				}
+			} else if(ap.equals("print_float")) {
+				if(!(printInfix2(e.es) instanceof TFloat)){
+					System.err.println(" expected a type float in " + ap);
+	    			System.exit(1);
+				}
+			}
+		}else {
+			Type att = tabSym.get(((Var)e.e).id.toString()) ;
+			if(!(printInfix2(e.es).equalsType(att))){
+				System.err.println("expected a type " + att.toString());
     			System.exit(1);
 			}
-		} else if(ap.equals("print_float")) {
-			if(!(printInfix2(e.es) instanceof TFloat)){
-				System.err.println(" expected a type float");
-    			System.exit(1);
-			}
+			return tabSym.get(((Var)e.e).id.toString());
+		
 		}
+		
 		return null;
 	}
 
