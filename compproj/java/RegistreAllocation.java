@@ -38,8 +38,11 @@ public class RegistreAllocation implements Visitor {
 					if (var.id.equals(v)) {
 						r.var = var;
 						return r.nom;
-					}
+					} 
 				}
+				Var var = new Var(v);
+				r.var = var;
+				return r.nom;
 			}
 		}
 		return null;

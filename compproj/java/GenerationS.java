@@ -61,14 +61,14 @@ public class GenerationS implements ObjVisitor<String> {
 		if (e.e1 instanceof Var) {
 			r1 = RegistreAllocation.getRegistre(((Var)e.e1).id);
 		} else {
-			System.err.println("internal error -- GenerationS -- add");
+			System.err.println("internal error -- GenerationS -- sub");
 			System.exit(1);
 			return null;
 		}
 		if (e.e2 instanceof Var) {
 			r2 = RegistreAllocation.getRegistre(((Var)e.e2).id);
 		} else {
-			System.err.println("internal error -- GenerationS -- add");
+			System.err.println("internal error -- GenerationS -- sub");
 			System.exit(1);
 			return null;
 		}
@@ -109,14 +109,14 @@ public class GenerationS implements ObjVisitor<String> {
 		if (e.e1 instanceof Var) {
 			r1 = RegistreAllocation.getRegistre(((Var)e.e1).id);
 		} else {
-			System.err.println("internal error -- GenerationS -- add");
+			System.err.println("internal error -- GenerationS -- mul");
 			System.exit(1);
 			return null;
 		}
 		if (e.e2 instanceof Var) {
 			r2 = RegistreAllocation.getRegistre(((Var)e.e2).id);
 		} else {
-			System.err.println("internal error -- GenerationS -- add");
+			System.err.println("internal error -- GenerationS -- mul");
 			System.exit(1);
 			return null;
 		}
@@ -172,12 +172,11 @@ public class GenerationS implements ObjVisitor<String> {
 		String reg="";
 		String retour = "";
 		int nbreg = 0;
-		retour += e.e.accept(this);
 		defFunc +=String.format("\nmin_caml_%s:\n",e.fd.id);
 		
 		for (Id id : e.fd.args){
 			if (nbreg <4){
-				RegistreAllocation.add(id,String.format("%s%d", registre,nbreg));
+				//RegistreAllocation.add(id,String.format("%s%d", registre,nbreg));
 				reg = RegistreAllocation.getRegistre(id);
 				defFunc += String.format("\tmov\t%s,r%d\n",reg,nbreg);
 				nbreg++;
@@ -187,21 +186,21 @@ public class GenerationS implements ObjVisitor<String> {
 				System.exit(1);
 			}
 		}
-		if (e.e instanceof OpBin){
-			System.out.println("oooooo");
+		if (e.fd.e instanceof OpBin){
 			Id idretour = Id.gen();
 			String regRetour = RegistreAllocation.getRegistre(idretour);
-			((OpBin)e.e).registreDeRetour = regRetour;
-			retour += e.e.accept(this);
-			retour += String.format("\n\tmov\tr0,%s",regRetour);
+			((OpBin)e.fd.e).registreDeRetour = regRetour;
+			retour += e.fd.e.accept(this);
+			retour += String.format("\tmov\tr0,%s",regRetour);
+			for (Id id : e.fd.args){
+				RegistreAllocation.sup(id);
+			}
+			defFunc += retour;
 		}
 		
-		e.fd.e.accept(this);
-		for (Id id : e.fd.args){
-			RegistreAllocation.sup(id);
-		}
-		e.e.accept(this);	
-		return retour;
+		//e.fd.e.accept(this);
+		
+		return e.e.accept(this);	
 	}
 
 	@Override
@@ -211,10 +210,12 @@ public class GenerationS implements ObjVisitor<String> {
     	for(Exp param : e.es){
     		if(param.accept(this)==null){
     			retour += String.format("\tbl\tmin_caml_%s\n",e.e.accept(this));
-    		} 
-    		else{
+    		}else if (param instanceof Var){
     			registre = RegistreAllocation.getRegistre(((Var)param).id);
     			retour +=String.format("\tmov\tr0,%s\n", registre);
+    			retour = String.format("%s\tbl\tmin_caml_%s\n",retour,e.e.accept(this));
+    		}else {
+    			retour +=String.format("\tmov\tr0,%s\n",param.accept(this));
     			retour = String.format("%s\tbl\tmin_caml_%s\n",retour,e.e.accept(this));
     		}
     	}
