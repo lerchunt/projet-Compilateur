@@ -10,12 +10,10 @@ public class TestGenerateS {
 	public void testPrintNewLine() {
 		Parser p;
 		try {
-			p = new Parser(new Lexer(new FileReader("/home/julie/Documents/ProjetCompil/high5/compproj/minml/print_newline.ml")));
+			p = new Parser(new Lexer(new FileReader("/home/lorrie/Documents/ProjetCompil/high5/compproj/minml/print_newline.ml")));
 			Exp expression = (Exp) p.parse().value; 
-			String retour = "\t.text\n\t.global _start\n_start:\n";
-		    retour += expression.accept(new GenerationS());
 			String retour = this.head();
-		    retour += expression.accept(new GenerationS());
+			retour += expression.accept(new GenerationS());
 		    retour += this.end();
 		    System.out.println(retour);    
 	    } catch (Exception e) {
@@ -30,8 +28,9 @@ public class TestGenerateS {
 		try {
 			p = new Parser(new Lexer(new FileReader("/home/lorrie/Documents/ProjetCompil/high5/compproj/minml/print.ml")));
 			Exp expression = (Exp) p.parse().value;
-		    String retour = "\t.text\n\t.global _start\n_start:\n";
+		    String retour = this.head();
 			retour += expression.accept(new GenerationS());
+			retour += this.end();
 		    System.out.println(retour);    
 	    } catch (Exception e) {
 			e.printStackTrace();

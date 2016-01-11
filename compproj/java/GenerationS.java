@@ -2,9 +2,6 @@ import java.util.Hashtable;
 
 
 public class GenerationS implements ObjVisitor<String> {
-<<<<<<< HEAD
-	static String s;
-=======
 	
 	static Hashtable<String,String> variables = new Hashtable<String,String>();
 	private int nbReg = 4;
@@ -38,7 +35,14 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Add e) {
-		return String.format("\tadd\tr0,%s,%s",e.e1.accept(this),e.e2.accept(this));
+		affectRegistre(e.e1.accept(this),nbReg);
+		String registre1 = variables.get(e.e1.accept(this));
+    	String retour = String.format("\tmov\t%s,%s\n", registre1,e.e1.accept(this));
+    	nbReg++;
+    	affectRegistre(e.e2.accept(this),nbReg);
+		String registre2 = variables.get(e.e2.accept(this));
+    	retour += String.format("\tmov\t%s,%s\n", registre2,e.e2.accept(this));
+		return retour += String.format("\tadd\tr0,%s,%s\n",registre1,registre2);
 	}
 
 	@Override
@@ -113,7 +117,9 @@ public class GenerationS implements ObjVisitor<String> {
 		String registre = variables.get(e.e2.accept(this));
 		String retour = String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		retour += String.format("\tmov\tr0,%s\n", registre);
-		return retour += String.format("\tbl\tmin_caml_exit\n");
+		//nbReg++;
+		//System.out.println(retour);
+		return retour;
 	}
 
 	@Override
@@ -190,12 +196,6 @@ public class GenerationS implements ObjVisitor<String> {
 		String registre = String.format("r%d", nb);
 		this.variables.put(Var, registre);
 	}
-	}
-
-	@Override
-	public String visit(FunDef e) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 	
 }
