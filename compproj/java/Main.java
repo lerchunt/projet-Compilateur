@@ -77,6 +77,10 @@ public class Main {
 					System.out.println("------ AST Knorm ------");
 					expression.accept(new PrintVisitor());
 					System.out.println();
+					expression = expression.accept(new AlphaConversion());
+					System.out.println("------ AST AlphaConv ------");
+					expression.accept(new PrintVisitor());
+					System.out.println();
 					System.out.println("------ ASML ------");
 					expression.accept(new GenerationASML());
 					System.out.println();

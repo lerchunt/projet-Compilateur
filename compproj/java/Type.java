@@ -3,22 +3,84 @@ abstract class Type {
     static Type gen() {
         return new TVar("?" + x++);
     }
+	public abstract boolean equalsType(Type g) ;
     
 }
 
-class TUnit extends Type { }
+class TUnit extends Type {
 
-class TBool extends Type { }
+	@Override
+	public boolean equalsType(Type g) {
+		return g instanceof TUnit;
+	} 
+}
 
-class TInt extends Type { }
+class TBool extends Type {
 
-class TFloat extends Type { }
+	@Override
+	public boolean equalsType(Type g) {
+		return g instanceof TBool;
+	} 
+	
+	@Override
+    public String toString()
+    {
+    	return "boolean";
+    }
+}
 
-class TFun extends Type { }
+class TInt extends Type {
 
-class TTuple extends Type { }
+	@Override
+	public boolean equalsType(Type g) {
+		return (g instanceof TInt) ;
+	} 
+	
+	 @Override
+	    public String toString()
+	    {
+	    	return "int";
+	    }
+	
+}
 
-class TArray extends Type { }
+class TFloat extends Type {
+
+	@Override
+	public boolean equalsType(Type g) {
+		return g instanceof TFloat ;
+	}
+	
+	@Override
+    public String toString()
+    {
+    	return "float";
+    }
+}
+
+class TFun extends Type { 
+	
+	@Override
+	public boolean equalsType(Type g) {
+		return g instanceof TFun ;
+	}
+}
+
+class TTuple extends Type { 
+	
+	@Override
+	public boolean equalsType(Type g) {
+		return g instanceof TTuple ;
+	}
+}
+
+class TArray extends Type { 
+	
+	@Override
+	public boolean equalsType(Type g) {
+		return g instanceof TArray ;
+	}
+}
 
 class TVar extends Type {
     String v;
@@ -29,5 +91,10 @@ class TVar extends Type {
     public String toString() {
         return v; 
     }
+    
+    @Override
+	public boolean equalsType(Type g) {
+		return g instanceof TVar ;
+	}
 }
 
