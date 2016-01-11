@@ -403,6 +403,13 @@ class Var extends Exp {
     Var(Id id) {
         this.id = id;
     }
+    
+    @Override
+    public String toString()
+    {
+    	return id.toString();
+    }
+    
 
     <E> E accept(ObjVisitor<E> v) {
         return v.visit(this);
@@ -544,7 +551,7 @@ class Put extends Exp {
     }
 }
 
-class FunDef {
+class FunDef extends Exp {
     Id id;
     Type type;
     List<Id> args;
@@ -557,6 +564,16 @@ class FunDef {
         this.args = args;
         this.e = e;
     }
+
+	@Override
+	void accept(Visitor v) {
+         v.visit(this);
+	}
+
+	@Override
+	<E> E accept(ObjVisitor<E> v) {
+		return v.visit(this);
+	}
  
 }
  

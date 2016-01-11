@@ -2,14 +2,12 @@ import java.util.Hashtable;
 
 
 public class GenerationS implements ObjVisitor<String> {
+<<<<<<< HEAD
 	static String s;
-	private int nbReg = 4;
-	Hashtable<String,String> variables = new Hashtable<String,String>();
+=======
 	
-	public GenerationS()
-	{
-		//GenerationS.s = "\t.text\n\t.global _start\n_start:";
-	}
+	static Hashtable<String,String> variables = new Hashtable<String,String>();
+	private int nbReg = 4;
 	
 	@Override
 	public String visit(Bool e) {
@@ -40,16 +38,12 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Add e) {
-		e.e1.accept(this);
-		e.e2.accept(this);
-		return null;
+		return String.format("\tadd\tr0,%s,%s",e.e1.accept(this),e.e2.accept(this));
 	}
 
 	@Override
 	public String visit(Sub e) {
-		e.e1.accept(this);
-		e.e2.accept(this);
-		return null;
+		return String.format("\tsub\tr0,%s,%s",e.e1.accept(this),e.e2.accept(this));
 	}
 
 	@Override
@@ -81,9 +75,7 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Mul e) {
-		e.e1.accept(this);
-		e.e2.accept(this);
-		return null;
+		return String.format("\tmul\tr0,%s,%s",e.e1.accept(this),e.e2.accept(this));
 	}
 
 	@Override
@@ -137,17 +129,19 @@ public class GenerationS implements ObjVisitor<String> {
 	@Override
 	public String visit(App e) {
     	String retour="";
+    	
     	for(Exp param : e.es){
     		if(param.accept(this)==null){
     			retour += String.format("\tbl\tmin_caml_%s\n",e.e.accept(this));
-    		}
-    		else{
-		    	retour += String.format("\tmov\tr%d,%s\n", nbReg,param.accept(this));
-		    	retour += String.format("\tmov\tr0,r%d\n", nbReg);
-		    	retour += String.format("\tbl\tmin_caml_%s\n",e.e.accept(this));
+
+    		} else if(param.isInt()){
+	    		retour+=String.format("\tmov\tr%d,%s\n", nbReg,param.accept(this));
+	    		retour+=String.format("\tmov\tr0,r%d\n", nbReg);
+	    		retour = String.format("%s\tbl\tmin_caml_%s\n",retour,e.e.accept(this));
+	    		nbReg++;
     		}
     	}
-		return retour += String.format("\tbl\tmin_caml_exit\n");
+		return retour;
 		
 	}
 
@@ -196,4 +190,12 @@ public class GenerationS implements ObjVisitor<String> {
 		String registre = String.format("r%d", nb);
 		this.variables.put(Var, registre);
 	}
+	}
+
+	@Override
+	public String visit(FunDef e) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 }
