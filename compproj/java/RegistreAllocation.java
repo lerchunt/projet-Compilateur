@@ -10,15 +10,6 @@ public class RegistreAllocation implements Visitor {
 		}
 	}
 	
-	private class Registre {
-		public String nom;
-		public Var var = null;
-		
-		public Registre(String nom) {
-			this.nom = nom;
-		}
-	}
-	
 	static LinkedList<Var> tabVar = new LinkedList<>();
 	static LinkedList<Registre> tabReg= new LinkedList<>();
 	
@@ -54,6 +45,29 @@ public class RegistreAllocation implements Visitor {
 		return null;
 	}
 
+	static void add(Id v, String reg) {
+		Var var = new Var(v);
+		tabVar.add(var);
+		Registre r = new Registre(reg);
+		r.var = var;
+		tabReg.add(r);
+	}
+	
+	static void sup(Id v) {
+		for (Registre r : tabReg) {
+			if (r.var != null) {
+				if (r.var.id.equals(v)) {
+					tabReg.remove(r);
+				}
+			}
+		}
+		for (Var var : tabVar) {
+			if (var.id.equals(v)) {
+				tabVar.remove(var);
+			}
+		}
+	}
+	
 	@Override
 	public void visit(Unit e) {
 	}
@@ -206,4 +220,15 @@ public class RegistreAllocation implements Visitor {
 		e.e3.accept(this);
 	}
 
+	
+	private static class Registre {
+		public String nom;
+		public Var var = null;
+		
+		public Registre(String nom) {
+			this.nom = nom;
+		}
+	}
+
 }
+
