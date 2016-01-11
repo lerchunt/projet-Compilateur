@@ -3,7 +3,6 @@ import java.util.Hashtable;
 
 public class GenerationS implements ObjVisitor<String> {
 
-	private int nbReg = 4;
 	
 	@Override
 	public String visit(Bool e) {
