@@ -16,6 +16,7 @@ for i in tests/TestsOk/*.ml
 do
 echo "\033[0mTest de $i \033[31m"
 ./min-ml $i > journal.log
+./min-ml.s
 done
 echo ""
 echo "\033[36m******* TEST DES FICHIERS INCORRECTS ******* \n"
