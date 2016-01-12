@@ -1,26 +1,8 @@
-import java.util.ArrayList;
+public class InlineExpansion implements ObjVisitor<Exp> {
 
-public class AlphaConversion implements ObjVisitor<Exp> {
-	static ArrayList <BindVar> variables = new ArrayList<BindVar>();
+	private static int threshold = 5;
+	public InlineExpansion() {
 
-	public void stockerId(Id id){
-		variables.add(new BindVar(id.toString(), id.toString()));
-		checkName(id.toString());
-	}
-	public void checkName(String s){
-		boolean existing = false;
-		int cpt=0;
-		for(BindVar i : variables){
-			if(i.getIdPrec().equals(s)){
-				cpt++;
-				if (cpt>1)
-					existing=true;
-			}
-		}
-		if(existing){
-			Id newId = Id.gen(); //si la variable existe déjà dans la liste, on la renomme
-			 variables.get(variables.size()-1).setIdNew(newId.toString());
-		}
 	}
 	
 	@Override
@@ -129,50 +111,24 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Let e) {
-		e.e1.accept(this);
-		stockerId(e.id);
-		int last_var=0;
-		String valeur=e.id.toString();
-		for(BindVar bv : variables){
-			if(bv.getIdPrec().equals(valeur)){
-				last_var=variables.indexOf(bv);
-			}
-		}
-		e.id.id=variables.get(last_var).getIdNew();
-		e.e2.accept(this);
+
 		return e;
 	}
 
 	@Override
 	public Exp visit(Var e) {
-		int last_var=0;
-		String valeur=e.id.toString();
-		for(BindVar bv : variables){
-			if(bv.getIdPrec().equals(valeur)){
-				last_var=variables.indexOf(bv);
-			}
-		}
-		e.id.id=variables.get(last_var).getIdNew();
 		return e;
 	}
 
 	@Override
 	public Exp visit(LetRec e) {
-		for(Id i : e.fd.args){
-			stockerId(i);
-			int last_var=0;
-			String valeur=i.toString();
-			for(BindVar bv : variables){
-				if(bv.getIdPrec().equals(valeur)){
-					last_var=variables.indexOf(bv);
-				}
-			}
-			i.id=variables.get(last_var).getIdNew();
+		int height = Height.computeHeight(e);
+		if (height<=threshold){
+			return e;
 		}
-		e.fd.e.accept(this);
-		e.e.accept(this);
-		return e;
-
+		else{
+			return e;	
+		}
 	}
 
 	@Override
@@ -208,26 +164,5 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 	public Exp visit(Put e) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	private class BindVar{
-		private String IdPrec;
-		private String IdNew;
-		
-		private BindVar(String idold,String idnew){
-			this.IdNew=idnew;
-			this.IdPrec=idold;
-		}
-		
-		public void setIdNew(String s){
-			this.IdNew=s;
-		}
-		
-		public String getIdPrec(){
-			return this.IdPrec;
-		}
-		public String getIdNew(){
-			return this.IdNew;
-		}
 	}
 }
