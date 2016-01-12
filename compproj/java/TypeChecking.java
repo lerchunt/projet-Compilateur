@@ -439,7 +439,7 @@ public class TypeChecking implements ObjVisitor<Type> {
 			System.exit(1);
 		}
 		def = true ; 
-		printInfix(e.fd.args) ; 
+		printInfix(e.fd.args) ;
 		Type f = e.fd.e.accept(this);
 		tabSym.put(e.fd.id.toString(), f);
 		if(e.e.isVar()){
@@ -449,7 +449,7 @@ public class TypeChecking implements ObjVisitor<Type> {
 			def = false ;
 			e.e.accept(this);
 		}
-		return f;
+		return 	e.e.accept(this);
 	}
 	
 	private void printInfix(List<Id> args) {
@@ -486,14 +486,14 @@ public class TypeChecking implements ObjVisitor<Type> {
 					System.err.println(" expected a type int in " + ap);
 	    			System.exit(1);
 				} else {
-					return new TInt();
+					return new TUnit();
 				}
 			} else if(ap.equals("print_float")) {
 				if(!(printInfix2(e.es) instanceof TFloat)){
 					System.err.println(" expected a type float in " + ap);
 	    			System.exit(1);
 				} else {
-					return new TFloat();
+					return new TUnit();
 				}
 			}
 		}else {
