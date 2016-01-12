@@ -48,14 +48,14 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Not e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e = e.e.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Neg e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e = e.e.accept(this);
+		return e;
 	}
 
 	@Override

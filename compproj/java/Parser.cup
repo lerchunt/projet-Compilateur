@@ -111,7 +111,7 @@ exp ::=
 | ARRAY_CREATE simple_exp:e1 simple_exp:e2    
            {: RESULT = new Array(e1, e2); :}
     %prec prec_app
-| error    {: RESULT = null; /* TODO */ :}
+| error:e    {: RESULT = null; if (RESULT == null) { throw new Exception("Parser Error : "+e.toString());} :}
 ;
 
 fundef ::=
