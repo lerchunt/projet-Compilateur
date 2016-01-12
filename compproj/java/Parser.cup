@@ -21,7 +21,7 @@ parser code {:
     
     
     public void report_error(String m, Object o) {
-    	System.err.println("syntax error at ("+o.sym+") <line " + (cur_token.left+1) + ", column " +(cur_token.right+1) + ">" );  
+    	System.err.println("syntax error at <line " + (cur_token.left+1) + ", column " +(cur_token.right+1) + ">" );  
     	System.exit(1);
     }
     
