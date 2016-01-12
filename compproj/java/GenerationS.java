@@ -8,7 +8,9 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Bool e) {
-		return String.format("%s",e.b);
+		if (e.b){
+			return "#1";
+		} else return "#0";
 	}
 
 	@Override
@@ -23,24 +25,7 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Not e) {
-		String retour = "";
-		int bool = 0; //False
-		if (e.e instanceof Bool){
-			if(!((Bool)(e.e)).b){
-				bool = 1;				
-			}
-			//registre ??
-			retour += (String.format("\tmov\t%s,#%d\n",bool));
-		} else if (e.e instanceof Var){
-			String r = RegistreAllocation.getRegistre(((Var)(e.e)).id);
-			
-			retour +=String.format("\tmov\tr0,%s\n", r);
-		} else {
-			System.err.println("internal error -- GenerationS -- Not");
-			System.exit(1);
-			return null;
-		}
-		return retour;
+		return e.e.accept(this);
 	}
 
 	@Override
@@ -329,7 +314,5 @@ public class GenerationS implements ObjVisitor<String> {
 
 		return null;
 	}	
-
-
 
 }
