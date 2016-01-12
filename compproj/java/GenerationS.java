@@ -8,7 +8,9 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Bool e) {
-		return null;
+		if (e.b){
+			return "#1";
+		} else return "#0";
 	}
 
 	@Override
@@ -23,14 +25,34 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Not e) {
-		e.e.accept(this);
-		return null;
+		String retour = "";
+		int bool = 0; //False
+		if (e.e instanceof Bool){
+			if(!((Bool)(e.e)).b){
+				bool = 1;				
+			}
+			retour += (String.format("#%d",bool));
+		} else if (e.e instanceof Var){
+			String r = RegistreAllocation.getRegistre(((Var)(e.e)).id);
+			
+			
+		} else {
+			System.err.println("internal error -- GenerationS -- Not");
+			System.exit(1);
+			return null;
+		}
+		return retour;
 	}
 
 	@Override
 	public String visit(Neg e) {
-		e.e.accept(this);
-		return null;
+		if(e.e instanceof Int){
+			return String.format("#	-%d",((Int)(e.e)).i);
+		} else {
+			System.err.println("internal error -- GenerationS -- Not");
+			System.exit(1);
+			return null;
+		}
 	}
 
 	@Override
@@ -51,7 +73,7 @@ public class GenerationS implements ObjVisitor<String> {
 			System.exit(1);
 			return null;
 		}
-		return String.format("\tadd\t%s, %s, %s\n",e.registreDeRetour, r1, r2);
+		return String.format("\tadd\t%s,%s,%s\n",e.registreDeRetour, r1, r2);
 	}
 
 	@Override
@@ -77,8 +99,13 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(FNeg e) {
-		e.e.accept(this);
-		return null;
+		if(e.e instanceof Int){
+			return String.format("#	-%d",((Int)(e.e)).i);
+		} else {
+			System.err.println("internal error -- GenerationS -- Not");
+			System.exit(1);
+			return null;
+		}
 	}
 
 	@Override
@@ -196,11 +223,19 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Let e) {
-
-		String registre = RegistreAllocation.getRegistre(e.id);
-		String retour = String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
-		retour += e.e2.accept(this);
-		return retour;
+		String retour ="";
+		if (e.e1 instanceof Not){
+			String registre = RegistreAllocation.getRegistre(e.id);
+			retour = String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
+			
+			retour += e.e2.accept(this);
+			return retour;
+		}else{			
+			String registre = RegistreAllocation.getRegistre(e.id);
+			retour = String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
+			retour += e.e2.accept(this);
+			return retour;
+		}
 	}
 
 	@Override
@@ -210,7 +245,6 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(LetRec e) {
-		String registre ="r";
 		String reg="";
 		String retour = "";
 		int nbreg = 0;
@@ -218,7 +252,6 @@ public class GenerationS implements ObjVisitor<String> {
 
 		for (Id id : e.fd.args){
 			if (nbreg <4){
-				//RegistreAllocation.add(id,String.format("%s%d", registre,nbreg));
 				reg = RegistreAllocation.getRegistre(id);
 				defFunc += String.format("\tmov\t%s,r%d\n",reg,nbreg);
 				nbreg++;
@@ -305,7 +338,5 @@ public class GenerationS implements ObjVisitor<String> {
 
 		return null;
 	}	
-
-
 
 }
