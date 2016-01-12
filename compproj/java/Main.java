@@ -81,6 +81,10 @@ public class Main {
 					System.out.println("------ AST AlphaConv ------");
 					expression.accept(new PrintVisitor());
 					System.out.println();
+					expression = expression.accept(new BetaReduction());
+					System.out.println("------ AST BetaReduc ------");
+					expression.accept(new PrintVisitor());
+					System.out.println();
 					System.out.println("------ ASML ------");
 					expression.accept(new GenerationASML());
 					System.out.println();
@@ -96,6 +100,17 @@ public class Main {
 						ReadFile(pathAsml);
 					}
 
+					String retour = "\t.text\n\t.global _start\n_start:\n"; // init
+				    expression.accept(new RegistreAllocation());
+					retour += expression.accept(new GenerationS());
+					retour += "\tbl\tmin_caml_exit\n";
+					retour += GenerationS.defFunc;
+					retour += GenerationS.defVar;
+					PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(Main.Path+Main.OutName+".s")));
+					writer.print(retour);
+					writer.close();
+					
+					
 					new Backend(pathAsml);
 					// supprimer le fichier asml créé.
 					new File(pathAsml).delete();
@@ -125,5 +140,7 @@ public class Main {
 		}
 		buffer.close(); 
 	}
+	
+	
 }
 
