@@ -24,6 +24,9 @@ public class RegistreAllocation implements Visitor {
 			if (r.var != null) {
 				if (r.var.id.equals(v)) {
 					var.dec();
+					if (var.nbOccurence == 0) {
+						r.var = null;
+					}
 					return r.nom;
 				}
 			}
@@ -57,10 +60,10 @@ public class RegistreAllocation implements Visitor {
 	}
 	
 	static void sup(Id v) {
-		for (Registre r : (LinkedList<Registre>)tabReg.clone()) {
+		for (Registre r : tabReg) {
 			if (r.var != null) {
 				if (r.var.id.equals(v)) {
-					tabReg.remove(r);
+					r.var = null;
 				}
 			}
 		}
@@ -234,6 +237,15 @@ public class RegistreAllocation implements Visitor {
 		public Registre(String nom) {
 			this.nom = nom;
 		}
+	}
+
+
+	public static void printTabVar() {
+		String retour = "TabVar : \n";
+		for (Var v : tabVar) {
+			retour = String.format("%s%s - %d | ", retour, v.id.id, v.nbOccurence);
+		}
+		System.out.println(retour);
 	}
 
 }

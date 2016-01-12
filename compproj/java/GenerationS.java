@@ -47,30 +47,30 @@ public class GenerationS implements ObjVisitor<String> {
 			r1 = e.e1.accept(this);
 		}
 		else if (e.e1 instanceof Var) {
-			r1 = RegistreAllocation.getRegistre(((Var)e.e1).id);
-			} 
-			else {
-				System.err.println("internal error -- GenerationS -- add");
-				System.exit(1);
-				return null;
-			}
+			r1 = e.e1.accept(this);
+		} 
+		else {
+			System.err.println("internal error -- GenerationS -- add");
+			System.exit(1);
+			return null;
+		}
 		if(e.e2 instanceof Int){
 			r2 = e.e2.accept(this);
 		}
 		else if (e.e2 instanceof Var) {
-			r2 = RegistreAllocation.getRegistre(((Var)e.e2).id);
-			} 
-			else {
-				System.err.println("internal error -- GenerationS -- add");
-				System.exit(1);
-				return null;
-			}
-		
+			r2 = e.e2.accept(this);
+		} 
+		else {
+			System.err.println("internal error -- GenerationS -- add");
+			System.exit(1);
+			return null;
+		}
+
 		if(e.e1 instanceof Int)
 			return String.format("\tadd\t%s,%s,%s\n",e.registreDeRetour, r2, r1);
 		else
 			return String.format("\tadd\t%s,%s,%s\n",e.registreDeRetour, r1, r2);
-			
+
 	}
 
 	@Override
@@ -78,14 +78,14 @@ public class GenerationS implements ObjVisitor<String> {
 		String r1 = "";
 		String r2 = "";
 		if (e.e1 instanceof Var) {
-			r1 = RegistreAllocation.getRegistre(((Var)e.e1).id);
+			r1 = e.e1.accept(this);
 		} else {
 			System.err.println("internal error -- GenerationS -- sub");
 			System.exit(1);
 			return null;
 		}
 		if (e.e2 instanceof Var) {
-			r2 = RegistreAllocation.getRegistre(((Var)e.e2).id);
+			r2 = e.e2.accept(this);
 		} else {
 			System.err.println("internal error -- GenerationS -- sub");
 			System.exit(1);
@@ -110,14 +110,14 @@ public class GenerationS implements ObjVisitor<String> {
 		String r1 = "";
 		String r2 = "";
 		if (e.e1 instanceof Var) {
-			r1 = RegistreAllocation.getRegistre(((Var)e.e1).id);
+			r1 = e.e1.accept(this);
 		} else {
 			System.err.println("internal error -- GenerationS -- add");
 			System.exit(1);
 			return null;
 		}
 		if (e.e2 instanceof Var) {
-			r2 = RegistreAllocation.getRegistre(((Var)e.e2).id);
+			r2 = e.e2.accept(this);
 		} else {
 			System.err.println("internal error -- GenerationS -- add");
 			System.exit(1);
@@ -131,14 +131,14 @@ public class GenerationS implements ObjVisitor<String> {
 		String r1 = "";
 		String r2 = "";
 		if (e.e1 instanceof Var) {
-			r1 = RegistreAllocation.getRegistre(((Var)e.e1).id);
+			r1 = e.e1.accept(this);
 		} else {
 			System.err.println("internal error -- GenerationS -- sub");
 			System.exit(1);
 			return null;
 		}
 		if (e.e2 instanceof Var) {
-			r2 = RegistreAllocation.getRegistre(((Var)e.e2).id);
+			r2 = e.e2.accept(this);
 		} else {
 			System.err.println("internal error -- GenerationS -- sub");
 			System.exit(1);
@@ -152,14 +152,14 @@ public class GenerationS implements ObjVisitor<String> {
 		String r1 = "";
 		String r2 = "";
 		if (e.e1 instanceof Var) {
-			r1 = RegistreAllocation.getRegistre(((Var)e.e1).id);
+			r1 = e.e1.accept(this);
 		} else {
 			System.err.println("internal error -- GenerationS -- mul");
 			System.exit(1);
 			return null;
 		}
 		if (e.e2 instanceof Var) {
-			r2 = RegistreAllocation.getRegistre(((Var)e.e2).id);
+			r2 = e.e2.accept(this);
 		} else {
 			System.err.println("internal error -- GenerationS -- mul");
 			System.exit(1);
@@ -173,14 +173,14 @@ public class GenerationS implements ObjVisitor<String> {
 		String r1 = "";
 		String r2 = "";
 		if (e.e1 instanceof Var) {
-			r1 = RegistreAllocation.getRegistre(((Var)e.e1).id);
+			r1 = e.e1.accept(this);
 		} else {
 			System.err.println("internal error -- GenerationS -- mul");
 			System.exit(1);
 			return null;
 		}
 		if (e.e2 instanceof Var) {
-			r2 = RegistreAllocation.getRegistre(((Var)e.e2).id);
+			r2 = e.e2.accept(this);
 		} else {
 			System.err.println("internal error -- GenerationS -- mul");
 			System.exit(1);
@@ -222,14 +222,38 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(Let e) {
 		String retour ="";
 		String registre = RegistreAllocation.getRegistre(e.id);
-		retour = String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
-		retour += e.e2.accept(this);
+		if (e.e1 instanceof OpBin){
+			Id idretour = Id.gen();
+			String regRetour = RegistreAllocation.getRegistre(idretour);
+			((OpBin)e.e1).registreDeRetour = regRetour;
+			retour += e.e1.accept(this);
+			retour += String.format("\tmov\t%s,%s\n",registre,regRetour);
+		} else if (e.e1 instanceof Var) {
+			String regE1 = e.e1.accept(this);
+			retour += String.format("\tmov\t%s,%s\n",registre,regE1);
+		} else {
+			retour += String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
+		}
+		
+		if (e.e2 instanceof OpBin){
+			Id idretour = Id.gen();
+			String regRetour = RegistreAllocation.getRegistre(idretour);
+			((OpBin)e.e2).registreDeRetour = regRetour;
+			retour += e.e2.accept(this);
+			retour += String.format("\tmov\tr0%s\n",regRetour);
+		} else if (e.e2 instanceof Var) {
+			String regE1 = e.e2.accept(this);
+			retour += String.format("\tmov\tr0,%s\n",regE1);
+		} else {
+			retour += e.e2.accept(this);
+		}
+		
 		return retour;
 	}
 
 	@Override
 	public String visit(Var e) {
-		return e.id.id;
+		return RegistreAllocation.getRegistre(e.id);
 	}
 
 	@Override
@@ -259,8 +283,10 @@ public class GenerationS implements ObjVisitor<String> {
 			for (Id id : e.fd.args){
 				RegistreAllocation.sup(id);
 			}
-			defFunc += retour;
+		} else {
+			retour += e.fd.e.accept(this);
 		}
+		defFunc += retour;
 
 		//e.fd.e.accept(this);
 
@@ -292,8 +318,13 @@ public class GenerationS implements ObjVisitor<String> {
 				}
 			}
 		}
-		retour = String.format("%s\tbl\tmin_caml_%s\n",retour,e.e.accept(this));
-		
+		if (e.e instanceof Var) {
+			retour = String.format("%s\tbl\tmin_caml_%s\n",retour,((Var)e.e).id.id);
+		} else {
+			System.err.println("internal error - definition function (GenerationS)");
+			System.exit(1);
+		}
+
 		return retour;
 
 	}
@@ -338,7 +369,7 @@ public class GenerationS implements ObjVisitor<String> {
 
 		return null;
 	}	
-	
+
 	private String epilogue() {
 		return "\tadd\tr13,r11,#0\n\tldr\tr11,[r13]\n\tadd\tr13,r13,#4\n\tbx\n\tlr";
 	}

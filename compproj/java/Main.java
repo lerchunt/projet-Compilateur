@@ -68,14 +68,14 @@ public class Main {
 				expression.accept(new PrintVisitor());
 				System.out.println();
 				System.out.println("------ TYPE CHECKING ------");
-				try {
+				/*try {
 					if (!(expression.accept(new TypeChecking()) instanceof TUnit)) {
 				        throw new Exception();
 				    } else { System.out.println("OK"); }
 				} catch(Exception e) {
 					System.err.println("Type error, expected a final type unit");
 					System.exit(1);					
-				}
+				}*/
 				// Type Checking
 				if (!stopAfterTypeChecking) {
 					expression  = expression.accept(new KNormalization());
@@ -107,6 +107,9 @@ public class Main {
 
 					String retour = "\t.text\n\t.global _start\n_start:\n"; // init
 				    expression.accept(new RegistreAllocation());
+				    // debug *************
+				    RegistreAllocation.printTabVar();
+				    //********************
 					retour += expression.accept(new GenerationS());
 					retour += "\tbl\tmin_caml_exit\n";
 					retour += GenerationS.defFunc;
