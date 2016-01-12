@@ -68,14 +68,14 @@ public class Main {
 				expression.accept(new PrintVisitor());
 				System.out.println();
 				System.out.println("------ TYPE CHECKING ------");
-				/*try {
+				try {
 					if (!(expression.accept(new TypeChecking()) instanceof TUnit)) {
 				        throw new Exception();
 				    } else { System.out.println("OK"); }
 				} catch(Exception e) {
 					System.err.println("Type error, expected a final type unit");
 					System.exit(1);					
-				}*/
+				}
 				// Type Checking
 				if (!stopAfterTypeChecking) {
 					expression  = expression.accept(new KNormalization());
