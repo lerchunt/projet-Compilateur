@@ -110,8 +110,6 @@ public class Main {
 					writer.print(retour);
 					writer.close();
 					
-					
-					new Backend(pathAsml);
 					// supprimer le fichier asml créé.
 					new File(pathAsml).delete();
 				}
