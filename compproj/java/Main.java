@@ -67,9 +67,9 @@ public class Main {
 				System.out.println("------ AST ------");
 				expression.accept(new PrintVisitor());
 				System.out.println();
-				/*System.out.println("------ TYPE CHECKING ------");
+				System.out.println("------ TYPE CHECKING ------");
 				expression.accept(new TypeChecking());
-				System.out.println("OK");*/
+				System.out.println("OK");
 
 				// Type Checking
 				if (!stopAfterTypeChecking) {
