@@ -287,8 +287,7 @@ public class GenerationS implements ObjVisitor<String> {
 			retour += e.fd.e.accept(this);
 		}
 		defFunc += retour;
-
-		//e.fd.e.accept(this);
+		defFunc += "\tbx\tlr\n";
 
 		return e.e.accept(this);	
 	}
