@@ -138,5 +138,3 @@ min_caml_print_int:
 	ldmfd	sp!, {lr}
         bx	lr
         .size min_caml_print_int, .-min_caml_print_int
-
-

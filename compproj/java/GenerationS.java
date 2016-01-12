@@ -43,21 +43,34 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(Add e) {
 		String r1 = "";
 		String r2 = "";
-		if (e.e1 instanceof Var) {
+		if(e.e1 instanceof Int){
+			r1 = e.e1.accept(this);
+		}
+		else if (e.e1 instanceof Var) {
 			r1 = RegistreAllocation.getRegistre(((Var)e.e1).id);
-		} else {
-			System.err.println("internal error -- GenerationS -- add");
-			System.exit(1);
-			return null;
+			} 
+			else {
+				System.err.println("internal error -- GenerationS -- add");
+				System.exit(1);
+				return null;
+			}
+		if(e.e2 instanceof Int){
+			r2 = e.e2.accept(this);
 		}
-		if (e.e2 instanceof Var) {
+		else if (e.e2 instanceof Var) {
 			r2 = RegistreAllocation.getRegistre(((Var)e.e2).id);
-		} else {
-			System.err.println("internal error -- GenerationS -- add");
-			System.exit(1);
-			return null;
-		}
-		return String.format("\tadd\t%s,%s,%s\n",e.registreDeRetour, r1, r2);
+			} 
+			else {
+				System.err.println("internal error -- GenerationS -- add");
+				System.exit(1);
+				return null;
+			}
+		
+		if(e.e1 instanceof Int)
+			return String.format("\tadd\t%s,%s,%s\n",e.registreDeRetour, r2, r1);
+		else
+			return String.format("\tadd\t%s,%s,%s\n",e.registreDeRetour, r1, r2);
+			
 	}
 
 	@Override
@@ -258,18 +271,29 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(App e) {
 		String retour="";
 		String registre="";
+		int nbParam = 0;
 		for(Exp param : e.es){
-			if(param.accept(this)==null){
-				retour += String.format("\tbl\tmin_caml_%s\n",e.e.accept(this));
-			}else if (param instanceof Var){
-				registre = RegistreAllocation.getRegistre(((Var)param).id);
-				retour +=String.format("\tmov\tr0,%s\n", registre);
-				retour = String.format("%s\tbl\tmin_caml_%s\n",retour,e.e.accept(this));
-			}else {
-				retour +=String.format("\tmov\tr0,%s\n",param.accept(this));
-				retour = String.format("%s\tbl\tmin_caml_%s\n",retour,e.e.accept(this));
+			if (nbParam >3) {
+				System.err.println("invalid argument number (>3) in function call");
+				System.exit(1);
+			}
+			String strP = param.accept(this);
+			if(strP!=null){
+				if (param instanceof Var){
+					nbParam ++;
+					registre = RegistreAllocation.getRegistre(((Var)param).id);
+					retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  registre);
+				} else if (param instanceof App) {
+					nbParam ++;
+					retour += strP;
+				} else {
+					nbParam++;
+					retour +=String.format("\tmov\tr%d,%s\n", nbParam-1, strP);
+				}
 			}
 		}
+		retour = String.format("%s\tbl\tmin_caml_%s\n",retour,e.e.accept(this));
+		
 		return retour;
 
 	}
@@ -314,5 +338,9 @@ public class GenerationS implements ObjVisitor<String> {
 
 		return null;
 	}	
+	
+	private String epilogue() {
+		return "\tadd\tr13,r11,#0\n\tldr\tr11,[r13]\n\tadd\tr13,r13,#4\n\tbx\n\tlr";
+	}
 
 }
