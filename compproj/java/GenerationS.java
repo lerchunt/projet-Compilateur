@@ -466,7 +466,7 @@ public class GenerationS implements ObjVisitor<String> {
 	}
 	
 	private String prologue() {
-		return "\tadd\tr13,r13,#-4\n\tstr\tr11,[r13]\n\tadd\tr11,r13,#0\n\tadd\tr13,r13,#-4 @taille des variables locales";
+		return "\tadd\tr13,r13,#-4\n\tstr\tr11,[r13]\n\tadd\tr11,r13,#0\n\tadd\tr13,r13,#-4 @taille des variables locales\n";
 	}
 	
 	private String push() {
