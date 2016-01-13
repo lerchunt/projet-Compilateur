@@ -428,7 +428,7 @@ class Let extends Exp {
 class Var extends Exp {
     Id id;
     
-    int nbOccurence = 0;
+    int nbOccurence = 1;
 
     Var(Id id) {
         this.id = id;
