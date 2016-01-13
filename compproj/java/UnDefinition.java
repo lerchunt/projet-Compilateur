@@ -1,61 +1,58 @@
-import java.util.List;
 
-
-public class ClosureConversion implements ObjVisitor<Exp> {
-	
-	private class Closure {
-		List<Exp> params;
-		LetRec funcDApel;
-	}
-
-	@Override
-	public Exp visit(Unit e) {
-		return e;
-	}
+public class UnDefinition implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Bool e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Exp visit(Int e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Exp visit(Float e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Exp visit(Not e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Exp visit(Neg e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Exp visit(Add e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Exp visit(Sub e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Exp visit(FNeg e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Exp visit(FAdd e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
@@ -66,52 +63,62 @@ public class ClosureConversion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(FMul e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
+
 	@Override
 	public Exp visit(Mul e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Exp visit(FDiv e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Exp visit(Eq e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Exp visit(LE e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Exp visit(If e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Exp visit(Let e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Exp visit(Var e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Exp visit(LetRec e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Exp visit(App e) {
-		return e;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
@@ -140,6 +147,12 @@ public class ClosureConversion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Put e) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Exp visit(Unit unit) {
 		// TODO Auto-generated method stub
 		return null;
 	}
