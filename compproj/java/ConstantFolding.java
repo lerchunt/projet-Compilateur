@@ -1,14 +1,13 @@
+import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 
 
 public class ConstantFolding implements ObjVisitor<Exp> {
 
 	private static Hashtable<String, Exp> tabSym = new Hashtable<String, Exp>();
-	public static Hashtable<String, Object> tabVar = new Hashtable<String, Object>();
-
-
+	static Hashtable<String, Object> tabVa = new Hashtable<String, Object>();
+	
 	@Override
 	public Exp visit(Bool e) {
 		return e;
@@ -38,13 +37,13 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	public Exp visit(Add e) {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
+			tabVa.put(((Var)e.e1).id.toString(), true) ;
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
+			tabVa.put(((Var)e.e2).id.toString(), true) ;
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -55,13 +54,13 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	public Exp visit(Sub e) {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
+			tabVa.put(((Var)e.e1).id.toString(), true) ;
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
+			tabVa.put(((Var)e.e2).id.toString(), true) ;
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -77,13 +76,13 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	public Exp visit(FAdd e) {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
+			tabVa.put(((Var)e.e1).id.toString(), true) ;
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
+			tabVa.put(((Var)e.e2).id.toString(), true) ;
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -94,13 +93,13 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	public Exp visit(FSub e) {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
+			tabVa.put(((Var)e.e1).id.toString(), true) ;
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
+			tabVa.put(((Var)e.e2).id.toString(), true) ;
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -111,13 +110,13 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	public Exp visit(FMul e) {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
+			tabVa.put(((Var)e.e1).id.toString(), true) ;
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
+			tabVa.put(((Var)e.e2).id.toString(), true) ;
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		}
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);;
@@ -128,13 +127,13 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	public Exp visit(Mul e) {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
+			tabVa.put(((Var)e.e1).id.toString(), true) ;
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
+			tabVa.put(((Var)e.e2).id.toString(), true) ;
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -145,13 +144,13 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	public Exp visit(FDiv e) {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
+			tabVa.put(((Var)e.e1).id.toString(), true) ;
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
+			tabVa.put(((Var)e.e2).id.toString(), true) ;
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -162,13 +161,13 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	public Exp visit(Eq e) {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
+			tabVa.put(((Var)e.e1).id.toString(), true) ;
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
+			tabVa.put(((Var)e.e2).id.toString(), true) ;
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -179,13 +178,13 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	public Exp visit(LE e) {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
+			tabVa.put(((Var)e.e1).id.toString(), true) ;
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
+			tabVa.put(((Var)e.e2).id.toString(), true) ;
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -196,18 +195,18 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	public Exp visit(If e) {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
+			tabVa.put(((Var)e.e1).id.toString(), true) ;
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
+			tabVa.put(((Var)e.e2).id.toString(), true) ;
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e3).id.toString()))
 		{
+			tabVa.put(((Var)e.e3).id.toString(), true) ;
 			e.e3 = tabSym.get(((Var)e.e3).id.toString()) ;
-			tabVar.put(((Var)e.e3).id.toString(), true) ;
 		}
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -230,8 +229,8 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		} else {
 			e.e1 = e.e1.accept(this);
 		}
-		e.e2 = e.e2.accept(this);
-		return e;
+		e.e2 = e.e2.accept(this);     
+		return e;      
 	}
 
 	@Override
@@ -251,12 +250,13 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		while(cpt < args.size()){
 			if(args.get(cpt).isVar()){
 				if(tabSym.containsKey(((Var)args.get(cpt)).id.toString())) {
+					tabVa.put(((Var)args.get(cpt)).id.toString(), true) ;
 					args.set(cpt, tabSym.get(((Var)args.get(cpt)).id.toString()));
-					tabVar.put(((Var)args.get(cpt)).id.toString(), true) ;
 			    }
 			} else {
 				args.get(cpt).accept(this);
 			}
+
 			cpt++;
 		}
 		return args;
