@@ -1,9 +1,13 @@
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 
 
 public class ConstantFolding implements ObjVisitor<Exp> {
 
-	private Hashtable<String, Exp> tabSym = new Hashtable<String, Exp>();
+	private static Hashtable<String, Exp> tabSym = new Hashtable<String, Exp>();
+	public static Hashtable<String, Bool> tabVar = new Hashtable<String, Bool>();
+
 
 	@Override
 	public Exp visit(Bool e) {
@@ -220,9 +224,26 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		e.fd.e = e.fd.e.accept(this);
 		return e;
 	}
+	
+	public List<Exp> printIntFix(List<Exp> args) {
+		Iterator<Exp> it = args.iterator();
+		if (!args.isEmpty()) {
+		    if(tabSym.containsKey(it.toString())) {
+		    	it = (Iterator<Exp>) tabSym.get(it.toString());
+		    }
+	    }
+		while (it.hasNext()) {
+	    	if(tabSym.containsKey(it.next().toString())) {
+		    	it = (Iterator<Exp>) tabSym.get(it.next().toString());
+		    }
+	    }
+		args = (List<Exp>) it ;
+		return args;
+}
 
 	@Override
 	public Exp visit(App e) {
+			//e.es = printIntFix(e.es);
 		return e;
 	}
 

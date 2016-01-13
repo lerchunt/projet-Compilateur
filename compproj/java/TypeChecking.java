@@ -79,6 +79,12 @@ public class TypeChecking implements ObjVisitor<Type> {
 				tabSym.remove(e.e2.toString());
 				tabSym.put(e.e2.toString(), new TInt());
 				return e.e1.accept(this);
+			} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TUnit){
+				tabSym.remove(e.e2.toString());
+				tabSym.put(e.e2.toString(), new TInt());
+				tabSym.remove(e.e1.toString());
+				tabSym.put(e.e1.toString(), new TInt());
+				return e.e1.accept(this);
 			} else if(e.e1.accept(this) instanceof TInt && e.e2.accept(this) instanceof TInt)
 			{
 				return e.e1.accept(this);
@@ -106,6 +112,12 @@ public class TypeChecking implements ObjVisitor<Type> {
 			} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TInt){
 				tabSym.remove(e.e2.toString());
 				tabSym.put(e.e2.toString(), new TInt());
+				return e.e1.accept(this);
+			} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TUnit){
+				tabSym.remove(e.e2.toString());
+				tabSym.put(e.e2.toString(), new TInt());
+				tabSym.remove(e.e1.toString());
+				tabSym.put(e.e1.toString(), new TInt());
 				return e.e1.accept(this);
 			} else if(e.e1.accept(this) instanceof TInt && e.e2.accept(this) instanceof TInt)
 			{
@@ -162,6 +174,12 @@ public class TypeChecking implements ObjVisitor<Type> {
 				return e.e1.accept(this);
 			} else if (e.e2.accept(this) instanceof TFloat && e.e1.accept(this) instanceof TFloat){
 				return e.e1.accept(this);
+			} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TUnit){
+				tabSym.remove(e.e2.toString());
+				tabSym.put(e.e2.toString(), new TFloat());
+				tabSym.remove(e.e1.toString());
+				tabSym.put(e.e1.toString(), new TFloat());
+				return e.e1.accept(this);
 			}
 			System.err.println(e.e1.toString() + " +. " + e.e2.toString() + " : expected a type float ");
 			System.exit(1);
@@ -186,6 +204,12 @@ public class TypeChecking implements ObjVisitor<Type> {
 			} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TFloat){
 				tabSym.remove(e.e2.toString());
 				tabSym.put(e.e2.toString(), e.e1.accept(this));
+				return e.e1.accept(this);
+			} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TUnit){
+				tabSym.remove(e.e2.toString());
+				tabSym.put(e.e2.toString(), new TFloat());
+				tabSym.remove(e.e1.toString());
+				tabSym.put(e.e1.toString(), new TFloat());
 				return e.e1.accept(this);
 			} else if(e.e1.accept(this) instanceof TFloat && e.e2.accept(this) instanceof TFloat)
 			{
@@ -215,6 +239,12 @@ public class TypeChecking implements ObjVisitor<Type> {
 				tabSym.remove(e.e2.toString());
 				tabSym.put(e.e2.toString(), new TFloat());
 				return e.e1.accept(this);
+			} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TUnit){
+				tabSym.remove(e.e2.toString());
+				tabSym.put(e.e2.toString(), new TFloat());
+				tabSym.remove(e.e1.toString());
+				tabSym.put(e.e1.toString(), new TFloat());
+				return e.e1.accept(this);
 			} else if (e.e2.accept(this) instanceof TFloat && e.e1.accept(this) instanceof TFloat){
 				return e.e1.accept(this);
 			}
@@ -241,6 +271,12 @@ public class TypeChecking implements ObjVisitor<Type> {
 			} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TInt){
 				tabSym.remove(e.e2.toString());
 				tabSym.put(e.e2.toString(), new TInt());
+				return e.e1.accept(this);
+			} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TUnit){
+				tabSym.remove(e.e2.toString());
+				tabSym.put(e.e2.toString(), new TInt());
+				tabSym.remove(e.e1.toString());
+				tabSym.put(e.e1.toString(), new TInt());
 				return e.e1.accept(this);
 			} else if(e.e1.accept(this) instanceof TInt && e.e2.accept(this) instanceof TInt){
 				return e.e1.accept(this);
@@ -269,6 +305,12 @@ public class TypeChecking implements ObjVisitor<Type> {
 			} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TFloat){
 				tabSym.remove(e.e2.toString());
 				tabSym.put(e.e2.toString(), new TFloat());
+				return e.e1.accept(this);
+			} else if (e.e2.accept(this) instanceof TUnit && e.e1.accept(this) instanceof TUnit){
+				tabSym.remove(e.e2.toString());
+				tabSym.put(e.e2.toString(), new TFloat());
+				tabSym.remove(e.e1.toString());
+				tabSym.put(e.e1.toString(), new TFloat());
 				return e.e1.accept(this);
 			} else if (e.e2.accept(this) instanceof TFloat && e.e1.accept(this) instanceof TFloat){
 				return e.e1.accept(this);
