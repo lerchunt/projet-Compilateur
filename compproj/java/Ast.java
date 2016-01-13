@@ -1,6 +1,7 @@
 import java.util.List;
 
 abstract class Exp implements Cloneable {
+	String registreDeRetour  = "r0";
     abstract void accept(Visitor v);
 
     abstract <E> E accept(ObjVisitor<E> v);
@@ -63,8 +64,6 @@ abstract class Exp implements Cloneable {
 abstract class OpBin extends Exp {
 	Exp e1;
     Exp e2;
-
-    String registreDeRetour;
     
     OpBin(Exp e1, Exp e2) {
         this.e1 = e1;
@@ -82,8 +81,6 @@ abstract class OpBin extends Exp {
  */
 abstract class OpUn extends Exp {
 	Exp e;
-
-    String registreDeRetour;
     
     OpUn(Exp e) {
         this.e = e;
@@ -383,8 +380,6 @@ class If extends Exp {
     Exp e1;
     Exp e2;
     Exp e3;
-    
-    String registreDeRetour;
 
     If(Exp e1, Exp e2, Exp e3) {
         this.e1 = e1;
