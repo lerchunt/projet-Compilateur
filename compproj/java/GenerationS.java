@@ -348,7 +348,7 @@ public class GenerationS implements ObjVisitor<String> {
 		for (Id id : e.fd.args){
 			if (nbreg <4){
 				reg = RegistreAllocation.getRegistre(id);
-				defFunc += String.format("\n\tmov\t%s,r%d\n",reg,nbreg);
+				defFunc += String.format("\tmov\t%s,r%d\n",reg,nbreg);
 				nbreg++;
 			}
 			else{
@@ -462,7 +462,7 @@ public class GenerationS implements ObjVisitor<String> {
 	}
 	
 	private String prologue() {
-		return "\tadd\tr13,r13,#-4\n\tstr\tr11,[r13]\n\tadd\tr11,r13,#0\n\tadd\tr13,r13,#-4 @taille des variables locales";
+		return "\tadd\tr13,r13,#-4\n\tstr\tr11,[r13]\n\tadd\tr11,r13,#0\n\tadd\tr13,r13,#-4 @taille des variables locales\n";
 	}
 	
 	private String push() {
