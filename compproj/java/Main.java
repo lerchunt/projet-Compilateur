@@ -90,6 +90,10 @@ public class Main {
 					System.out.println("------ AST BetaReduc ------");
 					expression.accept(new PrintVisitor());
 					System.out.println();
+					expression = expression.accept(new ConstantFolding());
+					System.out.println("------ AST ConstantFolding ------");
+					expression.accept(new PrintVisitor());
+					System.out.println();
 					System.out.println("------ ASML ------");
 					expression.accept(new GenerationASML());
 					System.out.println();
@@ -111,7 +115,7 @@ public class Main {
 				    RegistreAllocation.printTabVar();
 				    //********************
 					String main = expression.accept(new GenerationS());
-					main += "\tbl\tmin_caml_exit\n";
+					main += "\tbl\tmin_caml_print_newline\n\tbl\tmin_caml_exit\n";
 					retour += GenerationS.defFunc;
 					retour += "\n_start:\n"+main;
 					retour += GenerationS.defVar;
