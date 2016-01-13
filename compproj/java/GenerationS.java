@@ -260,7 +260,7 @@ public class GenerationS implements ObjVisitor<String> {
 		
 		if (e.e2 instanceof Var){
 			ifTrue+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e2.accept(this));
-		} else if (e.e2 instanceof App){
+		} /*else if (e.e2 instanceof App){
 			ifTrue+=e.e2.accept(this);		
 		} else if (e.e2 instanceof Let){
 			
@@ -269,15 +269,17 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e2 instanceof OpBin){ 
 						
 		} else if (e.e2 instanceof OpUn){ //neg et not
-			
-		} else { //entier +float +bool
+		*/	
+		else if (e.e2 instanceof Int || e.e2 instanceof Float || e.e2 instanceof Bool ) { //entier +float +bool
 			ifTrue+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e2.accept(this));
+		}else {
+			ifTrue+=e.e2.accept(this);
 		}
 		
 		
 		if (e.e3 instanceof Var){
 			ifFalse+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e3.accept(this));
-		} else if (e.e3 instanceof App){
+		/*} else if (e.e3 instanceof App){
 			ifFalse+=e.e3.accept(this);
 		} else if (e.e3 instanceof Let){
 			
@@ -286,9 +288,11 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e3 instanceof OpBin){ 
 						
 		} else if (e.e3 instanceof OpUn){ //neg et not
-			
-		} else { //entier +float +bool
+		*/	
+		} else if (e.e3 instanceof Int || e.e3 instanceof Float || e.e3 instanceof Bool ) {//entier +float +bool
 			ifFalse+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e3.accept(this));
+		} else {
+			ifFalse+=e.e3.accept(this);
 		}
 		
 		ifFalse+="\tb\tendIf\n";
@@ -348,7 +352,7 @@ public class GenerationS implements ObjVisitor<String> {
 		for (Id id : e.fd.args){
 			if (nbreg <4){
 				reg = RegistreAllocation.getRegistre(id);
-				defFunc += String.format("\n\tmov\t%s,r%d\n",reg,nbreg);
+				defFunc += String.format("\tmov\t%s,r%d\n",reg,nbreg);
 				nbreg++;
 			}
 			else{
