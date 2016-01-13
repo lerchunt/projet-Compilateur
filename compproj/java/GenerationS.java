@@ -25,7 +25,20 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Not e) {
-		return e.e.accept(this);
+		if (e.e instanceof Not){
+			return ((Not)e.e).e.accept(this);
+		} else if (e.e instanceof Eq){
+			return e.e.accept(this).replaceAll("beq", "bne");
+		} else if (e.e instanceof LE){
+			return e.e.accept(this).replaceAll("ble", "bne");
+		} else if (e.e instanceof Bool){
+			((Bool)e.e).b = !((Bool)e.e).b;
+			return e.e.accept(this);
+		} else {
+			System.err.println("internal error -- GenerationS not");
+			System.exit(1);
+		}
+		return null;
 	}
 
 	@Override
@@ -229,87 +242,67 @@ public class GenerationS implements ObjVisitor<String> {
 	@Override
 	public String visit(LE e) {
 		String retour=String.format("\tcmp\t%s,%s\n", e.e1.accept(this),e.e2.accept(this));
-		
-		e.e1.accept(this); 
-		e.e2.accept(this);
+		retour += "\tble\tifTrue\n";
 		return retour;
 	}
 
 	@Override
 	public String visit(If e) {
-		String retour ="";
-		
-		String ifTrue="ifTrue:\n";
-		String ifFalse="ifFalse:\n";
+		String retour ="";		
+		String ifTrue="";
+		String ifFalse="";
 		
 		if(e.e1 instanceof OpBin || e.e1 instanceof OpUn){
 			e.e1.registreDeRetour = e.registreDeRetour;
-			retour += e.e1.accept(this);
-			
+			retour += e.e1.accept(this);			
 		} else {
 			System.err.println("internal error - If e1 (GenerationS)");
 			System.exit(1);
 		}
+		if (e.e1 instanceof Not){
+			e.e1.accept(this);
+		}
 		
-		if (e.e2 instanceof Var){
-			
-			ifTrue+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e2.accept(this));
-			
+		if (e.e2 instanceof Var){			
+			ifTrue+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e2.accept(this));			
 		} else if (e.e2 instanceof App){
-			ifTrue+=e.e2.accept(this);	
-			
+			ifTrue+=e.e2.accept(this);				
 		} else if (e.e2 instanceof Let){
 			e.e2.registreDeRetour = e.registreDeRetour;
-			ifTrue+=e.e2.accept(this);
-			
+			ifTrue+=e.e2.accept(this);			
 		} else if (e.e2 instanceof LetRec){
 			e.e2.registreDeRetour = e.registreDeRetour;
-			ifTrue+=e.e2.accept(this);
-			
+			ifTrue+=e.e2.accept(this);			
 		} else if (e.e2 instanceof OpBin || e.e2 instanceof OpUn){ 
 			e.e2.registreDeRetour = e.registreDeRetour;
-			ifTrue += e.e2.accept(this);
-		
+			ifTrue += e.e2.accept(this);		
 		}else { //entier +float +bool
-			ifTrue+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e2.accept(this));
-			
+			ifTrue+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e2.accept(this));	
 		}
 		
 		if (e.e3 instanceof Var){
-			ifFalse+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e3.accept(this));
-			
+			ifFalse+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e3.accept(this));			
 		} else if (e.e3 instanceof App){
-			ifFalse+=e.e3.accept(this);
-			
+			ifFalse+=e.e3.accept(this);			
 		} else if (e.e3 instanceof Let){
 			e.e2.registreDeRetour = e.registreDeRetour;
-			ifFalse+=e.e3.accept(this);
-						
+			ifFalse+=e.e3.accept(this);						
 		} else if (e.e3 instanceof LetRec){
 			e.e2.registreDeRetour = e.registreDeRetour;
-			ifFalse+=e.e3.accept(this);
-		
+			ifFalse+=e.e3.accept(this);		
 		} else if (e.e3 instanceof OpBin || e.e3 instanceof OpUn){ 
 			e.e3.registreDeRetour = e.registreDeRetour;
-			ifFalse += e.e3.accept(this);
-		
-		} else {//entier +float +bool
+			ifFalse += e.e3.accept(this);		
+		} else { //entier +float +bool
 			ifFalse+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e3.accept(this));
-		}
+		}		
 		
 		
-		
-		if (e.e1 instanceof Not){
-			ifTrue+="\tb\tendIf\n";
-			retour+=ifTrue;
-			retour+=ifFalse;
-			
-		}else{
-			ifFalse+="\tb\tendIf\n";
-			retour+=ifFalse;
-			retour+=ifTrue;
-			
-		}
+		retour+="ifFalse:\n";
+		ifFalse+="\tb\tendIf\n";
+		retour+=ifFalse;
+		retour+="ifTrue:\n";
+		retour+=ifTrue;			
 		retour+="endIf:\n";
 		
 		return retour;
