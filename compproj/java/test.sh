@@ -31,6 +31,8 @@ echo "(*\c" > tmp.txt
 qemu-arm ./${i%%.*}.arm >> tmp.txt
 echo "*)" >> tmp.txt
 sed -n 1p $i > tmp2.txt
+cat tmp.txt
+cat tmp2.txt
 test=`diff -q tmp.txt tmp2.txt | grep on`
 if [ -z "$test" ]
 then
