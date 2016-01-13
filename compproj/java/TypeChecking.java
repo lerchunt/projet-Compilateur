@@ -339,7 +339,7 @@ public class TypeChecking implements ObjVisitor<Type> {
 	}
 
 	@Override
-	public Type visit(If e) {
+	public Type visit(If e) { 
 		if(!def){
 			if(e.e1.accept(this) instanceof TBool)
 			{
@@ -350,6 +350,9 @@ public class TypeChecking implements ObjVisitor<Type> {
 				{
 					return e.e2.accept(this);
 				} else if(e.e2.accept(this) instanceof TBool && e.e3.accept(this) instanceof TBool)
+				{
+					return e.e2.accept(this);
+				} else if(e.e2.accept(this) instanceof TUnit && e.e3.accept(this) instanceof TUnit)
 				{
 					return e.e2.accept(this);
 				}
@@ -404,8 +407,8 @@ public class TypeChecking implements ObjVisitor<Type> {
 			Type exp = e.e1.accept(this) ; 
 			tabSym.put(e.id.toString(), exp);
 		} else {
-			tabSym.remove(e.id.toString());
 			Type exp = e.e1.accept(this) ; 
+			tabSym.remove(e.id.toString());
 			tabSym.put(e.id.toString(), exp);
 		}		
 		return e.e2.accept(this);
@@ -442,6 +445,7 @@ public class TypeChecking implements ObjVisitor<Type> {
 		printInfix(e.fd.args) ;
 		Type f = e.fd.e.accept(this);
 		tabSym.put(e.fd.id.toString(), f);
+		printInfixR(e.fd.args) ;
 		if(e.e.isVar()){
 			e.e.accept(this);
 			def = false ;
@@ -449,7 +453,7 @@ public class TypeChecking implements ObjVisitor<Type> {
 			def = false ;
 			e.e.accept(this);
 		}
-		return 	e.e.accept(this);
+		return 	e.e.accept(this); 
 	}
 	
 	private void printInfix(List<Id> args) {
@@ -459,6 +463,16 @@ public class TypeChecking implements ObjVisitor<Type> {
         }
 		while (it.hasNext()) {
         	tabSym.put(it.next().toString(), new TUnit());
+        }
+	}
+	
+	private void printInfixR(List<Id> args) {
+		Iterator<Id> it = args.iterator();
+		if (!args.isEmpty()) {
+		    tabSym.remove(it.toString());
+        }
+		while (it.hasNext()) {
+		    tabSym.remove(it.next().toString());
         }
 	}
 

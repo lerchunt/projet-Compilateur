@@ -86,7 +86,7 @@ comment =  "(*" [^*] ~"*)"
 "-."    { return symbol(sym.MINUS_DOT); }
 "+."    { return symbol(sym.PLUS_DOT); }
 "*."    { return symbol(sym.AST_DOT); }
-"*"	{ return symbol(sym.AST); }
+"*"		{ return symbol(sym.AST); }
 "/."    { return symbol(sym.SLASH_DOT); }
 "="     { return symbol(sym.EQUAL); }
 "<>"	{ return symbol(sym.LESS_GREATER); }
@@ -110,7 +110,12 @@ eof     { return symbol(sym.EOF); }
 
 {lower} ({digit}|{lower}|{upper}|"_")*   { return symbol(sym.IDENT, new Id(yytext())); }
 }
-[^]                    { throw new Error("Illegal character <"+yytext()+">"); }
+[^]                    { try {
+							throw new Exception();
+						}catch(Exception e){
+						System.err.println("Illegal character <"+yytext()+">"+ " at <line " + yyline + ", column " + yycolumn + ">");
+						System.exit(1);
+						} }
 
 
 

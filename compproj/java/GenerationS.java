@@ -77,21 +77,33 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(Sub e) {
 		String r1 = "";
 		String r2 = "";
-		if (e.e1 instanceof Var) {
+		if(e.e1 instanceof Int){
 			r1 = e.e1.accept(this);
-		} else {
-			System.err.println("internal error -- GenerationS -- sub");
+		}
+		else if (e.e1 instanceof Var) {
+			r1 = e.e1.accept(this);
+		} 
+		else {
+			System.err.println("internal error -- GenerationS -- add");
 			System.exit(1);
 			return null;
 		}
-		if (e.e2 instanceof Var) {
+		if(e.e2 instanceof Int){
 			r2 = e.e2.accept(this);
-		} else {
-			System.err.println("internal error -- GenerationS -- sub");
+		}
+		else if (e.e2 instanceof Var) {
+			r2 = e.e2.accept(this);
+		} 
+		else {
+			System.err.println("internal error -- GenerationS -- add");
 			System.exit(1);
 			return null;
 		}
-		return String.format("\tsub\t%s, %s, %s\n",e.registreDeRetour, r1, r2);
+
+		if(e.e1 instanceof Int)
+			return String.format("\tsub\t%s,%s,%s\n",e.registreDeRetour, r2, r1);
+		else
+			return String.format("\tsub\t%s,%s,%s\n",e.registreDeRetour, r1, r2);
 	}
 
 	@Override
@@ -172,21 +184,34 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(Mul e) {
 		String r1 = "";
 		String r2 = "";
-		if (e.e1 instanceof Var) {
+		if(e.e1 instanceof Int){
 			r1 = e.e1.accept(this);
-		} else {
-			System.err.println("internal error -- GenerationS -- mul");
+		}
+		else if (e.e1 instanceof Var) {
+			r1 = e.e1.accept(this);
+		} 
+		else {
+			System.err.println("internal error -- GenerationS -- add");
 			System.exit(1);
 			return null;
 		}
-		if (e.e2 instanceof Var) {
+		if(e.e2 instanceof Int){
 			r2 = e.e2.accept(this);
-		} else {
-			System.err.println("internal error -- GenerationS -- mul");
+		}
+		else if (e.e2 instanceof Var) {
+			r2 = e.e2.accept(this);
+		} 
+		else {
+			System.err.println("internal error -- GenerationS -- add");
 			System.exit(1);
 			return null;
 		}
-		return String.format("\tmul\t%s, %s, %s\n",e.registreDeRetour, r1, r2);
+
+		if(e.e1 instanceof Int)
+			return String.format("\tmul\t%s,%s,%s\n",e.registreDeRetour, r2, r1);
+		else
+			return String.format("\tmul\t%s,%s,%s\n",e.registreDeRetour, r1, r2);
+
 	}
 
 	@Override
@@ -280,11 +305,8 @@ public class GenerationS implements ObjVisitor<String> {
 		String retour ="";
 		String registre = RegistreAllocation.getRegistre(e.id);
 		if (e.e1 instanceof OpBin){
-			Id idretour = Id.gen();
-			String regRetour = RegistreAllocation.getRegistre(idretour);
-			((OpBin)e.e1).registreDeRetour = regRetour;
+			((OpBin)e.e1).registreDeRetour = registre;
 			retour += e.e1.accept(this);
-			retour += String.format("\tmov\t%s,%s\n",registre,regRetour);
 		} else if (e.e1 instanceof Var) {
 			String regE1 = e.e1.accept(this);
 			retour += String.format("\tmov\t%s,%s\n",registre,regE1);
@@ -347,8 +369,7 @@ public class GenerationS implements ObjVisitor<String> {
 			retour += e.fd.e.accept(this);
 		}
 		defFunc += retour;
-
-		//e.fd.e.accept(this);
+		defFunc += "\tbx\tlr\n";
 
 		return e.e.accept(this);	
 	}
@@ -367,7 +388,7 @@ public class GenerationS implements ObjVisitor<String> {
 			if(strP!=null){
 				if (param instanceof Var){
 					nbParam ++;
-					registre = RegistreAllocation.getRegistre(((Var)param).id);
+					registre = strP;
 					retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  registre);
 				} else if (param instanceof App) {
 					nbParam ++;

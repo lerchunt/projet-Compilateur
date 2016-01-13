@@ -43,9 +43,10 @@ echo "\033[0mTest de $j \033[31m"
 
 ./min-ml $j >> journal.log
 fichier=${j%%.*}
-cp ${j%%.*}.s ${j%%.*}.arm
-echo "lancement de .arm"
-qemu-arm ./${j%%.*}.arm
+#cp ${j%%.*}.s ${j%%.*}.arm
+#echo "lancement de .arm"
+#qemu-arm ./${j%%.*}.arm
+#pas besoin car incorrect
 done
 fi
 echo "\033[0mFin des Tests "
