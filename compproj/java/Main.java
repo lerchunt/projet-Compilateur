@@ -136,7 +136,7 @@ public class Main {
 				System.out.println("using HeightVisitor: " + height);
 
 			} catch (Exception e) {
-				System.err.println(e.getMessage());
+				e.printStackTrace();
 				System.exit(1);
 			}
 		}

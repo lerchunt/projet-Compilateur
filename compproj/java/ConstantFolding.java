@@ -36,36 +36,20 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Add e) {
-		if(tabSym.containsKey(((Var)e.e1).id.toString()))
-		{
-			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
-		} 
-		if(tabSym.containsKey(((Var)e.e2).id.toString()))
-		{
-			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
-		} 
-		e.e1 = e.e1.accept(this);
-		e.e2 = e.e2.accept(this);
-		return e;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Int && newExp.e2 instanceof Int) {
+			return new Int(((Int)newExp.e1).i + ((Int)newExp.e2).i);
+		}
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(Sub e) {
-		if(tabSym.containsKey(((Var)e.e1).id.toString()))
-		{
-			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
-		} 
-		if(tabSym.containsKey(((Var)e.e2).id.toString()))
-		{
-			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
-		} 
-		e.e1 = e.e1.accept(this);
-		e.e2 = e.e2.accept(this);
-		return e;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Int && newExp.e2 instanceof Int) {
+			return new Int(((Int)newExp.e1).i - ((Int)newExp.e2).i);
+		}
+		return newExp;
 	}
 
 	@Override
@@ -75,139 +59,93 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(FAdd e) {
-		if(tabSym.containsKey(((Var)e.e1).id.toString()))
-		{
-			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
-		} 
-		if(tabSym.containsKey(((Var)e.e2).id.toString()))
-		{
-			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
-		} 
-		e.e1 = e.e1.accept(this);
-		e.e2 = e.e2.accept(this);
-		return e;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
+			return new Float(((Float)newExp.e1).f + ((Float)newExp.e2).f);
+		}
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(FSub e) {
-		if(tabSym.containsKey(((Var)e.e1).id.toString()))
-		{
-			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
-		} 
-		if(tabSym.containsKey(((Var)e.e2).id.toString()))
-		{
-			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
-		} 
-		e.e1 = e.e1.accept(this);
-		e.e2 = e.e2.accept(this);
-		return e;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
+			return new Float(((Float)newExp.e1).f - ((Float)newExp.e2).f);
+		}
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(FMul e) {
-		if(tabSym.containsKey(((Var)e.e1).id.toString()))
-		{
-			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
-		} 
-		if(tabSym.containsKey(((Var)e.e2).id.toString()))
-		{
-			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
+			return new Float(((Float)newExp.e1).f * ((Float)newExp.e2).f);
 		}
-		e.e1 = e.e1.accept(this);
-		e.e2 = e.e2.accept(this);;
-		return e;
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(Mul e) {
-		if(tabSym.containsKey(((Var)e.e1).id.toString()))
-		{
-			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
-		} 
-		if(tabSym.containsKey(((Var)e.e2).id.toString()))
-		{
-			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
-		} 
-		e.e1 = e.e1.accept(this);
-		e.e2 = e.e2.accept(this);
-		return e;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Int && newExp.e2 instanceof Int) {
+			return new Int(((Int)newExp.e1).i * ((Int)newExp.e2).i);
+		}
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(FDiv e) {
-		if(tabSym.containsKey(((Var)e.e1).id.toString()))
-		{
-			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
-		} 
-		if(tabSym.containsKey(((Var)e.e2).id.toString()))
-		{
-			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
-		} 
-		e.e1 = e.e1.accept(this);
-		e.e2 = e.e2.accept(this);
-		return e;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
+			return new Float(((Float)newExp.e1).f / ((Float)newExp.e2).f);
+		}
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(Eq e) {
-		if(tabSym.containsKey(((Var)e.e1).id.toString()))
-		{
-			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
-		} 
-		if(tabSym.containsKey(((Var)e.e2).id.toString()))
-		{
-			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
-		} 
-		e.e1 = e.e1.accept(this);
-		e.e2 = e.e2.accept(this);
-		return e;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
+			return new Bool(((Float)newExp.e1).f == ((Float)newExp.e2).f);
+		} else if (e.e1 instanceof Int && e.e2 instanceof Int) {
+			return new Bool(((Int)newExp.e1).i == ((Int)newExp.e2).i);
+		}
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(LE e) {
-		if(tabSym.containsKey(((Var)e.e1).id.toString()))
-		{
-			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
-		} 
-		if(tabSym.containsKey(((Var)e.e2).id.toString()))
-		{
-			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
-		} 
-		e.e1 = e.e1.accept(this);
-		e.e2 = e.e2.accept(this);
-		return e;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
+			return new Bool(((Float)newExp.e1).f <= ((Float)newExp.e2).f);
+		} else if (newExp.e1 instanceof Int && newExp.e2 instanceof Int) {
+			return new Bool(((Int)newExp.e1).i <= ((Int)newExp.e2).i);
+		}
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(If e) {
-		if(tabSym.containsKey(((Var)e.e1).id.toString()))
-		{
-			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
-			tabVar.put(((Var)e.e1).id.toString(), true) ;
-		} 
-		if(tabSym.containsKey(((Var)e.e2).id.toString()))
-		{
-			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
-			tabVar.put(((Var)e.e2).id.toString(), true) ;
-		} 
-		if(tabSym.containsKey(((Var)e.e3).id.toString()))
-		{
-			e.e3 = tabSym.get(((Var)e.e3).id.toString()) ;
-			tabVar.put(((Var)e.e3).id.toString(), true) ;
+		if (e.e1 instanceof Var) {
+			if(tabSym.containsKey(((Var)e.e1).id.toString()))
+			{
+				tabVar.put(((Var)e.e1).id.toString(), true) ;
+				e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+			} 
+		}
+		if (e.e2 instanceof Var) {
+			if(tabSym.containsKey(((Var)e.e2).id.toString()))
+			{
+				tabVar.put(((Var)e.e2).id.toString(), true) ;
+				e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+			} 
+		}
+		if (e.e3 instanceof Var) {
+			if(tabSym.containsKey(((Var)e.e3).id.toString()))
+			{
+				tabVar.put(((Var)e.e3).id.toString(), true) ;
+				e.e3 = tabSym.get(((Var)e.e3).id.toString()) ;
+			}
 		}
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -218,17 +156,15 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	@Override
 	public Exp visit(Let e) {
 		Exp exp ;
-		if(!e.e1.isVIFB()){
-			if(!tabSym.containsKey(e.id.toString())) {
-				exp = e.e1.accept(this) ; 
-				tabSym.put(e.id.toString(), exp);
-			} else {
-				exp = e.e1.accept(this) ; 
-				tabSym.remove(e.id.toString());
-				tabSym.put(e.id.toString(), exp);
+		if(!tabSym.containsKey(e.id.toString())) {
+			e.e1 = e.e1.accept(this) ; 
+			if (e.e1 instanceof Int || e.e1 instanceof Float || e.e1 instanceof Bool ) {
+				tabSym.put(e.id.toString(), e.e1);
 			}
 		} else {
-			e.e1 = e.e1.accept(this);
+			exp = e.e1.accept(this) ; 
+			tabSym.remove(e.id.toString());
+			tabSym.put(e.id.toString(), exp);
 		}
 		e.e2 = e.e2.accept(this);
 		return e;
@@ -245,15 +181,16 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		e.fd.e = e.fd.e.accept(this);
 		return e;
 	}
-	
+
 	public List<Exp> printIntFix(List<Exp> args){
 		int cpt = 0 ;
 		while(cpt < args.size()){
-			if(args.get(cpt).isVar()){
-				if(tabSym.containsKey(((Var)args.get(cpt)).id.toString())) {
-					args.set(cpt, tabSym.get(((Var)args.get(cpt)).id.toString()));
-					tabVar.put(((Var)args.get(cpt)).id.toString(), true) ;
-			    }
+			Exp arg = args.get(cpt);
+			if( arg instanceof Var){
+				if(tabSym.containsKey(((Var)arg).id.toString())) {
+					tabVar.put(((Var)arg).id.toString(), true) ;
+					args.set(cpt, tabSym.get(((Var)arg).id.toString()));
+				}
 			} else {
 				args.get(cpt).accept(this);
 			}
@@ -308,6 +245,28 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	@Override
 	public Exp visit(Unit unit) {
 		return unit;
+	}
+
+	private Exp CFolding(OpBin e) {
+		OpBin newExp = (OpBin)e.clone();
+
+		if (e.e1 instanceof Var) {
+			if(tabSym.containsKey(((Var)e.e1).id.toString()))
+			{
+				tabVar.put(((Var)e.e1).id.toString(), true) ;
+				newExp.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+			} 
+		}
+		if (e.e2 instanceof Var){
+			if(tabSym.containsKey(((Var)e.e2).id.toString()))
+			{
+				tabVar.put(((Var)e.e2).id.toString(), true) ;
+				newExp.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+			} 
+		}
+		newExp.e1 = newExp.e1.accept(this);
+		newExp.e2 = newExp.e2.accept(this);
+		return newExp;
 	}
 
 }

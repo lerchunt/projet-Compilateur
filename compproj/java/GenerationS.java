@@ -61,8 +61,7 @@ public class GenerationS implements ObjVisitor<String> {
 		}
 		else if (e.e1 instanceof Var) {
 			r1 = e.e1.accept(this);
-		} 
-		else {
+		} else {
 			System.err.println("internal error -- GenerationS -- add");
 			System.exit(1);
 			return null;
