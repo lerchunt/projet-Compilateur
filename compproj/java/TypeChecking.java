@@ -404,8 +404,8 @@ public class TypeChecking implements ObjVisitor<Type> {
 			Type exp = e.e1.accept(this) ; 
 			tabSym.put(e.id.toString(), exp);
 		} else {
-			tabSym.remove(e.id.toString());
 			Type exp = e.e1.accept(this) ; 
+			tabSym.remove(e.id.toString());
 			tabSym.put(e.id.toString(), exp);
 		}		
 		return e.e2.accept(this);
