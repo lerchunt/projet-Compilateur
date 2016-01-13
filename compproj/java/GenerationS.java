@@ -322,7 +322,7 @@ public class GenerationS implements ObjVisitor<String> {
 			String regRetour = RegistreAllocation.getRegistre(idretour);
 			((OpBin)e.e2).registreDeRetour = regRetour;
 			retour += e.e2.accept(this);
-			retour += String.format("\tmov\tr0%s\n",regRetour);
+			retour += String.format("\tmov\tr0,%s\n",regRetour);
 		} else if (e.e2 instanceof Var) {
 			String regE1 = e.e2.accept(this);
 			retour += String.format("\tmov\tr0,%s\n",regE1);
@@ -344,11 +344,11 @@ public class GenerationS implements ObjVisitor<String> {
 		String retour = "";
 		int nbreg = 0;
 		defFunc +=String.format("\nmin_caml_%s:\n",e.fd.id);
-
+		defFunc += String.format("\t@prologue\n%s\n",prologue());
 		for (Id id : e.fd.args){
 			if (nbreg <4){
 				reg = RegistreAllocation.getRegistre(id);
-				defFunc += String.format("\tmov\t%s,r%d\n",reg,nbreg);
+				defFunc += String.format("\n\tmov\t%s,r%d\n",reg,nbreg);
 				nbreg++;
 			}
 			else{
@@ -356,6 +356,11 @@ public class GenerationS implements ObjVisitor<String> {
 				System.exit(1);
 			}
 		}
+		
+		defFunc += String.format("\n\t@push: empiler registre\n%s\n",push());
+		defFunc += "\n\tsub\tr13,r13,#4 @place pour le résultat\n";
+		defFunc +=String.format("\n\t@pushFP:\n%s\n",pushFP());
+		
 		if (e.fd.e instanceof OpBin){
 			Id idretour = Id.gen();
 			String regRetour = RegistreAllocation.getRegistre(idretour);
@@ -368,8 +373,9 @@ public class GenerationS implements ObjVisitor<String> {
 		} else {
 			retour += e.fd.e.accept(this);
 		}
-		defFunc += retour;
-		defFunc += "\tbx\tlr\n";
+		defFunc += retour+"\n";
+		defFunc +=String.format("\n\t@epilogue:\n%s\n",epilogue());
+		defFunc += "\n\tbx\tlr\n";
 
 		return e.e.accept(this);	
 	}
@@ -452,7 +458,19 @@ public class GenerationS implements ObjVisitor<String> {
 	}	
 
 	private String epilogue() {
-		return "\tadd\tr13,r11,#0\n\tldr\tr11,[r13]\n\tadd\tr13,r13,#4\n\tbx\n\tlr";
+		return "\tadd\tr13,r11,#0\n\tldr\tr11,[r13]\n\tadd\tr13,r13,#4";
+	}
+	
+	private String prologue() {
+		return "\tadd\tr13,r13,#-4\n\tstr\tr11,[r13]\n\tadd\tr11,r13,#0\n\tadd\tr13,r13,#-4 @taille des variables locales";
+	}
+	
+	private String push() {
+		return "\tsub\tr13,r13,#4\n\tstr\tr0,[r13]";
+	}
+	
+	private String pushFP() {
+		return "\tadd\tr13,r13,#12\n\tstr\tr11,[r13]";
 	}
 
 }
