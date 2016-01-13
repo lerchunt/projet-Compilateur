@@ -86,7 +86,7 @@ comment =  "(*" [^*] ~"*)"
 "-."    { return symbol(sym.MINUS_DOT); }
 "+."    { return symbol(sym.PLUS_DOT); }
 "*."    { return symbol(sym.AST_DOT); }
-"*"	{ return symbol(sym.AST); }
+"*"		{ return symbol(sym.AST); }
 "/."    { return symbol(sym.SLASH_DOT); }
 "="     { return symbol(sym.EQUAL); }
 "<>"	{ return symbol(sym.LESS_GREATER); }

@@ -119,6 +119,8 @@ exp ::=
     {: RESULT = new Let(Id.gen(), new TUnit(), e1, e2); :}
 | ARRAY_CREATE simple_exp:e1 simple_exp:e2    
            {: RESULT = new Array(e1, e2); :}
+| LPAREN AST exp AST RPAREN
+    {: RESULT = null ; :}
     %prec prec_app
 | error:e    {: RESULT = null; //syntax_error("syntax error : ", e); :}
 ;
