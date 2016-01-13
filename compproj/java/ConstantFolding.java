@@ -6,7 +6,7 @@ import java.util.List;
 public class ConstantFolding implements ObjVisitor<Exp> {
 
 	private static Hashtable<String, Exp> tabSym = new Hashtable<String, Exp>();
-	public static Hashtable<String, Bool> tabVar = new Hashtable<String, Bool>();
+	public static Hashtable<String, Object> tabVar = new Hashtable<String, Object>();
 
 
 	@Override
@@ -39,10 +39,12 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -54,10 +56,12 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -74,10 +78,12 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -89,10 +95,12 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -104,10 +112,12 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		}
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);;
@@ -119,10 +129,12 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -134,10 +146,12 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -149,10 +163,12 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -164,10 +180,12 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -179,14 +197,17 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		if(tabSym.containsKey(((Var)e.e1).id.toString()))
 		{
 			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+			tabVar.put(((Var)e.e1).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e2).id.toString()))
 		{
 			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+			tabVar.put(((Var)e.e2).id.toString(), true) ;
 		} 
 		if(tabSym.containsKey(((Var)e.e3).id.toString()))
 		{
 			e.e3 = tabSym.get(((Var)e.e3).id.toString()) ;
+			tabVar.put(((Var)e.e3).id.toString(), true) ;
 		}
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
@@ -225,25 +246,25 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		return e;
 	}
 	
-	public List<Exp> printIntFix(List<Exp> args) {
-		Iterator<Exp> it = args.iterator();
-		if (!args.isEmpty()) {
-		    if(tabSym.containsKey(it.toString())) {
-		    	it = (Iterator<Exp>) tabSym.get(it.toString());
-		    }
-	    }
-		while (it.hasNext()) {
-	    	if(tabSym.containsKey(it.next().toString())) {
-		    	it = (Iterator<Exp>) tabSym.get(it.next().toString());
-		    }
-	    }
-		args = (List<Exp>) it ;
+	public List<Exp> printIntFix(List<Exp> args){
+		int cpt = 0 ;
+		while(cpt < args.size()){
+			if(args.get(cpt).isVar()){
+				if(tabSym.containsKey(((Var)args.get(cpt)).id.toString())) {
+					args.set(cpt, tabSym.get(((Var)args.get(cpt)).id.toString()));
+					tabVar.put(((Var)args.get(cpt)).id.toString(), true) ;
+			    }
+			} else {
+				args.get(cpt).accept(this);
+			}
+			cpt++;
+		}
 		return args;
-}
+	}
 
 	@Override
 	public Exp visit(App e) {
-			//e.es = printIntFix(e.es);
+		e.es = printIntFix(e.es);
 		return e;
 	}
 

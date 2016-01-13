@@ -2,7 +2,6 @@ export PATH := /opt/gnu/arm/bin:$(PATH)
 
 AS=arm-eabi-as
 LD=arm-eabi-ld
-
 ASM=$(wildcard *.s)
 PRG=$(subst .s,.arm,${ASM})
 
