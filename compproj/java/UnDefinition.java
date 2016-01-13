@@ -1,64 +1,57 @@
+import java.util.Enumeration;
+import java.util.Hashtable;
 
-public class UnDefinition implements ObjVisitor<Exp> {
+
+public class UnDefinition extends ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Bool e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
 	public Exp visit(Int e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
 	public Exp visit(Float e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
 	public Exp visit(Not e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e.accept(this);
 	}
 
 	@Override
 	public Exp visit(Neg e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e.accept(this);
 	}
 
 	@Override
 	public Exp visit(Add e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e.accept(this);
 	}
 
 	@Override
 	public Exp visit(Sub e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e.accept(this);
 	}
 
 	@Override
 	public Exp visit(FNeg e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e.accept(this);
 	}
 
 	@Override
 	public Exp visit(FAdd e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e.accept(this);
 	}
 
 	@Override
 	public Exp visit(FSub e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e.accept(this);
 	}
 
 	@Override
@@ -99,8 +92,10 @@ public class UnDefinition implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Let e) {
-		// TODO Auto-generated method stub
-		return null;
+		if(ConstantFolding.tabVar.containsKey(e.id.toString())) {
+			e = (Let) e.e2.accept(this);
+		}
+		return e;
 	}
 
 	@Override

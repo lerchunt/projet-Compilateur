@@ -1,14 +1,13 @@
+import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 
 
 public class ConstantFolding implements ObjVisitor<Exp> {
 
 	private static Hashtable<String, Exp> tabSym = new Hashtable<String, Exp>();
-	public static Hashtable<String, Object> tabVar = new Hashtable<String, Object>();
-
-
+	static Hashtable<String, Object> tabVar = new Hashtable<String, Object>();
+	
 	@Override
 	public Exp visit(Bool e) {
 		return e;
@@ -166,8 +165,8 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 			tabSym.remove(e.id.toString());
 			tabSym.put(e.id.toString(), exp);
 		}
-		e.e2 = e.e2.accept(this);
-		return e;
+		e.e2 = e.e2.accept(this);     
+		return e;      
 	}
 
 	@Override
@@ -194,6 +193,7 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 			} else {
 				args.get(cpt).accept(this);
 			}
+
 			cpt++;
 		}
 		return args;
