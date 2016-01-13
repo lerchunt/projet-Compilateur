@@ -223,24 +223,81 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Eq e) {
-		e.e1.accept(this);
-		e.e2.accept(this);
-		return null;
+		String retour=String.format("\tcmp\t%s,%s\n", e.e1.accept(this),e.e2.accept(this));
+		retour += "\tbeq\tifTrue\n";
+		return retour;
 	}
 
 	@Override
 	public String visit(LE e) {
-		e.e1.accept(this);
+		String retour=String.format("\tcmp\t%s,%s\n", e.e1.accept(this),e.e2.accept(this));
+		
+		e.e1.accept(this); 
 		e.e2.accept(this);
-		return null;
+		return retour;
 	}
 
 	@Override
 	public String visit(If e) {
-		e.e1.accept(this);
-		e.e2.accept(this);
-		e.e3.accept(this);
-		return null;
+		String retour ="";
+		String regE1 = "";
+		String regE2="";
+		String regE3="";
+		String ifTrue="ifTrue:\n";
+		String ifFalse="ifFalse:\n";
+		
+		if(e.e1 instanceof OpBin || e.e1 instanceof OpUn){
+			Id idretour = Id.gen();
+			regE1 = RegistreAllocation.getRegistre(idretour);
+			((OpBin)e.e1).registreDeRetour = regE1;
+			retour += e.e1.accept(this);
+			
+		} else {
+			System.err.println("internal error - If e1 (GenerationS)");
+			System.exit(1);
+		}
+		
+		
+		if (e.e2 instanceof Var){
+			
+		} else if (e.e2 instanceof App){
+			
+		} else if (e.e2 instanceof Let){
+			
+		} else if (e.e2 instanceof LetRec){
+			
+		} else if (e.e2 instanceof OpBin){ 
+						
+		} else if (e.e2 instanceof OpUn){ //neg et not
+			
+		} else { //entier +float +bool
+			ifTrue+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e2.accept(this));
+		}
+		
+		
+		if (e.e3 instanceof Var){
+			
+		} else if (e.e3 instanceof App){
+			
+		} else if (e.e3 instanceof Let){
+			
+		} else if (e.e3 instanceof LetRec){
+		
+		} else if (e.e3 instanceof OpBin){ 
+						
+		} else if (e.e3 instanceof OpUn){ //neg et not
+			
+		} else { //entier +float +bool
+			ifFalse+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e3.accept(this));
+		}
+		
+		ifFalse+="\tb\tendIf\n";
+		retour+= ifFalse;
+		
+		retour+=ifTrue;
+		retour+="endIf:\n";
+		
+		return retour;
 	}
 
 	@Override
@@ -253,6 +310,9 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e1 instanceof Var) {
 			String regE1 = e.e1.accept(this);
 			retour += String.format("\tmov\t%s,%s\n",registre,regE1);
+		} else if (e.e1 instanceof If){
+			((If)e.e1).registreDeRetour = registre;
+			retour+=e.e1.accept(this);
 		} else {
 			retour += String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		}
