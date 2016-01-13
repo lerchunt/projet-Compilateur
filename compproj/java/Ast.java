@@ -383,6 +383,8 @@ class If extends Exp {
     Exp e1;
     Exp e2;
     Exp e3;
+    
+    String registreDeRetour;
 
     If(Exp e1, Exp e2, Exp e3) {
         this.e1 = e1;
