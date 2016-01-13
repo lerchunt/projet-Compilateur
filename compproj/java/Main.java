@@ -115,7 +115,7 @@ public class Main {
 				    RegistreAllocation.printTabVar();
 				    //********************
 					String main = expression.accept(new GenerationS());
-					main += "\tbl\tmin_caml_exit\n";
+					main += "\tbl\tmin_caml_print_newline\n\tbl\tmin_caml_exit\n";
 					retour += GenerationS.defFunc;
 					retour += "\n_start:\n"+main;
 					retour += GenerationS.defVar;
