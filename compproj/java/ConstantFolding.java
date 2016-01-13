@@ -1,124 +1,229 @@
+import java.util.Hashtable;
+
 
 public class ConstantFolding implements ObjVisitor<Exp> {
 
+	private Hashtable<String, Exp> tabSym = new Hashtable<String, Exp>();
+
 	@Override
 	public Exp visit(Bool e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
 	public Exp visit(Int e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
 	public Exp visit(Float e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
 	public Exp visit(Not e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e.accept(this);
 	}
 
 	@Override
 	public Exp visit(Neg e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e.accept(this);
 	}
 
 	@Override
 	public Exp visit(Add e) {
-		// TODO Auto-generated method stub
-		return null;
+		if(tabSym.containsKey(((Var)e.e1).id.toString()))
+		{
+			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+		} 
+		if(tabSym.containsKey(((Var)e.e2).id.toString()))
+		{
+			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+		} 
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Sub e) {
-		// TODO Auto-generated method stub
-		return null;
+		if(tabSym.containsKey(((Var)e.e1).id.toString()))
+		{
+			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+		} 
+		if(tabSym.containsKey(((Var)e.e2).id.toString()))
+		{
+			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+		} 
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(FNeg e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e.accept(this);
 	}
 
 	@Override
 	public Exp visit(FAdd e) {
-		// TODO Auto-generated method stub
-		return null;
+		if(tabSym.containsKey(((Var)e.e1).id.toString()))
+		{
+			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+		} 
+		if(tabSym.containsKey(((Var)e.e2).id.toString()))
+		{
+			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+		} 
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(FSub e) {
-		// TODO Auto-generated method stub
-		return null;
+		if(tabSym.containsKey(((Var)e.e1).id.toString()))
+		{
+			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+		} 
+		if(tabSym.containsKey(((Var)e.e2).id.toString()))
+		{
+			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+		} 
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(FMul e) {
-		// TODO Auto-generated method stub
-		return null;
+		if(tabSym.containsKey(((Var)e.e1).id.toString()))
+		{
+			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+		} 
+		if(tabSym.containsKey(((Var)e.e2).id.toString()))
+		{
+			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+		}
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);;
+		return e;
 	}
 
 	@Override
 	public Exp visit(Mul e) {
-		// TODO Auto-generated method stub
-		return null;
+		if(tabSym.containsKey(((Var)e.e1).id.toString()))
+		{
+			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+		} 
+		if(tabSym.containsKey(((Var)e.e2).id.toString()))
+		{
+			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+		} 
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(FDiv e) {
-		// TODO Auto-generated method stub
-		return null;
+		if(tabSym.containsKey(((Var)e.e1).id.toString()))
+		{
+			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+		} 
+		if(tabSym.containsKey(((Var)e.e2).id.toString()))
+		{
+			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+		} 
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Eq e) {
-		// TODO Auto-generated method stub
-		return null;
+		if(tabSym.containsKey(((Var)e.e1).id.toString()))
+		{
+			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+		} 
+		if(tabSym.containsKey(((Var)e.e2).id.toString()))
+		{
+			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+		} 
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(LE e) {
-		// TODO Auto-generated method stub
-		return null;
+		if(tabSym.containsKey(((Var)e.e1).id.toString()))
+		{
+			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+		} 
+		if(tabSym.containsKey(((Var)e.e2).id.toString()))
+		{
+			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+		} 
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(If e) {
-		// TODO Auto-generated method stub
-		return null;
+		if(tabSym.containsKey(((Var)e.e1).id.toString()))
+		{
+			e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+		} 
+		if(tabSym.containsKey(((Var)e.e2).id.toString()))
+		{
+			e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+		} 
+		if(tabSym.containsKey(((Var)e.e3).id.toString()))
+		{
+			e.e3 = tabSym.get(((Var)e.e3).id.toString()) ;
+		}
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		e.e3 = e.e3.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Let e) {
-		// TODO Auto-generated method stub
-		return null;
+		Exp exp ;
+		if(!e.e1.isVIFB()){
+			if(!tabSym.containsKey(e.id.toString())) {
+				exp = e.e1.accept(this) ; 
+				tabSym.put(e.id.toString(), exp);
+			} else {
+				exp = e.e1.accept(this) ; 
+				tabSym.remove(e.id.toString());
+				tabSym.put(e.id.toString(), exp);
+			}
+		} else {
+			e.e1 = e.e1.accept(this);
+		}
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Var e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
 	public Exp visit(LetRec e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e = e.e.accept(this);
+		e.fd.e = e.fd.e.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(App e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
@@ -153,8 +258,7 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Unit unit) {
-		// TODO Auto-generated method stub
-		return null;
+		return unit;
 	}
 
 }
