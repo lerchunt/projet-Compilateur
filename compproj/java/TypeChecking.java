@@ -352,6 +352,9 @@ public class TypeChecking implements ObjVisitor<Type> {
 				} else if(e.e2.accept(this) instanceof TBool && e.e3.accept(this) instanceof TBool)
 				{
 					return e.e2.accept(this);
+				} else if(e.e2.accept(this) instanceof TUnit && e.e3.accept(this) instanceof TUnit)
+				{
+					return e.e2.accept(this);
 				}
 			}
 		} else {

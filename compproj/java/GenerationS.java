@@ -248,11 +248,8 @@ public class GenerationS implements ObjVisitor<String> {
 		String retour ="";
 		String registre = RegistreAllocation.getRegistre(e.id);
 		if (e.e1 instanceof OpBin){
-			Id idretour = Id.gen();
-			String regRetour = RegistreAllocation.getRegistre(idretour);
-			((OpBin)e.e1).registreDeRetour = regRetour;
+			((OpBin)e.e1).registreDeRetour = registre;
 			retour += e.e1.accept(this);
-			//retour += String.format("\tmov\t%s,%s\n",registre,regRetour);
 		} else if (e.e1 instanceof Var) {
 			String regE1 = e.e1.accept(this);
 			retour += String.format("\tmov\t%s,%s\n",registre,regE1);
@@ -331,7 +328,7 @@ public class GenerationS implements ObjVisitor<String> {
 			if(strP!=null){
 				if (param instanceof Var){
 					nbParam ++;
-					registre = RegistreAllocation.getRegistre(((Var)param).id);
+					registre = strP;
 					retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  registre);
 				} else if (param instanceof App) {
 					nbParam ++;
