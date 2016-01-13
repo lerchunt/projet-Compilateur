@@ -225,25 +225,24 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		return e;
 	}
 	
-	public List<Exp> printIntFix(List<Exp> args) {
-		Iterator<Exp> it = args.iterator();
-		if (!args.isEmpty()) {
-		    if(tabSym.containsKey(it.toString())) {
-		    	it = (Iterator<Exp>) tabSym.get(it.toString());
-		    }
-	    }
-		while (it.hasNext()) {
-	    	if(tabSym.containsKey(it.next().toString())) {
-		    	it = (Iterator<Exp>) tabSym.get(it.next().toString());
-		    }
-	    }
-		args = (List<Exp>) it ;
+	public List<Exp> printIntFix(List<Exp> args){
+		int cpt = 0 ;
+		while(cpt < args.size()){
+			if(args.get(cpt).isVar()){
+				if(tabSym.containsKey(((Var)args.get(cpt)).id.toString())) {
+					args.set(cpt, tabSym.get(((Var)args.get(cpt)).id.toString()));
+			    }
+			} else {
+				args.get(cpt).accept(this);
+			}
+			cpt++;
+		}
 		return args;
-}
+	}
 
 	@Override
 	public Exp visit(App e) {
-			//e.es = printIntFix(e.es);
+		e.es = printIntFix(e.es);
 		return e;
 	}
 
