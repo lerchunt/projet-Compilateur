@@ -24,7 +24,7 @@ public class RegistreAllocation implements Visitor {
 			if (r.var != null) {
 				if (r.var.id.equals(v)) {
 					var.dec();
-					if (var.nbOccurence == 0) {
+					if (var.nbOccurence <= 0) {
 						r.var = null;
 					}
 					return r.nom;
@@ -39,6 +39,7 @@ public class RegistreAllocation implements Visitor {
 			if (r.var == null) {
 				for (Var var : tabVar) {
 					if (var.id.equals(v)) {
+						var.dec();
 						r.var = var;
 						return r.nom;
 					} 
