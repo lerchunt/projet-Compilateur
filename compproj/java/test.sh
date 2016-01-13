@@ -26,7 +26,7 @@ do
 echo "\033[0mTest de $i \033[31m"
 ./min-ml $i > journal.log
 fichier=${i%%.*}
-cp ${i%%.*}.s ${j%%.*}.arm
+cp ${i%%.*}.s ${i%%.*}.arm
 echo "lancement de .arm"
 qemu-arm ./${i%%.*}.arm
 
