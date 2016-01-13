@@ -339,7 +339,7 @@ public class TypeChecking implements ObjVisitor<Type> {
 	}
 
 	@Override
-	public Type visit(If e) {
+	public Type visit(If e) { 
 		if(!def){
 			if(e.e1.accept(this) instanceof TBool)
 			{
@@ -442,6 +442,7 @@ public class TypeChecking implements ObjVisitor<Type> {
 		printInfix(e.fd.args) ;
 		Type f = e.fd.e.accept(this);
 		tabSym.put(e.fd.id.toString(), f);
+		printInfixR(e.fd.args) ;
 		if(e.e.isVar()){
 			e.e.accept(this);
 			def = false ;
@@ -449,7 +450,7 @@ public class TypeChecking implements ObjVisitor<Type> {
 			def = false ;
 			e.e.accept(this);
 		}
-		return 	e.e.accept(this);
+		return 	e.e.accept(this); 
 	}
 	
 	private void printInfix(List<Id> args) {
@@ -459,6 +460,16 @@ public class TypeChecking implements ObjVisitor<Type> {
         }
 		while (it.hasNext()) {
         	tabSym.put(it.next().toString(), new TUnit());
+        }
+	}
+	
+	private void printInfixR(List<Id> args) {
+		Iterator<Id> it = args.iterator();
+		if (!args.isEmpty()) {
+		    tabSym.remove(it.toString());
+        }
+		while (it.hasNext()) {
+		    tabSym.remove(it.next().toString());
         }
 	}
 
