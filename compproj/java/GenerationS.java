@@ -259,9 +259,9 @@ public class GenerationS implements ObjVisitor<String> {
 		
 		
 		if (e.e2 instanceof Var){
-			
+			ifTrue+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e2.accept(this));
 		} else if (e.e2 instanceof App){
-			
+			ifTrue+=e.e2.accept(this);		
 		} else if (e.e2 instanceof Let){
 			
 		} else if (e.e2 instanceof LetRec){
@@ -276,9 +276,9 @@ public class GenerationS implements ObjVisitor<String> {
 		
 		
 		if (e.e3 instanceof Var){
-			
+			ifFalse+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e3.accept(this));
 		} else if (e.e3 instanceof App){
-			
+			ifFalse+=e.e3.accept(this);
 		} else if (e.e3 instanceof Let){
 			
 		} else if (e.e3 instanceof LetRec){
