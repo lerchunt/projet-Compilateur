@@ -312,7 +312,7 @@ public class GenerationS implements ObjVisitor<String> {
 			retour += e.fd.e.accept(this);
 		}
 		defFunc += retour;
-		defFunc += "\tbx\tlr\n";
+		defFunc += "\n\tbx\tlr\n";
 
 		return e.e.accept(this);	
 	}
@@ -335,7 +335,12 @@ public class GenerationS implements ObjVisitor<String> {
 					retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  registre);
 				} else if (param instanceof App) {
 					nbParam ++;
-					retour += strP;
+					retour += String.format("\t@prologue\n%s\n",prologue());
+					retour += "\n"+strP;
+					retour += String.format("\n\t@push: empiler registre\n%s\n",push());
+					retour += "\n\tsub\tr13,r13,#4 @place pour le résultat\n";
+					retour +=String.format("\n\t@pushFP:\n%s\n",pushFP());
+					retour +=String.format("\n\t@epilogue:\n%s\n",epilogue());
 				} else {
 					nbParam++;
 					retour +=String.format("\tmov\tr%d,%s\n", nbParam-1, strP);
@@ -395,7 +400,19 @@ public class GenerationS implements ObjVisitor<String> {
 	}	
 
 	private String epilogue() {
-		return "\tadd\tr13,r11,#0\n\tldr\tr11,[r13]\n\tadd\tr13,r13,#4\n\tbx\n\tlr";
+		return "\tadd\tr13,r11,#0\n\tldr\tr11,[r13]\n\tadd\tr13,r13,#4";
+	}
+	
+	private String prologue() {
+		return "\tadd\tr13,r13,#-4\n\tstr\tr11,[r13]\n\tadd\tr11,r13,#0\n\tadd\tr13,r13,#-4 @taille des variables locales";
+	}
+	
+	private String push() {
+		return "\tsub\tr13,r13,#4\n\tstr\tr0,[r13]";
+	}
+	
+	private String pushFP() {
+		return "\tadd\tr13,r13,#12\n\tstr\tr11,[r13]";
 	}
 
 }
