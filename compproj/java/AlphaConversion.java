@@ -118,14 +118,15 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 	public Exp visit(Let e) {
 		e.e1 = e.e1.accept(this);
 		Id newVar = e.id;
+		
 		if (isInVar(e.id)) {
 			newVar = Id.gen();
 			while (isInProc(newVar) || isInVar(newVar)) {
 				newVar = Id.gen();
 			}
-			e.id = newVar;
 		}
 		variables.addLast(new BindVar(e.id, newVar));
+		e.id = newVar;
 		e.e2 = e.e2.accept(this);
 		return e;
 	}

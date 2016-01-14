@@ -334,10 +334,14 @@ public class GenerationS implements ObjVisitor<String> {
 			retour+=e.e1.accept(this);
 		} else if (e.e1 instanceof Float){
 			retour += String.format("\tldr\t%s,=%s\n", registre,e.e1.accept(this));
-		}else if (e.e1 instanceof Not){
+		} else if (e.e1 instanceof Not){
 			e.e1.registreDeRetour = registre;
 			retour += e.e1.accept(this);
-		} else {
+		} else if (e.e1 instanceof App) {
+			e.e1.registreDeRetour = registre;
+			retour += e.e1.accept(this);
+			retour += String.format("\tmov\t%s,r0\n",registre);
+		}else {
 			retour += String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		}
 		
