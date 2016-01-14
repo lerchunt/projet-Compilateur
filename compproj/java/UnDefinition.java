@@ -111,6 +111,7 @@ public class UnDefinition extends ConstantFolding implements ObjVisitor<Exp> {
 	@Override
 	public Exp visit(Let e) {
 		if(ConstantFolding.tabVar.containsKey(e.id.toString())) {
+
 			e.e1 = e.e1.accept(this);
 			return ((Exp)e.e2.accept(this)) ;
 		} else {
