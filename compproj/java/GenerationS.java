@@ -3,7 +3,7 @@ import java.util.Hashtable;
 
 public class GenerationS implements ObjVisitor<String> {
 	public static String defFunc = "";
-	public static String defVar = "\n.data";
+	public static String defVar = "";
 	public int nbReg;
 	public int nbFloat=0;
 
@@ -38,6 +38,10 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e instanceof Bool){
 			((Bool)e.e).b = !((Bool)e.e).b;
 			return e.e.accept(this);
+		}else if (e.e instanceof Var){
+			String reg = e.registreDeRetour;
+			return String.format("\trsc\t%s,%s\n\tmul\t%s,%s\n",reg,e.e.accept(this),reg,reg);
+			
 		} else {
 			System.err.println("internal error -- GenerationS not");
 			System.exit(1);
@@ -326,6 +330,9 @@ public class GenerationS implements ObjVisitor<String> {
 			retour+=e.e1.accept(this);
 		} else if (e.e1 instanceof Float){
 			retour += String.format("\tldr\t%s,=%s\n", registre,e.e1.accept(this));
+		}else if (e.e1 instanceof Not){
+			e.e1.registreDeRetour = registre;
+			retour += e.e1.accept(this);
 		} else {
 			retour += String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		}
@@ -342,7 +349,6 @@ public class GenerationS implements ObjVisitor<String> {
 		} else {
 			retour += e.e2.accept(this);
 		}
-		
 		return retour;
 	}
 
@@ -354,10 +360,11 @@ public class GenerationS implements ObjVisitor<String> {
 				isVar = true;
 			}
 		}
-		if(isVar){
+		if(isVar){			
 			return RegistreAllocation.getRegistre(e.id);
 		}else{
-			return String.format("\tbl\t%s\n",e.id);
+			return String.format("\tbl\tmin_caml_%s\n",e.id);
+			
 		}
 	}
 
