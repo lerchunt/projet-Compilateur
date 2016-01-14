@@ -262,7 +262,11 @@ public class GenerationS implements ObjVisitor<String> {
 		if(e.e1 instanceof OpBin || e.e1 instanceof OpUn){
 			e.e1.registreDeRetour = e.registreDeRetour;
 			retour += e.e1.accept(this);			
-		} else {
+		} else if (e.e1 instanceof Bool) {
+			if (((Bool)e.e1).b) {
+				retour += "\tb\tifTrue\n";
+			}
+		}else {
 			System.err.println("internal error - If e1 (GenerationS)");
 			System.exit(1);
 		}
