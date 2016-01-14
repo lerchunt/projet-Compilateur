@@ -41,14 +41,14 @@ retour=`qemu-arm ./${i%%.*}.arm`
 echo -n "$retour">> tmp.txt
 echo "*)" >> tmp.txt
 sed -n 1p $i > tmp2.txt
-cat tmp.txt
-cat tmp2.txt
 test=`diff -q tmp.txt tmp2.txt | grep on`
 if [ -z "$test" ]
 then
 echo "\033[32mOK\033[0m"
 else
 echo "$test"
+cat tmp.txt
+cat tmp2.txt
 fi
 done
 echo ""
