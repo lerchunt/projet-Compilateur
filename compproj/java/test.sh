@@ -16,19 +16,29 @@ then
 echo "\033[36m******* TEST DE TOUS LES FICHIERS  ******* \033[0m\n"
 
 echo "\033[36m******* TEST DES FICHIERS CORRECTS ******* \033[0m\n"
+for i in tests/TestsOk/*.ml
+do
+echo "génération des .s"
+./min-ml $i > journal.log
+done
+
+###### CREATION ARM #########
 cd tests/TestsOk
 make
 cd ../../
+#############################
+
 for i in tests/TestsOk/*.ml
 do
 echo "\033[0mTest de $i \033[31m"
-./min-ml $i > journal.log
 fichier=${i%%.*}
+
 #make test Var=${i%%.*}
 #cp ${i%%.*}.s ${i%%.*}.arm
 #echo "lancement de .arm"
-echo "(*\c" > tmp.txt
-qemu-arm ./${i%%.*}.arm >> tmp.txt
+echo -n "(*" > tmp.txt
+retour=`qemu-arm ./${i%%.*}.arm`
+echo -n "$retour">> tmp.txt
 echo "*)" >> tmp.txt
 sed -n 1p $i > tmp2.txt
 cat tmp.txt
@@ -40,8 +50,6 @@ echo "\033[32mOK\033[0m"
 else
 echo "$test"
 fi
-
-
 done
 echo ""
 echo "\033[36m******* TEST DES FICHIERS INCORRECTS ******* \n"
