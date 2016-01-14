@@ -25,12 +25,14 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Not e) {
-		return e.accept(this);
+		e.e = e.e.accept(this) ; 
+		return e ;
 	}
 
 	@Override
 	public Exp visit(Neg e) {
-		return e.accept(this);
+		e.e = e.e.accept(this) ; 
+		return e ;
 	}
 
 	@Override
@@ -53,7 +55,8 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(FNeg e) {
-		return e.accept(this);
+		e.e = e.e.accept(this) ; 
+		return e ;
 	}
 
 	@Override
@@ -165,6 +168,7 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 			e.e1 = e.e1.accept(this) ; 
 			if (e.e1 instanceof Int || e.e1 instanceof Float || e.e1 instanceof Bool ) {
 				tabSym.put(e.id.toString(), e.e1);
+				tabVar.put(e.id.toString(), true);
 			}
 		} else {
 			exp = e.e1.accept(this) ; 
@@ -182,6 +186,11 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(LetRec e) {
+		if(!tabSym.containsKey(e.fd.id.toString())){
+			tabSym.put(e.fd.id.toString(), e);
+		} else {
+			tabVar.put(e.fd.id.toString(), true);
+		}
 		e.e = e.e.accept(this);
 		e.fd.e = e.fd.e.accept(this);
 		return e;
