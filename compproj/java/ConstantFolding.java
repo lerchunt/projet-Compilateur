@@ -156,6 +156,12 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	public Exp visit(Let e) {
 		Exp exp ;
 		if(!tabSym.containsKey(e.id.toString())) {
+			if(e.e1 instanceof Var){
+				if(tabSym.containsKey(((Var)e.e1).id.toString())){
+					tabVar.put(((Var)e.e1).id.toString(), true) ;
+					e.e1 = tabSym.get(((Var)e.e1).id.toString());
+				}
+			}
 			e.e1 = e.e1.accept(this) ; 
 			if (e.e1 instanceof Int || e.e1 instanceof Float || e.e1 instanceof Bool ) {
 				tabSym.put(e.id.toString(), e.e1);
