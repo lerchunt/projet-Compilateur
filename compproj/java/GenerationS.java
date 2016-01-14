@@ -3,8 +3,9 @@ import java.util.Hashtable;
 
 public class GenerationS implements ObjVisitor<String> {
 	public static String defFunc = "";
-	public static String defVar = "";
+	public static String defVar = "\n.data";
 	public int nbReg;
+	public int nbFloat=0;
 
 	@Override
 	public String visit(Bool e) {
@@ -20,7 +21,10 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Float e) {
-		return null;
+		nbFloat++;
+		String strFloat="fl"+nbFloat;
+		defVar += "\n\t" + strFloat+":\t.float "+e.f;
+		return strFloat;
 	}
 
 	@Override
@@ -320,6 +324,8 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e1 instanceof If){
 			e.e1.registreDeRetour = registre;
 			retour+=e.e1.accept(this);
+		} else if (e.e1 instanceof Float){
+			retour += String.format("\tldr\t%s,=%s\n", registre,e.e1.accept(this));
 		} else {
 			retour += String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		}
