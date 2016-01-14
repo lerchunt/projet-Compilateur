@@ -21,99 +21,125 @@ public class UnDefinition extends ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Not e) {
-		return e.accept(this);
+		e.e = e.e.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Neg e) {
-		return e.accept(this);
+		e.e = e.e.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Add e) {
-		return e.accept(this);
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Sub e) {
-		return e.accept(this);
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(FNeg e) {
-		return e.accept(this);
+		e.e = e.e.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(FAdd e) {
-		return e.accept(this);
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(FSub e) {
-		return e.accept(this);
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(FMul e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Mul e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(FDiv e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Eq e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(LE e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(If e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		e.e3 = e.e3.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Let e) {
 		if(ConstantFolding.tabVar.containsKey(e.id.toString())) {
-			e = (Let) e.e2.accept(this);
+			if(e.e2 instanceof Let){
+				e = (Let) e.e2.accept(this);
+			} else {
+				e.e2 = e.e2.accept(this) ;
+			}
+			e.e1 = e.e1.accept(this);
+		} else {
+			e.e2 = e.e2.accept(this);
+			e.e1 = e.e1.accept(this);
 		}
 		return e;
 	}
 
 	@Override
 	public Exp visit(Var e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e ;
 	}
 
 	@Override
 	public Exp visit(LetRec e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e = e.e.accept(this);
+		e.fd.e = e.fd.e.accept(this);
+		return e ;
 	}
 
 	@Override
 	public Exp visit(App e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e = e.e.accept(this);
+		return e ;
 	}
 
 	@Override
