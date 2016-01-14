@@ -448,10 +448,12 @@ public class TypeChecking implements ObjVisitor<Type> {
 		if(!tabSym.containsKey(e.id.toString())) {
 			Type exp = e.e1.accept(this) ; 
 			tabSym.put(e.id.toString(), exp);
+			e.t = exp ; 
 		} else {
 			Type exp = e.e1.accept(this) ; 
 			tabSym.remove(e.id.toString());
 			tabSym.put(e.id.toString(), exp);
+			e.t = exp ; 
 		}		
 		return e.e2.accept(this);
 	}
@@ -483,6 +485,7 @@ public class TypeChecking implements ObjVisitor<Type> {
 			System.err.println(e.fd.id.toString() + " : is already exist");
 			System.exit(1);
 		}
+		e.fd.type = new TFun();
 		def = true ; 
 		printInfix(e.fd.args) ;
 		Type f = e.fd.e.accept(this);
