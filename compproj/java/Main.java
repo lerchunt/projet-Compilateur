@@ -118,10 +118,10 @@ public class Main {
 					}
 					if (verbose) {
 						System.out.println("------ ASML ------");
-						expression.accept(new GenerationASML());
 						System.out.println();
-					}
 
+					}
+						expression.accept(new GenerationASML());
 					String pathAsml = Path+InName+".asml";
 
 					PrintWriter w = new PrintWriter( new BufferedWriter( new FileWriter(pathAsml)));
@@ -136,6 +136,7 @@ public class Main {
 					String retour = "\t.text\n\t.global _start\n"; // init
 					expression.accept(new RegistreAllocation());
 					if (verbose) {
+						System.out.println("------ Tableau des variables -- nb d'occurence ------");
 						RegistreAllocation.printTabVar();
 					}
 					String main = expression.accept(new GenerationS());
