@@ -1,5 +1,6 @@
 	.text
         .globl min_caml_exit
+
 /* exit syscall */
 min_caml_exit:
 	mov	r0, #0
@@ -130,7 +131,7 @@ stringofint:
 	.size	stringofint, .-stringofint
         .align	2
         .globl min_caml_print_int
-	
+
 min_caml_print_int:
 	stmfd	sp!, {lr}
 	bl	stringofint

@@ -470,7 +470,7 @@ public class GenerationS implements ObjVisitor<String> {
 	}
 	
 	private String pushFP() {
-		return "\tadd\tr13,r13,#12\n\tstr\tr11,[r13]";
+		return "\tadd\tr13,r13,#12\n\tstr\tr11,[r13]\n";
 	}
 
 }
