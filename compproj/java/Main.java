@@ -14,6 +14,8 @@ public class Main {
 	static String InName = "";
 	static String OutName = "";
 	static String Version = "1";
+	public static boolean verbose = false;
+
 	static public void main(String argv[]) {   
 		// gestion des options
 
@@ -43,6 +45,8 @@ public class Main {
 			case "-asml":
 				printAsml = true;
 				break;
+			case "-verbose":
+				verbose = true;
 			default:
 			}
 		}
@@ -63,15 +67,19 @@ public class Main {
 				Parser p = new Parser(new Lexer(new FileReader(argv[argv.length-1])));
 				Exp expression = (Exp) p.parse().value;      
 				assert (expression != null);
-				
-				System.out.println("------ AST ------");
-				expression.accept(new PrintVisitor());
-				System.out.println();
-				System.out.println("------ TYPE CHECKING ------");
+
+				if (verbose) {
+					System.out.println("------ AST ------");
+					expression.accept(new PrintVisitor());
+					System.out.println();
+					System.out.println("------ TYPE CHECKING ------");
+				}
 				try {
 					if (!(expression.accept(new TypeChecking()) instanceof TUnit)) {
-				        throw new Exception();
-				    } else { System.out.println("OK"); }
+						throw new Exception();
+					} else { 
+						if (verbose) {System.out.println("OK");}
+					}
 				} catch(Exception e) {
 					System.err.println("Type error, expected a final type unit");
 					System.exit(1);					
@@ -79,28 +87,40 @@ public class Main {
 				// Type Checking
 				if (!stopAfterTypeChecking) {
 					expression  = expression.accept(new KNormalization());
-					System.out.println("------ AST Knorm ------");
-					expression.accept(new PrintVisitor());
-					System.out.println();
+					if (verbose) {
+						System.out.println("------ AST Knorm ------");
+						expression.accept(new PrintVisitor());
+						System.out.println();
+					}
 					expression = expression.accept(new AlphaConversion());
-					System.out.println("------ AST AlphaConv ------");
-					expression.accept(new PrintVisitor());
-					System.out.println();
+					if (verbose) {
+						System.out.println("------ AST AlphaConv ------");
+						expression.accept(new PrintVisitor());
+						System.out.println();
+					}
 					expression = expression.accept(new BetaReduction());
-					System.out.println("------ AST BetaReduc ------");
-					expression.accept(new PrintVisitor());
-					System.out.println();
+					if (verbose) {
+						System.out.println("------ AST BetaReduc ------");
+						expression.accept(new PrintVisitor());
+						System.out.println();
+					}
 					expression = expression.accept(new ConstantFolding());
-					System.out.println("------ AST ConstantFolding ------");
-					expression.accept(new PrintVisitor());
-					System.out.println();
+					if (verbose) {
+						System.out.println("------ AST ConstantFolding ------");
+						expression.accept(new PrintVisitor());
+						System.out.println();
+					}
 					expression = expression.accept(new UnDefinition());
-					System.out.println("------ AST UnecessaryDefinition ------");
-					expression.accept(new PrintVisitor());
-					System.out.println();
-					System.out.println("------ ASML ------");
-					expression.accept(new GenerationASML());
-					System.out.println();
+					if (verbose) {
+						System.out.println("------ AST UnecessaryDefinition ------");
+						expression.accept(new PrintVisitor());
+						System.out.println();
+					}
+					if (verbose) {
+						System.out.println("------ ASML ------");
+						expression.accept(new GenerationASML());
+						System.out.println();
+					}
 
 					String pathAsml = Path+InName+".asml";
 
@@ -114,10 +134,10 @@ public class Main {
 					}
 
 					String retour = "\t.text\n\t.global _start\n"; // init
-				    expression.accept(new RegistreAllocation());
-				    // debug *************
-				    RegistreAllocation.printTabVar();
-				    //********************
+					expression.accept(new RegistreAllocation());
+					if (verbose) {
+						RegistreAllocation.printTabVar();
+					}
 					String main = expression.accept(new GenerationS());
 					main += "\tbl\tmin_caml_print_newline\n\tbl\tmin_caml_exit\n";
 					retour += GenerationS.defFunc;
@@ -126,19 +146,21 @@ public class Main {
 					PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(Main.Path+Main.OutName+".s")));
 					writer.print(retour);
 					writer.close();
-					
+
 					// supprimer le fichier asml créé.
 					new File(pathAsml).delete();
 				}
-				System.out.println("------ Height of the AST ----");
-				int height = Height.computeHeight(expression);
-				System.out.println("using Height.computeHeight: " + height);
+
+				if (verbose) {
+					System.out.println("------ Height of the AST ----");
+					int height = Height.computeHeight(expression);
+					System.out.println("using Height.computeHeight: " + height);
 
 
-				ObjVisitor<Integer> v = new HeightVisitor();
-				height = expression.accept(v);
-				System.out.println("using HeightVisitor: " + height);
-
+					ObjVisitor<Integer> v = new HeightVisitor();
+					height = expression.accept(v);
+					System.out.println("using HeightVisitor: " + height);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.exit(1);
@@ -155,7 +177,7 @@ public class Main {
 		}
 		buffer.close(); 
 	}
-	
-	
+
+
 }
 
