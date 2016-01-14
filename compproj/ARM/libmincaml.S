@@ -139,25 +139,80 @@ min_caml_print_int:
         bx	lr
         .size min_caml_print_int, .-min_caml_print_int
 
-	.text
-	.globl	min_caml_print_float
-min_caml_print_float:
-	stmfd	sp!, {lr}
-	bl	stringoffloat
-	bl	min_caml_print_string
-	ldmfd	sp!, {lr}
-        bx	lr
-	.size min_caml_print_float, .-min_caml_print_float
+
+
+
+
+
+
+
+
+
+
+
 
 	.data
 .string_for_float:
-	.asciz "2147483647"    @ 12 char are sufficient (for 32-bit ints, incl '\0')
+	.asciz "1.175494351e-38"
 
 	.text
-	.globl	stringofloat
+	.globl	stringoffloat
 stringoffloat:
 	stmfd	sp!, {r4, r5}
 	mov	r3, r0    @ the number
 	ldr	r0, =.string_for_float  @ pointer to begining of buffer
         add	r0, #11     @ pointer to end of buffer (char '\0')
-	.globl min_caml_print_float
+      @special case for -1.175494351e-38
+	ldr	r2, .i2s_constants2+4
+        cmp	r3, r2
+        moveq	r1, #56     @ char '8'
+        subeq	r0, #1
+        streq	r1, [r0]
+        ldreq	r3, .i2s_constants2+8
+      @special case for 0
+        cmp	r3, #0
+        bne	.i2s_non_zero2 @ here number is zero
+        moveq	r1, #48     @ char '0'
+        subeq	r0, #1
+        streq	r1, [r0]
+        beq	.i2s_exit
+.i2s_non_zero2:
+	movgt	r5, #43    @ char '+'
+        movlt	r5, #45    @ char '-'
+	rsblt	r3, r3, #0 @ get absolute number
+	ldr	r4, .i2s_constants2  @ load before loop
+.i2s_positive2:
+      @ tricky stuff to divide r3 and get modulo 10
+	smull	r2, r1, r4, r3
+	mov	r2, r3, asr #31
+	rsb	r2, r2, r1, asr #2
+	add	r1, r2, r2, asl #2
+	sub	r3, r3, r1, asl #1
+	add	r3, r3, #48  @ add '0' to modulo
+        sub	r0, #1
+	strb	r3, [r0]
+	mov	r3, r2       @ prepare result of division for next step
+	cmp	r2, #0
+        bne	.i2s_positive2
+        cmp	r5, #45    @ char '-'
+        subeq	r0, #1
+        streqb	r5, [r0]
+.i2s_exit2:
+	ldmfd	sp!, {r4, r5}
+        bx	lr
+.i2s_constants2:
+	.word	1717986919
+	.word	1,175494351e-38
+	.size	stringoffloat, .-stringoffloat
+        .align	2
+        .globl min_caml_print_float
+	
+min_caml_print_float:
+	stmfd	sp!, {lr}
+	bl	stringoffloat
+	bl	min_caml_print_float
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_print_float, .-min_caml_print_float
+
+

@@ -34,6 +34,8 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e instanceof Bool){
 			((Bool)e.e).b = !((Bool)e.e).b;
 			return e.e.accept(this);
+		}else if (e.e instanceof Var){
+			return e.e.accept(this); //Fonctionne pas !!
 		} else {
 			System.err.println("internal error -- GenerationS not");
 			System.exit(1);
@@ -348,7 +350,7 @@ public class GenerationS implements ObjVisitor<String> {
 				isVar = true;
 			}
 		}
-		if(isVar){
+		if(isVar){			
 			return RegistreAllocation.getRegistre(e.id);
 		}else{
 			return String.format("\tbl\t%s\n",e.id);
