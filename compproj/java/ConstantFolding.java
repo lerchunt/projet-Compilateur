@@ -1,160 +1,278 @@
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+
 
 public class ConstantFolding implements ObjVisitor<Exp> {
 
+	private static Hashtable<String, Exp> tabSym = new Hashtable<String, Exp>();
+	static Hashtable<String, Object> tabVar = new Hashtable<String, Object>();
+	
 	@Override
 	public Exp visit(Bool e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
 	public Exp visit(Int e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
 	public Exp visit(Float e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
 	public Exp visit(Not e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e.accept(this);
 	}
 
 	@Override
 	public Exp visit(Neg e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e.accept(this);
 	}
 
 	@Override
 	public Exp visit(Add e) {
-		// TODO Auto-generated method stub
-		return null;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Int && newExp.e2 instanceof Int) {
+			return new Int(((Int)newExp.e1).i + ((Int)newExp.e2).i);
+		}
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(Sub e) {
-		// TODO Auto-generated method stub
-		return null;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Int && newExp.e2 instanceof Int) {
+			return new Int(((Int)newExp.e1).i - ((Int)newExp.e2).i);
+		}
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(FNeg e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e.accept(this);
 	}
 
 	@Override
 	public Exp visit(FAdd e) {
-		// TODO Auto-generated method stub
-		return null;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
+			return new Float(((Float)newExp.e1).f + ((Float)newExp.e2).f);
+		}
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(FSub e) {
-		// TODO Auto-generated method stub
-		return null;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
+			return new Float(((Float)newExp.e1).f - ((Float)newExp.e2).f);
+		}
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(FMul e) {
-		// TODO Auto-generated method stub
-		return null;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
+			return new Float(((Float)newExp.e1).f * ((Float)newExp.e2).f);
+		}
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(Mul e) {
-		// TODO Auto-generated method stub
-		return null;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Int && newExp.e2 instanceof Int) {
+			return new Int(((Int)newExp.e1).i * ((Int)newExp.e2).i);
+		}
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(FDiv e) {
-		// TODO Auto-generated method stub
-		return null;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
+			return new Float(((Float)newExp.e1).f / ((Float)newExp.e2).f);
+		}
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(Eq e) {
-		// TODO Auto-generated method stub
-		return null;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
+			return new Bool(((Float)newExp.e1).f == ((Float)newExp.e2).f);
+		} else if (e.e1 instanceof Int && e.e2 instanceof Int) {
+			return new Bool(((Int)newExp.e1).i == ((Int)newExp.e2).i);
+		}
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(LE e) {
-		// TODO Auto-generated method stub
-		return null;
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
+			return new Bool(((Float)newExp.e1).f <= ((Float)newExp.e2).f);
+		} else if (newExp.e1 instanceof Int && newExp.e2 instanceof Int) {
+			return new Bool(((Int)newExp.e1).i <= ((Int)newExp.e2).i);
+		}
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(If e) {
-		// TODO Auto-generated method stub
-		return null;
+		if (e.e1 instanceof Var) {
+			if(tabSym.containsKey(((Var)e.e1).id.toString()))
+			{
+				tabVar.put(((Var)e.e1).id.toString(), true) ;
+				e.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+			} 
+		}
+		if (e.e2 instanceof Var) {
+			if(tabSym.containsKey(((Var)e.e2).id.toString()))
+			{
+				tabVar.put(((Var)e.e2).id.toString(), true) ;
+				e.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+			} 
+		}
+		if (e.e3 instanceof Var) {
+			if(tabSym.containsKey(((Var)e.e3).id.toString()))
+			{
+				tabVar.put(((Var)e.e3).id.toString(), true) ;
+				e.e3 = tabSym.get(((Var)e.e3).id.toString()) ;
+			}
+		}
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		e.e3 = e.e3.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Let e) {
-		// TODO Auto-generated method stub
-		return null;
+		Exp exp ;
+		if(!tabSym.containsKey(e.id.toString())) {
+			if(e.e1 instanceof Var){
+				if(tabSym.containsKey(((Var)e.e1).id.toString())){
+					tabVar.put(((Var)e.e1).id.toString(), true) ;
+					e.e1 = tabSym.get(((Var)e.e1).id.toString());
+				}
+			}
+			e.e1 = e.e1.accept(this) ; 
+			if (e.e1 instanceof Int || e.e1 instanceof Float || e.e1 instanceof Bool ) {
+				tabSym.put(e.id.toString(), e.e1);
+			}
+		} else {
+			exp = e.e1.accept(this) ; 
+			tabSym.remove(e.id.toString());
+			tabSym.put(e.id.toString(), exp);
+		}
+		e.e2 = e.e2.accept(this);     
+		return e;      
 	}
 
 	@Override
 	public Exp visit(Var e) {
-		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
 	public Exp visit(LetRec e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e = e.e.accept(this);
+		e.fd.e = e.fd.e.accept(this);
+		return e;
+	}
+
+	public List<Exp> printIntFix(List<Exp> args){
+		int cpt = 0 ;
+		while(cpt < args.size()){
+			Exp arg = args.get(cpt);
+			if( arg instanceof Var){
+				if(tabSym.containsKey(((Var)arg).id.toString())) {
+					tabVar.put(((Var)arg).id.toString(), true) ;
+					args.set(cpt, tabSym.get(((Var)arg).id.toString()));
+				}
+			} else {
+				args.get(cpt).accept(this);
+			}
+
+			cpt++;
+		}
+		return args;
 	}
 
 	@Override
 	public Exp visit(App e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.es = printIntFix(e.es);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Tuple e) {
-		// TODO Auto-generated method stub
-		return null;
+		for (Exp exp : e.es) {
+			exp = exp.accept(this);
+		}
+		return e;
 	}
 
 	@Override
 	public Exp visit(LetTuple e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Array e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Get e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Put e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		e.e3 = e.e3.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Unit unit) {
-		// TODO Auto-generated method stub
-		return null;
+		return unit;
+	}
+
+	private Exp CFolding(OpBin e) {
+		OpBin newExp = (OpBin)e.clone();
+
+		if (e.e1 instanceof Var) {
+			if(tabSym.containsKey(((Var)e.e1).id.toString()))
+			{
+				tabVar.put(((Var)e.e1).id.toString(), true) ;
+				newExp.e1 = tabSym.get(((Var)e.e1).id.toString()) ;
+			} 
+		}
+		if (e.e2 instanceof Var){
+			if(tabSym.containsKey(((Var)e.e2).id.toString()))
+			{
+				tabVar.put(((Var)e.e2).id.toString(), true) ;
+				newExp.e2 = tabSym.get(((Var)e.e2).id.toString()) ;
+			} 
+		}
+		newExp.e1 = newExp.e1.accept(this);
+		newExp.e2 = newExp.e2.accept(this);
+		return newExp;
 	}
 
 }
