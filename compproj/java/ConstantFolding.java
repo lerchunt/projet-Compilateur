@@ -166,7 +166,7 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 				}
 			}
 			e.e1 = e.e1.accept(this) ; 
-			if (e.e1 instanceof Int || e.e1 instanceof Float || e.e1 instanceof Bool ) {
+			if (e.e1 instanceof Int || e.e1 instanceof Float || e.e1 instanceof Bool || e.e1 instanceof Var) {
 				tabSym.put(e.id.toString(), e.e1);
 				tabVar.put(e.id.toString(), true);
 			}
