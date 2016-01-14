@@ -139,3 +139,26 @@ min_caml_print_int:
 	ldmfd	sp!, {lr}
         bx	lr
         .size min_caml_print_int, .-min_caml_print_int
+
+	.text
+	.globl	min_caml_print_float
+min_caml_print_float:
+	stmfd	sp!, {lr}
+	bl	stringoffloat
+	bl	min_caml_print_string
+	ldmfd	sp!, {lr}
+        bx	lr
+	.size min_caml_print_float, .-min_caml_print_float
+
+	.data
+.string_for_float:
+	.asciz "2147483647"    @ 12 char are sufficient (for 32-bit ints, incl '\0')
+
+	.text
+	.globl	stringofloat
+stringoffloat:
+	stmfd	sp!, {r4, r5}
+	mov	r3, r0    @ the number
+	ldr	r0, =.string_for_float  @ pointer to begining of buffer
+        add	r0, #11     @ pointer to end of buffer (char '\0')
+	.globl min_caml_print_float
