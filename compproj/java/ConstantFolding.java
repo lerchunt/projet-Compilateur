@@ -109,7 +109,7 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		OpBin newExp = (OpBin)CFolding(e);
 		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
 			return new Bool(((Float)newExp.e1).f == ((Float)newExp.e2).f);
-		} else if (e.e1 instanceof Int && e.e2 instanceof Int) {
+		} else if (newExp.e1 instanceof Int && newExp.e2 instanceof Int) {
 			return new Bool(((Int)newExp.e1).i == ((Int)newExp.e2).i);
 		}
 		return newExp;
