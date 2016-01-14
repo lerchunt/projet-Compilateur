@@ -94,7 +94,7 @@ public class Main {
 					System.out.println("------ AST ConstantFolding ------");
 					expression.accept(new PrintVisitor());
 					System.out.println();
-					//expression = expression.accept(new UnDefinition());
+					expression = expression.accept(new UnDefinition());
 					System.out.println("------ AST UnecessaryDefinition ------");
 					expression.accept(new PrintVisitor());
 					System.out.println();

@@ -1,27 +1,9 @@
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class AlphaConversion implements ObjVisitor<Exp> {
-	static ArrayList <BindVar> variables = new ArrayList<BindVar>();
-
-	public void stockerId(Id id){
-		variables.add(new BindVar(id.toString(), id.toString()));
-		checkName(id.toString());
-	}
-	public void checkName(String s){
-		boolean existing = false;
-		int cpt=0;
-		for(BindVar i : variables){
-			if(i.getIdPrec().equals(s)){
-				cpt++;
-				if (cpt>1)
-					existing=true;
-			}
-		}
-		if(existing){
-			Id newId = Id.gen(); //si la variable existe déjà dans la liste, on la renomme
-			 variables.get(variables.size()-1).setIdNew(newId.toString());
-		}
-	}
+	static LinkedList <BindVar> variables = new LinkedList<BindVar>();
+	static LinkedList <BindVar> procedures = new LinkedList<BindVar>();
 	
 	@Override
 	public Exp visit(Unit e) {
@@ -57,118 +39,133 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Add e) {
-		e.e1.accept(this);		
-		e.e2.accept(this);
+		e.e1 = e.e1.accept(this);		
+		e.e2 = e.e2.accept(this);
 		return e;
 	}
 
 	@Override
 	public Exp visit(Sub e) {
-		e.e1.accept(this);		
-		e.e2.accept(this);
+		e.e1 = e.e1.accept(this);		
+		e.e2 = e.e2.accept(this);
 		return e;
 	}
 
 	@Override
 	public Exp visit(FNeg e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e = e.e.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(FAdd e) {
-		e.e1.accept(this);		
-		e.e2.accept(this);
+		e.e1 = e.e1.accept(this);		
+		e.e2 = e.e2.accept(this);
 		return e;
 	}
 
 	@Override
 	public Exp visit(FSub e) {
-		e.e1.accept(this);		
-		e.e2.accept(this);
+		e.e1 = e.e1.accept(this);		
+		e.e2 = e.e2.accept(this);
 		return e;
 	}
 
 	@Override
 	public Exp visit(FMul e) {
-		e.e1.accept(this);		
-		e.e2.accept(this);
+		e.e1 = e.e1.accept(this);		
+		e.e2 = e.e2.accept(this);
 		return e;
 	}
 	
 	@Override
 	public Exp visit(Mul e) {
-		e.e1.accept(this);		
-		e.e2.accept(this);
+		e.e1 = e.e1.accept(this);		
+		e.e2 = e.e2.accept(this);
 		return e;
 	}
 
 	@Override
 	public Exp visit(FDiv e) {
-		e.e1.accept(this);		
-		e.e2.accept(this);
+		e.e1 = e.e1.accept(this);		
+		e.e2 = e.e2.accept(this);
 		return e;
 	}
 
 	@Override
 	public Exp visit(Eq e) {
-		e.e1.accept(this);		
-		e.e2.accept(this);
+		e.e1 = e.e1.accept(this);		
+		e.e2 = e.e2.accept(this);
 		return e;
 	}
 
 	@Override
 	public Exp visit(LE e) {
+		e.e1 = e.e1.accept(this);		
+		e.e2 = e.e2.accept(this);
 		return e;
 	}
 
 	@Override
 	public Exp visit(If e) {
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		e.e3 = e.e3.accept(this);
 		return e;
 	}
 
 	@Override
 	public Exp visit(Let e) {
-		e.e1.accept(this);
-		stockerId(e.id);
-		int last_var=0;
-		String valeur=e.id.toString();
-		for(BindVar bv : variables){
-			if(bv.getIdPrec().equals(valeur)){
-				last_var=variables.indexOf(bv);
+		e.e1 = e.e1.accept(this);
+		Id newVar = e.id;
+		if (isInVar(e.id)) {
+			newVar = Id.gen();
+			while (isInProc(newVar) || isInVar(newVar)) {
+				newVar = Id.gen();
 			}
+			e.id = newVar;
 		}
-		e.id.id=variables.get(last_var).getIdNew();
-		e.e2.accept(this);
+		variables.addLast(new BindVar(e.id, newVar));
+		e.e2 = e.e2.accept(this);
 		return e;
 	}
 
 	@Override
 	public Exp visit(Var e) {
-		int last_var=0;
-		String valeur=e.id.toString();
-		for(BindVar bv : variables){
-			if(bv.getIdPrec().equals(valeur)){
-				last_var=variables.indexOf(bv);
-			}
-		}
-		e.id.id=variables.get(last_var).getIdNew();
+		e.id=getNewId(e.id);
 		return e;
 	}
 
 	@Override
 	public Exp visit(LetRec e) {
-		for(Id i : e.fd.args){
-			stockerId(i);
-			int last_var=0;
-			String valeur=i.toString();
-			for(BindVar bv : variables){
-				if(bv.getIdPrec().equals(valeur)){
-					last_var=variables.indexOf(bv);
+		// renommage des noms de proc
+		Id newProc = e.fd.id;
+		if (isInProc(e.fd.id)) {
+			newProc = Id.gen();
+			while (isInProc(newProc) || isInVar(newProc)) {
+				newProc = Id.gen();
+			}
+			newProc.id = "_proc" + newProc;
+		}
+		e.fd.id = newProc;
+		procedures.addLast(new BindVar(e.fd.id, newProc));
+		
+		// renommage des params
+		List<Id> newArgs = new LinkedList<Id>() ;
+		
+		for(Id id : e.fd.args){
+			Id newVar = id;
+			if (isInVar(id)) {
+				newVar = Id.gen();
+				while (isInProc(newVar) || isInVar(newVar)) {
+					newVar = Id.gen();
 				}
 			}
-			i.id=variables.get(last_var).getIdNew();
+			variables.addLast(new BindVar(id, newVar));
+			newArgs.add(newVar);
 		}
+		e.fd.args = newArgs;
+		
 		e.fd.e.accept(this);
 		e.e.accept(this);
 		return e;
@@ -177,8 +174,13 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(App e) {
+		e.e = e.e.accept(this);
+		List<Exp> newParams = new LinkedList<Exp>();
+		for (Exp es : e.es) {
+			newParams.add(es.accept(this));
+		}
+		e.es = newParams;
 		return e;
-		// TODO
 	}
 
 	@Override
@@ -212,23 +214,46 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 	}
 
 	private class BindVar{
-		private String IdPrec;
-		private String IdNew;
+		Id IdPrec;
+		Id IdNew;
 		
-		private BindVar(String idold,String idnew){
+		private BindVar(Id idold,Id idnew){
 			this.IdNew=idnew;
 			this.IdPrec=idold;
 		}
-		
-		public void setIdNew(String s){
-			this.IdNew=s;
+	}
+	
+
+	private boolean isInVar(Id id) {
+		for (BindVar bv : variables) {
+			if (bv.IdPrec.equals(id) || bv.IdNew.equals(id)) {
+				return true;
+			}
 		}
-		
-		public String getIdPrec(){
-			return this.IdPrec;
+		return false;
+	}
+	private boolean isInProc(Id id) {
+		for (BindVar bv : procedures) {
+			if (bv.IdPrec.equals(id) || bv.IdNew.equals(id)) {
+				return true;
+			}
 		}
-		public String getIdNew(){
-			return this.IdNew;
+		return false;
+	}
+
+
+	private Id getNewId(Id id) {
+		Id newId = id;
+		for (BindVar bv : variables) {
+			if (bv.IdPrec.equals(id)) {
+				newId =  bv.IdNew;
+			}
 		}
+		for (BindVar bv : procedures) {
+			if (bv.IdPrec.equals(id)) {
+				newId =  bv.IdNew;
+			}
+		}
+		return newId;
 	}
 }
