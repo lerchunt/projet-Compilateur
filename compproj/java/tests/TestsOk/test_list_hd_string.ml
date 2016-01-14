@@ -1,2 +1,0 @@
-List.hd [ "High"; "Five"];;
-
