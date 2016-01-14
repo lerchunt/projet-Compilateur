@@ -188,9 +188,8 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	public Exp visit(LetRec e) {
 		if(!tabSym.containsKey(e.fd.id.toString())){
 			tabSym.put(e.fd.id.toString(), e);
-		} else {
-			tabVar.put(e.fd.id.toString(), true);
-		}
+			tabVar.put(e.fd.id.toString(), true) ;
+		} 
 		e.e = e.e.accept(this);
 		e.fd.e = e.fd.e.accept(this);
 		return e;
@@ -216,6 +215,10 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(App e) {
+		if(tabSym.containsKey(((Var)e.e).id.toString())){
+			tabVar.remove(((Var)e.e).id.toString()) ;
+		}
+		e.e = e.e.accept(this);
 		e.es = printIntFix(e.es);
 		return e;
 	}
