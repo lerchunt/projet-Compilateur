@@ -70,5 +70,7 @@ done
 fi
 echo "\033[0mFin des Tests "
 rm journal.log
+rm tmp.txt
+rm tmp2.txt
 
 #echo " il ya nb argument :" $#
