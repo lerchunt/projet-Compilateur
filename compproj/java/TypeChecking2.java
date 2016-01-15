@@ -234,11 +234,17 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(LetRec e) {
+		if ((e.isDefineAs() != null) && !(e.isDefineAs() instanceof TFun)) {
+			System.err.println(e.fd.id + " is already defined as a variable");
+			System.exit(1);
+		}
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		e.fd.type = new TFun();
 		Type newT = Type.gen();
 		((TFun)e.fd.type).typeRetour = newT;
-		e.fd.e.typeAttendu = newT;
+		Type newT2 = Type.gen();
+		e.fd.e.typeAttendu = newT2;
+		retour.add(new Equations(newT, newT2));
 		e.fd.e.env.addAll(e.env);
 		for (Id id : e.fd.args) {
 			Type newP = Type.gen();
@@ -284,6 +290,9 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 					System.err.println("error "+((Var)e.e).id.id+" expected "+((TFun)tFun).typeArgs.size()+" arguments");
 					System.exit(1);
 				}
+			} else if (tFun == null) {
+				System.err.println("error "+((Var)e.e).id+" if not defined");
+				System.exit(1);
 			} else {
 				System.err.println("error "+((Var)e.e).id.id+" expected as function and found as "+ tFun.toString());
 				System.exit(1);
@@ -356,13 +365,14 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 					if (eq.t2 instanceof TVar) {
 						Equations toInsert = lEq.remove(i);
 						lEq.addLast(toInsert);
+						i--;
 					} else {
 						// on parcourt la liste en remplacant var pas son type
-						for (int j = 1; j< lEq.size(); j++) {
+						for (int j = i+1; j< lEq.size(); j++) {
 							Equations eq2 = lEq.get(j);
-							if (eq2.t1.equals(eq.t1)) {
+							if (eq.t1.equals(eq2.t1)) {
 								eq2.t1 = eq.t2;
-							} else if (eq2.t2.equals(eq.t1)) {
+							} else if (eq.t1.equals(eq2.t2)) {
 								eq2.t2 = eq.t2;
 							}
 						}
@@ -370,11 +380,11 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 				} else {
 					if (eq.t2 instanceof TVar) {
 						// on parcourt la liste en remplacant var pas son type
-						for (int j = 1; j< lEq.size(); j++) {
+						for (int j = i+1; j< lEq.size(); j++) {
 							Equations eq2 = lEq.get(j);
-							if (eq2.t1.equals(eq.t2)) {
+							if (eq.t2.equals(eq2.t1)) {
 								eq2.t1 = eq.t1;
-							} else if (eq2.t2.equals(eq.t2)) {
+							} else if (eq.t2.equals(eq2.t2)) {
 								eq2.t2 = eq.t1;
 							}
 						}
