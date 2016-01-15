@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.LinkedList;
 
 public class Main {
 	static String Path = "";
@@ -75,11 +76,29 @@ public class Main {
 					System.out.println("------ TYPE CHECKING ------");
 				}
 				try {
-					if (!(expression.accept(new TypeChecking()) instanceof TUnit)) {
+
+					expression.initiateEnv();
+					expression.typeAttendu = new TUnit();
+					LinkedList<Equations> retour = expression.accept(new TypeChecking2());
+					if (verbose) {
+						for (Equations e : retour) {
+							System.out.println(e.toString());
+						}
+					}
+					
+					TypeChecking2.resolution(retour);
+					if (verbose) {
+						System.out.println("------ resol -----------");
+						for (Equations e : retour) {
+							System.out.println(e.toString());
+						}
+					}
+					
+					/*if (!(expression.accept(new TypeChecking()) instanceof TUnit)) {
 						throw new Exception();
 					} else { 
 						if (verbose) {System.out.println("OK");}
-					}
+					}*/
 				} catch(Exception e) {
 					System.err.println("Type error, expected a final type unit");
 					System.exit(1);					
