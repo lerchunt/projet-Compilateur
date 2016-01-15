@@ -346,7 +346,10 @@ public class GenerationS implements ObjVisitor<String> {
 			e.e1.registreDeRetour = registre;
 			retour += e.e1.accept(this);
 			retour += String.format("\tmov\t%s,r0\n",registre);
-		}else {
+		}else if (e.e1 instanceof Neg){
+			e.e1.registreDeRetour = registre;
+			retour += String.format("%s", e.e1.accept(this));
+		}else{
 			retour += String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		}
 		
