@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+
 abstract class Type {
     private static int x = 0;
     static Type gen() {
@@ -13,6 +15,11 @@ class TUnit extends Type {
 	public boolean equalsType(Type g) {
 		return g instanceof TUnit;
 	} 
+
+    @Override
+    public String toString() {
+        return "unit"; 
+    }
 }
 
 class TBool extends Type {
@@ -59,11 +66,17 @@ class TFloat extends Type {
 }
 
 class TFun extends Type { 
+	LinkedList<Type> typeArgs = new LinkedList<Type>();
+	Type typeRetour;
 	
 	@Override
 	public boolean equalsType(Type g) {
 		return g instanceof TFun ;
 	}
+    @Override
+    public String toString() {
+        return "function"; 
+    }
 }
 
 class TTuple extends Type { 
@@ -72,6 +85,10 @@ class TTuple extends Type {
 	public boolean equalsType(Type g) {
 		return g instanceof TTuple ;
 	}
+    @Override
+    public String toString() {
+        return "tuple"; 
+    }
 }
 
 class TArray extends Type { 
@@ -80,6 +97,10 @@ class TArray extends Type {
 	public boolean equalsType(Type g) {
 		return g instanceof TArray ;
 	}
+    @Override
+    public String toString() {
+        return "array"; 
+    }
 }
 
 class TVar extends Type {
@@ -96,5 +117,23 @@ class TVar extends Type {
 	public boolean equalsType(Type g) {
 		return g instanceof TVar ;
 	}
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj==this) {
+            return true;
+        }
+ 
+        if (obj instanceof TVar) {
+            TVar other = (TVar) obj;
+ 
+            if (!this.v.equals(other.v)) {
+                return false; 
+            }
+
+            return true;
+        }
+        return false;
+    }
 }
 
