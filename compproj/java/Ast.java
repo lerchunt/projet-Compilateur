@@ -1,8 +1,34 @@
+import java.util.LinkedList;
 import java.util.List;
 
 abstract class Exp implements Cloneable {
 	String registreDeRetour  = "r0";
     abstract void accept(Visitor v);
+    
+    // ********* Pour typing Apo *********************************
+    LinkedList<Environnement> env = new LinkedList<Environnement>();
+    Type typeAttendu;
+    protected class Environnement {
+    	Id nom;
+    	Type t;
+    	public Environnement(Id nom, Type t) {
+    		this.nom = nom;
+    		this.t = t;
+    	}
+    }
+    public void initiateEnv() {
+    	TFun tP1 = new TFun();
+    	tP1.typeRetour = new TUnit();
+    	tP1.typeArgs = new LinkedList<Type>();
+    	tP1.typeArgs.add(new TInt());
+    	/* TO DO Print_string
+    	TFun tP2 = new TFun();
+    	tP1.typeRetour = new TUnit();
+    	tP1.typeArgs.add(new TInt());
+    	*/
+    	this.env.add(new Environnement(new Id("print_int"), tP1));
+    }
+    // ***********************************************************
 
     abstract <E> E accept(ObjVisitor<E> v);
      
@@ -54,6 +80,10 @@ abstract class Exp implements Cloneable {
     public boolean isOpUn() {
     	return false;
     }
+
+	public void addEnv(Id id, Type t) {
+		this.env.addFirst(new Environnement(id,t));
+	}
 }
 
 /**
@@ -458,6 +488,15 @@ class Var extends Exp {
     {
     	return true ;
     }
+
+	public Type rechercheEnv() {
+		for (Environnement e : env) {
+			if (e.nom.equals(id)) {
+				return e.t;
+			}
+		}
+		return null;
+	}
 }
 
 class LetRec extends Exp {
