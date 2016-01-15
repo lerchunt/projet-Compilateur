@@ -202,7 +202,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		return retour;
 	}
 
-
+	
 	@Override
 	public LinkedList<Equations> visit(Let e) {
 		e.t = Type.gen();
@@ -255,13 +255,13 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		for (Id id : e.fd.args) {
 			e.fd.e.env.removeFirst();
 		}
-
+		
 		e.e.typeAttendu = e.typeAttendu;
 		e.e.env.addAll(e.env);
 		e.e.addEnv(e.fd.id, e.fd.type);
 		retour.addAll(e.e.accept(this));
 		e.e.env.removeFirst();
-
+		
 		return retour;
 	}
 
@@ -295,8 +295,9 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 			} else {
 				if (tFun instanceof TVar) {
 					System.err.println("error "+((Var)e.e).id.id+" expected as function and found as var");
-				}
+				} else {
 				System.err.println("error "+((Var)e.e).id.id+" expected as function and found as "+ tFun.toString());
+				}
 				System.exit(1);
 			}
 		} else {
