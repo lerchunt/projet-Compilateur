@@ -66,7 +66,7 @@ class TFloat extends Type {
 }
 
 class TFun extends Type { 
-	LinkedList<Type> typeArgs;
+	LinkedList<Type> typeArgs = new LinkedList<Type>();
 	Type typeRetour;
 	
 	@Override
