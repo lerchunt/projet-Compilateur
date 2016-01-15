@@ -17,11 +17,11 @@ echo:
 	${AS} -o $@ $^ 
 
 %.arm : %.o
-	${LD} -o $@ $^
+	${LD} -o $@ $^ -lc
 
 test: ${PRG}
 	@for p in ${PRG} ; do \
 	  echo "*** Launching $$p"; \
-	  qemu-arm ./$$p ; \
+	  qemu-arm ./$$p  ; \
 	done
 
