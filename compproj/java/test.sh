@@ -18,13 +18,13 @@ echo "\033[36m******* TEST DE TOUS LES FICHIERS  ******* \033[0m\n"
 echo "\033[36m******* TEST DES FICHIERS CORRECTS ******* \033[0m\n"
 for i in tests/TestsOk/*.ml
 do
-echo "génération des .s"
+echo "génération de $i.s"
 ./min-ml $i > journal.log
 done
 
-###### CREATION ARM #########
+###### CREATION ARM ######### 
 cd tests/TestsOk
-make
+make -k
 cd ../../
 #############################
 
