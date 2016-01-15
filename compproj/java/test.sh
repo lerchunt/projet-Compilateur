@@ -41,14 +41,14 @@ retour=`qemu-arm ./${i%%.*}.arm`
 echo -n "$retour">> tmp.txt
 echo "*)" >> tmp.txt
 sed -n 1p $i > tmp2.txt
-cat tmp.txt
-cat tmp2.txt
 test=`diff -q tmp.txt tmp2.txt | grep on`
 if [ -z "$test" ]
 then
 echo "\033[32mOK\033[0m"
 else
 echo "$test"
+cat tmp.txt
+cat tmp2.txt
 fi
 done
 echo ""
@@ -61,6 +61,7 @@ do
 echo "\033[0mTest de $j \033[31m"
 
 ./min-ml $j >> journal.log
+sed -n 1p $j
 fichier=${j%%.*}
 #cp ${j%%.*}.s ${j%%.*}.arm
 #echo "lancement de .arm"
@@ -70,5 +71,7 @@ done
 fi
 echo "\033[0mFin des Tests "
 rm journal.log
+rm tmp.txt
+rm tmp2.txt
 
 #echo " il ya nb argument :" $#
