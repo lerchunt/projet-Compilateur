@@ -296,7 +296,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 				if (tFun instanceof TVar) {
 					System.err.println("error "+((Var)e.e).id.id+" expected as function and found as var");
 				} else {
-				System.err.println("error "+((Var)e.e).id.id+" expected as function and found as "+ tFun.toString());
+					System.err.println("error "+((Var)e.e).id.id+" expected as function and found as "+ tFun.toString());
 				}
 				System.exit(1);
 			}

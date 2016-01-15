@@ -189,6 +189,12 @@ public class GenerationASML implements ObjVisitor<String> {
     public String visit(Eq e){ 
 		if(!def)
     	{
+			if(e.e1.isFloat()){
+    			String haut = "let _z" + cp++ + " = " + e.e1.accept(this)+ "\n";
+    			haut += "let _z" + cp++ + " = " + e.e2.accept(this)+ "\n";
+    			GenerationASML.asml = haut + GenerationASML.asml ; 
+    			GenerationASML.asml += "_z" + cp-- +  " = " + "_z" +cp++ ;
+    		}
 			e.e1.accept(this);
 	        GenerationASML.asml += " = ";
 	        e.e2.accept(this);
