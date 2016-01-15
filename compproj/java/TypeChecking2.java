@@ -202,7 +202,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		return retour;
 	}
 
-	
+
 	@Override
 	public LinkedList<Equations> visit(Let e) {
 		e.t = Type.gen();
@@ -249,13 +249,13 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		for (Id id : e.fd.args) {
 			e.fd.e.env.removeFirst();
 		}
-		
+
 		e.e.typeAttendu = e.typeAttendu;
 		e.e.env.addAll(e.env);
 		e.e.addEnv(e.fd.id, e.fd.type);
 		retour.addAll(e.e.accept(this));
 		e.e.env.removeFirst();
-		
+
 		return retour;
 	}
 
@@ -342,5 +342,53 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		retour.add(eq);
 		return retour;
+	}
+
+	public static LinkedList<Equations> resolution(LinkedList<Equations> lEq) {
+		int assertNotInfiniteBoucle = 0;
+		if (lEq == null || lEq.isEmpty()) {
+			return lEq;
+		}
+		for (int i = 0; i < lEq.size(); i ++) {
+			if (assertNotInfiniteBoucle <= lEq.size()*lEq.size()) {
+				Equations eq = lEq.get(i);
+				if (eq.t1 instanceof TVar) {
+					if (eq.t2 instanceof TVar) {
+						Equations toInsert = lEq.remove(i);
+						lEq.addLast(toInsert);
+					} else {
+						// on parcourt la liste en remplacant var pas son type
+						for (int j = 1; j< lEq.size(); j++) {
+							Equations eq2 = lEq.get(j);
+							if (eq2.t1.equals(eq.t1)) {
+								eq2.t1 = eq.t2;
+							} else if (eq2.t2.equals(eq.t1)) {
+								eq2.t2 = eq.t2;
+							}
+						}
+					}
+				} else {
+					if (eq.t2 instanceof TVar) {
+						// on parcourt la liste en remplacant var pas son type
+						for (int j = 1; j< lEq.size(); j++) {
+							Equations eq2 = lEq.get(j);
+							if (eq2.t1.equals(eq.t2)) {
+								eq2.t1 = eq.t1;
+							} else if (eq2.t2.equals(eq.t2)) {
+								eq2.t2 = eq.t1;
+							}
+						}
+					} else {
+						if (!eq.t1.equalsType(eq.t2)) {
+							System.err.println("type error : " + eq.t1.toString() + " != " + eq.t2.toString());
+							System.exit(1);
+						} 
+					}
+				}
+				assertNotInfiniteBoucle ++;
+			}
+
+		}
+		return lEq;
 	}
 }
