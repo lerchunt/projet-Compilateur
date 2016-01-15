@@ -184,14 +184,14 @@ public class GenerationS implements ObjVisitor<String> {
 		if (e.e1 instanceof Var) {
 			r1 = e.e1.accept(this);
 		} else {
-			System.err.println("internal error -- GenerationS -- mul");
+			System.err.println("internal error -- GenerationS -- fmul");
 			System.exit(1);
 			return null;
 		}
 		if (e.e2 instanceof Var) {
 			r2 = e.e2.accept(this);
 		} else {
-			System.err.println("internal error -- GenerationS -- mul");
+			System.err.println("internal error -- GenerationS -- fmul");
 			System.exit(1);
 			return null;
 		}
@@ -209,7 +209,7 @@ public class GenerationS implements ObjVisitor<String> {
 			r1 = e.e1.accept(this);
 		} 
 		else {
-			System.err.println("internal error -- GenerationS -- add");
+			System.err.println("internal error -- GenerationS -- mul");
 			System.exit(1);
 			return null;
 		}
@@ -220,15 +220,11 @@ public class GenerationS implements ObjVisitor<String> {
 			r2 = e.e2.accept(this);
 		} 
 		else {
-			System.err.println("internal error -- GenerationS -- add");
+			System.err.println("internal error -- GenerationS -- mul");
 			System.exit(1);
 			return null;
 		}
-
-		if(e.e1 instanceof Int)
-			return String.format("\tmul\t%s,%s,%s\n",e.registreDeRetour, r2, r1);
-		else
-			return String.format("\tmul\t%s,%s,%s\n",e.registreDeRetour, r1, r2);
+		return String.format("\tmul\t%s,%s,%s\n",e.registreDeRetour, r1, r2);
 
 	}
 
