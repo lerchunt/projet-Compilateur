@@ -222,7 +222,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 	public LinkedList<Equations> visit(Var e) {
 		Type Tvar = e.rechercheEnv();
 		if (Tvar == null) {
-			System.err.println("error "+e.id.id+" if not defined");
+			System.err.println("error "+e.id.id+" is not defined");
 			System.exit(1);
 		} else {
 			LinkedList<Equations> retour = new LinkedList<Equations>();
@@ -275,7 +275,6 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 			if (tFun instanceof TFun) {
 				Equations eq = new Equations(((TFun)tFun).typeRetour , e.typeAttendu);
 				retour.add(eq);
-				LinkedList<Type> tParams = new LinkedList<Type>();
 				if (e.es.size() == ((TFun)tFun).typeArgs.size()) {
 					int cmp = 0;
 					for (Exp param : e.es) {
@@ -291,9 +290,12 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 					System.exit(1);
 				}
 			} else if (tFun == null) {
-				System.err.println("error "+((Var)e.e).id+" if not defined");
+				System.err.println("error "+((Var)e.e).id+" is not defined");
 				System.exit(1);
 			} else {
+				if (tFun instanceof TVar) {
+					System.err.println("error "+((Var)e.e).id.id+" expected as function and found as var");
+				}
 				System.err.println("error "+((Var)e.e).id.id+" expected as function and found as "+ tFun.toString());
 				System.exit(1);
 			}
