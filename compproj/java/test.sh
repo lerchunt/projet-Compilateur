@@ -88,5 +88,6 @@ echo "\033[0mFin des Tests "
 rm journal.log
 rm tmp.txt
 rm tmp2.txt
+rm tmp3.txt
 
 #echo " il ya nb argument :" $#
