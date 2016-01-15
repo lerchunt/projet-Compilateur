@@ -3,7 +3,7 @@ import java.util.*;
 public class GenerationASML implements ObjVisitor<String> {
 	static String asml;
 	static int cp ; 
-	static boolean def = false ; 
+	private static boolean def = false ; 
 	public GenerationASML()
 	{
 		GenerationASML.asml = "\nlet _ = \n\t";
@@ -189,6 +189,12 @@ public class GenerationASML implements ObjVisitor<String> {
     public String visit(Eq e){ 
 		if(!def)
     	{
+			if(e.e1.isFloat()){
+    			String haut = "let _z" + cp++ + " = " + e.e1.accept(this)+ "\n";
+    			haut += "let _z" + cp++ + " = " + e.e2.accept(this)+ "\n";
+    			GenerationASML.asml = haut + GenerationASML.asml ; 
+    			GenerationASML.asml += "_z" + cp-- +  " = " + "_z" +cp++ ;
+    		}
 			e.e1.accept(this);
 	        GenerationASML.asml += " = ";
 	        e.e2.accept(this);
@@ -205,9 +211,16 @@ public class GenerationASML implements ObjVisitor<String> {
     public String visit(LE e){
     	if(!def)
     	{
-			e.e1.accept(this);
-	        GenerationASML.asml += " <= ";
-	        e.e2.accept(this);
+    		if(e.e1.isFloat()){
+    			String haut = "let _z" + cp++ + " = " + e.e1.accept(this)+ "\n";
+    			haut += "let _z" + cp++ + " = " + e.e2.accept(this)+ "\n";
+    			GenerationASML.asml = haut + GenerationASML.asml ; 
+    			GenerationASML.asml += "_z" + cp-- +  " <= " + "_z" +cp++ ;
+    		} else {
+    			e.e1.accept(this);
+    	        GenerationASML.asml += " <= ";
+    	        e.e2.accept(this);
+    		}
     		return GenerationASML.asml;
     	} else {
     		String txt = " ";
@@ -221,10 +234,10 @@ public class GenerationASML implements ObjVisitor<String> {
     	if(!def)
     	{
     		if (e.e2.isFloat()){
-    			String haut = "let_z" + cp++  ;
+    			String haut = "let _z" + cp++  ;
     			String s = e.e2.accept(this);
                 haut += " = " + s + "\n";
-                haut += "let_z" + cp  ;
+                haut += "let _z" + cp  ;
     			s = e.e3.accept(this);
                 haut += " = " + s + "\n";
                 GenerationASML.asml = haut + GenerationASML.asml ;
@@ -238,12 +251,12 @@ public class GenerationASML implements ObjVisitor<String> {
     		{
     			GenerationASML.asml += "if ";
                 e.e1.accept(this);
-                GenerationASML.asml += " then (\n\t";
+                GenerationASML.asml += " then (\n\t\t";
                 e.e2.accept(this);
                 if(!e.e2.isVIFB()){
                     GenerationASML.asml += " \n\t";
                 }
-                GenerationASML.asml += ") else (\n\t";
+                GenerationASML.asml += ") else (\n\t\t";
                 e.e3.accept(this);
                 if(!e.e3.isVIFB()){
                     GenerationASML.asml += " \n\t)";
@@ -264,8 +277,8 @@ public class GenerationASML implements ObjVisitor<String> {
     			txt += "if " ;
                 e.e1.accept(this);
                 cp-- ;
-                txt += " then ( \n\t_z" + cp++ + "\n\t";
-                txt += ") else (\n\t _z" + cp++ +" \n\t) ";
+                txt += " then ( \n\t\t_z" + cp++ + "\n\t";
+                txt += ") else (\n\t\t _z" + cp++ +" \n\t) ";
         		return txt ;
     		}else {
 	    		String txt = "if ";
@@ -341,9 +354,9 @@ public class GenerationASML implements ObjVisitor<String> {
                 if(e.e2.isVar())
                 {
                 	e.e2.accept(this);
-                    txt += " \n\t";
+                    txt += " \n";
                 } else {
-                    txt += " \n\t";
+                    txt += " \n";
                 	e.e2.accept(this);
                 }
             } else {
@@ -353,9 +366,9 @@ public class GenerationASML implements ObjVisitor<String> {
                 if(!e.e2.isVIFB())
                 {
                 	txt += e.e2.accept(this);
-                    txt += " \n\t";
+                    txt += " \n";
                 } else {
-                    txt += " \n\t";
+                    txt += " \n";
                 	txt += e.e2.accept(this);
                 }
             } 
@@ -416,12 +429,13 @@ public class GenerationASML implements ObjVisitor<String> {
       }
       def = true ; 
 	  haut += e.fd.e.accept(this);
-	  if(e.e.isVIFB()) 
+	  /*if(e.e.isVIFB()) 
 	  {
 		  haut += e.e.accept(this);
-	  }
+	  } */
 	  def = false ;
       GenerationASML.asml = haut + GenerationASML.asml;
+      e.e.accept(this);
       return GenerationASML.asml;
     }
 

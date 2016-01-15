@@ -1,6 +1,6 @@
-
 SRC= Lexer.java Parser.java 
 SRC_FILES = $(filter-out TestGenerateS.java, $(wildcard *.java))
+testFile ?= tests/TestsOk/print.ml
 
 all: ${SRC} 
 	javac -cp java-cup-11b-runtime.jar:. ${SRC_FILES}
@@ -16,3 +16,6 @@ clean:
 
 test:
 	./test.sh ${ARGS}
+
+run: ${testFile}
+	java -cp java-cup-11b-runtime.jar:.  Main $^
