@@ -6,6 +6,7 @@ public class GenerationS implements ObjVisitor<String> {
 	public static String defVar = "";
 	private boolean data = false; 
 	private int nbFloat=0;
+	private static int cmpIf = 0;
 
 	@Override
 	public String visit(Bool e) {
@@ -255,16 +256,17 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(If e) {
+		cmpIf ++;
 		String retour ="";		
-		String ifTrue="";
-		String ifFalse="";
+		String ifTrue="ifTrue"+cmpIf+":\n";
+		String ifFalse="ifFalse"+cmpIf+":\n";
 		
 		if(e.e1 instanceof OpBin || e.e1 instanceof OpUn){
 			e.e1.registreDeRetour = e.registreDeRetour;
 			retour += e.e1.accept(this);			
 		} else if (e.e1 instanceof Bool) {
-			if (((Bool)e.e1).b) {
-				retour += "\tb\tifTrue\n";
+			if (!((Bool)e.e1).b) {
+				retour += "\tb\tifFalse"+cmpIf+"\n";
 			}
 		}else {
 			System.err.println("internal error - If e1 (GenerationS)");
@@ -287,7 +289,10 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e2 instanceof OpBin || e.e2 instanceof OpUn){ 
 			e.e2.registreDeRetour = e.registreDeRetour;
 			ifTrue += e.e2.accept(this);		
-		}else { //entier +float +bool
+		} else if (e.e2 instanceof If) {
+			e.e2.registreDeRetour = e.registreDeRetour;
+			ifTrue += e.e2.accept(this);
+		} else { //entier +float +bool
 			ifTrue+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e2.accept(this));	
 		}
 		
@@ -304,18 +309,22 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e3 instanceof OpBin || e.e3 instanceof OpUn){ 
 			e.e3.registreDeRetour = e.registreDeRetour;
 			ifFalse += e.e3.accept(this);		
+		} else if (e.e3 instanceof If) {
+			e.e3.registreDeRetour = e.registreDeRetour;
+			ifFalse += e.e3.accept(this);
 		} else { //entier +float +bool
 			ifFalse+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e3.accept(this));
 		}		
 		
 		
-		retour+="ifFalse:\n";
-		ifFalse+="\tb\tendIf\n";
-		retour+=ifFalse;
-		retour+="ifTrue:\n";
+
+		ifFalse+="\tb\tendIf"+cmpIf+"\n";
+		ifTrue+="\tb\tendIf"+cmpIf+"\n";
 		retour+=ifTrue;			
-		retour+="endIf:\n";
-		
+		retour+=ifFalse;
+		retour+="endIf"+cmpIf+":\n";
+
+		cmpIf --;
 		return retour;
 	}
 

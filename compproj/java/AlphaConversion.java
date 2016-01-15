@@ -73,16 +73,44 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(FMul e) {
-		e.e1 = e.e1.accept(this);		
+		Exp newExp = e;
+		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
-		return e;
+		if (e.e1 instanceof Int) {
+			Id newId = Id.gen();
+			Let newLet = new Let(newId, new TInt(), (Exp)e.e1.clone(), e);
+			e.e1 = new Var(newId);
+			newExp = newLet;
+		}
+		if (e.e2 instanceof Int) {
+			Id newId = Id.gen();
+			Let newLet = new Let(newId, new TInt(), (Exp)e.e2.clone(), newExp);
+			e.e2 = new Var(newId);
+			newExp = newLet;
+		}
+		
+		return newExp;
 	}
 	
 	@Override
 	public Exp visit(Mul e) {
-		e.e1 = e.e1.accept(this);		
+		Exp newExp = e;
+		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
-		return e;
+		if (e.e1 instanceof Int) {
+			Id newId = Id.gen();
+			Let newLet = new Let(newId, new TInt(), (Exp)e.e1.clone(), e);
+			e.e1 = new Var(newId);
+			newExp = newLet;
+		}
+		if (e.e2 instanceof Int) {
+			Id newId = Id.gen();
+			Let newLet = new Let(newId, new TInt(), (Exp)e.e2.clone(), newExp);
+			e.e2 = new Var(newId);
+			newExp = newLet;
+		}
+		
+		return newExp;
 	}
 
 	@Override
