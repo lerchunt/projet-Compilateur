@@ -6,7 +6,7 @@ Depuis le dossier java :
 
 compiler avec make
 
-Pour afficher l'aide, vous pouvez lancer ./min-ml avec l'option -h
+Pour afficher de l'aide sur les options disponibles, vous pouvez lancer ./min-ml avec l'option -h
 
 Pour compiler un seul fichier :
 make run testFile=<YourFile>.ml
