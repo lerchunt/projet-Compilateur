@@ -514,6 +514,14 @@ class LetRec extends Exp {
     void accept(Visitor v) {
         v.visit(this);
     }
+	public Type isDefineAs() {
+		for (Environnement e : env) {
+			if (e.nom.equals(fd.id)) {
+				return e.t;
+			}
+		}
+		return null;
+	}
 }
 
 class App extends Exp {

@@ -4,8 +4,8 @@ import java.util.Hashtable;
 public class GenerationS implements ObjVisitor<String> {
 	public static String defFunc = "";
 	public static String defVar = "";
-	public int nbReg;
-	public int nbFloat=0;
+	private boolean data = false; 
+	private int nbFloat=0;
 
 	@Override
 	public String visit(Bool e) {
@@ -23,7 +23,7 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(Float e) {
 		nbFloat++;
 		String strFloat="fl"+nbFloat;
-		defVar += "\n\t" + strFloat+":\t.float "+e.f;
+		defVar += "\t" + strFloat+":\t.float "+e.f+"\n";
 		return strFloat;
 	}
 
@@ -333,6 +333,11 @@ public class GenerationS implements ObjVisitor<String> {
 			e.e1.registreDeRetour = registre;
 			retour+=e.e1.accept(this);
 		} else if (e.e1 instanceof Float){
+
+			if(!data){
+				defVar += ".data\n";
+				data = true;
+			}
 			retour += String.format("\tldr\t%s,=%s\n", registre,e.e1.accept(this));
 		} else if (e.e1 instanceof Not){
 			e.e1.registreDeRetour = registre;
@@ -341,7 +346,10 @@ public class GenerationS implements ObjVisitor<String> {
 			e.e1.registreDeRetour = registre;
 			retour += e.e1.accept(this);
 			retour += String.format("\tmov\t%s,r0\n",registre);
-		}else {
+		}else if (e.e1 instanceof Neg){
+			e.e1.registreDeRetour = registre;
+			retour += String.format("%s", e.e1.accept(this));
+		}else{
 			retour += String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		}
 		

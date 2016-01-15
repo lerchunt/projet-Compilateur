@@ -143,10 +143,29 @@ min_caml_print_int:
 
 
 
+	.data
+.string_for_float:
+	.long	1075000115    
 
+@ Warning: does not work for -2147483648
+	.text
+	.globl	stringofFloat
+stringofFloat:
+	stmfd	sp!, {r4, r5}
+	mov	r3, r0    @ the number
+	ldr	r0, =.string_for_float  @ pointer to begining of buffer
+        add	r0, #11     @ pointer to end of buffer (char '\0')
+	.size	stringofFloat, .-stringofFloat
 
-
-
+	.align	2
+        .globl min_caml_print_float
+min_caml_print_float:
+	stmfd	sp!, {lr}
+	bl	stringofFloat
+	bl	min_caml_print_string
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_print_float, .-min_caml_print_float
 
 
 

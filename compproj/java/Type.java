@@ -117,5 +117,23 @@ class TVar extends Type {
 	public boolean equalsType(Type g) {
 		return g instanceof TVar ;
 	}
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj==this) {
+            return true;
+        }
+ 
+        if (obj instanceof TVar) {
+            TVar other = (TVar) obj;
+ 
+            if (!this.v.equals(other.v)) {
+                return false; 
+            }
+
+            return true;
+        }
+        return false;
+    }
 }
 
