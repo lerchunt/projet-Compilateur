@@ -1,7 +1,7 @@
 export PATH := /opt/gnu/arm/bin:$(PATH)
 
-AS=arm-eabi-as
-LD=arm-eabi-ld
+AS=arm-none-eabi-as
+LD=arm-none-eabi-ld
 ASM=$(wildcard *.s)
 PRG=$(subst .s,.arm,${ASM})
 
@@ -22,4 +22,3 @@ test: ${PRG}
 	  echo "*** Launching $$p"; \
 	  qemu-arm ./$$p ; \
 	done
-
