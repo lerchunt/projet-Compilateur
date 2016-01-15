@@ -61,6 +61,7 @@ do
 echo "\033[0mTest de $j \033[31m"
 
 ./min-ml $j >> journal.log
+sed -n 1p $j
 fichier=${j%%.*}
 #cp ${j%%.*}.s ${j%%.*}.arm
 #echo "lancement de .arm"

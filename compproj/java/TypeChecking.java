@@ -496,9 +496,9 @@ public class TypeChecking implements ObjVisitor<Type> {
 			def = false ;
 		} else {
 			def = false ;
-			e.e.accept(this);
+			return e.e.accept(this);
 		}
-		return 	e.e.accept(this); 
+		return e.e.accept(this);
 	}
 	
 	private void printInfix(List<Id> args) {
