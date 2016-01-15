@@ -1,7 +1,8 @@
 export PATH := /opt/gnu/arm/bin:$(PATH)
 
 AS=arm-none-eabi-as
-LD=arm-none-eabi-ld 
+LD=arm-none-eabi-ld
+
 
 
 ASM=$(wildcard *.s)
@@ -13,7 +14,7 @@ echo:
 	echo ${ASM}
 	echo ${PRG}
 
-%.o : %.s libmincaml.S
+%.o : %.s libmincaml.S 
 	${AS} -o $@ $^ 
 
 %.arm : %.o
