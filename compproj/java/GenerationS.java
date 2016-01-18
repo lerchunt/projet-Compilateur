@@ -457,12 +457,13 @@ public class GenerationS implements ObjVisitor<String> {
 		if (e.e instanceof Var) {
 			retour = String.format("%s\tbl\tmin_caml_%s\n",retour,((Var)e.e).id.id);
 		} else if (e.e instanceof App){
-			for (Id id : e.closure){
-				registre = RegistreAllocation.getRegistre(id);
+			for (Var var : e.closure){
+				registre = RegistreAllocation.getRegistre(var.id);
+				retour +=String.format("\tmov\t%s,%s\n", registre, RegistreAllocation.getRegistre(var.id));
 			}
 			retour+=e.e.accept(this);
-			for (Id id : e.closure){
-				RegistreAllocation.sup(id);
+			for (Var var: e.closure){
+				RegistreAllocation.sup(var.id);
 			}			
 		}else{
 			System.err.println("internal error - definition function (GenerationS)");

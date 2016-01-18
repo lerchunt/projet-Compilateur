@@ -152,6 +152,8 @@ public class Main {
 					if (printAsml) {
 						ReadFile(pathAsml);
 					}
+					
+					expression = expression.accept(new ClosureConversion());
 
 					String retour = "\t.text\n\t.global _start\n"; // init
 					expression.accept(new RegistreAllocation());
