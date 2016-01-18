@@ -77,7 +77,7 @@ public class Main {
 				}
 				try {
 
-					expression.initiateEnv();
+					/*expression.initiateEnv();
 					expression.typeAttendu = new TUnit();
 					LinkedList<Equations> retour = expression.accept(new TypeChecking2());
 					if (verbose) {
@@ -92,7 +92,7 @@ public class Main {
 						for (Equations e : retour) {
 							System.out.println(e.toString());
 						}
-					}
+					}*/
 					
 					/*if (!(expression.accept(new TypeChecking()) instanceof TUnit)) {
 						throw new Exception();
