@@ -154,14 +154,17 @@ public class BetaReduction implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Tuple e) {
-		// TODO Auto-generated method stub
-		return null;
+		for (Exp exp : e.es) {
+			exp = exp.accept(this);
+		}
+		return e;
 	}
 
 	@Override
 	public Exp visit(LetTuple e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override

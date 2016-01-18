@@ -1,5 +1,6 @@
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -225,11 +226,34 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		}
 		return args;
 	}
+	
+	// print sequence of identifiers 
+    public <E> List<E>  printInfix(List<E> ids, Exp e1) {
+        
+    	int cpt = 0 ;
+		while(cpt < ids.size()){
+			E arg = ids.get(cpt);
+			if(!tabSym.containsKey(arg.toString())) {
+				
+				Var v = new Var((Id)arg); // REFAIRE par rapport à e1. 
+				tabSym.put(arg.toString(), v);
+				tabVar.put(arg.toString(), true) ;
+			}
+			cpt++;
+		}
+		return ids;
+    }
 
 	@Override
 	public Exp visit(App e) {
 		if(tabSym.containsKey(((Var)e.e).id.toString())){
 			tabVar.remove(((Var)e.e).id.toString()) ;
+		}
+		String ap = ((Var)e.e).id.toString();
+		if(!ap.equals("print_int") && !ap.equals("print_float")) {
+			e.e = e.e.accept(this);
+			e.es = printIntFix(e.es);
+			return e ;
 		}
 		e.e = e.e.accept(this);
 		e.es = printIntFix(e.es);
@@ -238,15 +262,14 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Tuple e) {
-		for (Exp exp : e.es) {
-			exp = exp.accept(this);
-		}
+		e.es = printIntFix(e.es);
 		return e;
 	}
 
 	@Override
 	public Exp visit(LetTuple e) {
 		e.e1 = e.e1.accept(this);
+		e.ids = printInfix(e.ids,e.e1);
 		e.e2 = e.e2.accept(this);
 		return e;
 	}

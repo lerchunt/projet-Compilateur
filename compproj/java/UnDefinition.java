@@ -144,14 +144,26 @@ public class UnDefinition extends ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Tuple e) {
-		// TODO Auto-generated method stub
-		return null;
+		for (Exp exp : e.es) {
+			exp = exp.accept(this);
+		}
+		return e;
 	}
 
 	@Override
 	public Exp visit(LetTuple e) {
-		// TODO Auto-generated method stub
-		return null;
+		int cpt = 0 ;
+		while(cpt < e.ids.size()){
+			Id arg = e.ids.get(cpt);
+			if(ConstantFolding.tabVar.containsKey(arg.toString())) {
+				cpt++;
+			} else {
+				e.e2 = e.e2.accept(this);
+				e.e1 = e.e1.accept(this);
+				return e ;
+			}
+		}
+		return ((Exp)e.e2.accept(this)) ;
 	}
 
 	@Override
