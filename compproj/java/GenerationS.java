@@ -381,10 +381,9 @@ public class GenerationS implements ObjVisitor<String> {
 			}
 		}
 		if(isVar){			
-			return RegistreAllocation.getRegistre(e.id);
+			return RegistreAllocation.getRegistre(e.id); 
 		}else{
 			return String.format("\tbl\tmin_caml_%s\n",e.id);
-			
 		}
 	}
 
@@ -458,7 +457,13 @@ public class GenerationS implements ObjVisitor<String> {
 		if (e.e instanceof Var) {
 			retour = String.format("%s\tbl\tmin_caml_%s\n",retour,((Var)e.e).id.id);
 		} else if (e.e instanceof App){
+			for (Id id : e.closure){
+				registre = RegistreAllocation.getRegistre(id);
+			}
 			retour+=e.e.accept(this);
+			for (Id id : e.closure){
+				RegistreAllocation.sup(id);
+			}			
 		}else{
 			System.err.println("internal error - definition function (GenerationS)");
 			System.exit(1);

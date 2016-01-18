@@ -123,7 +123,8 @@ public class Main {
 						expression.accept(new PrintVisitor());
 						System.out.println();
 					}
-					expression = expression.accept(new ConstantFolding());
+					/*
+					expression = expression.accept(new ConstantFolding());*/
 					if (verbose) {
 						System.out.println("------ AST ConstantFolding ------");
 						expression.accept(new PrintVisitor());

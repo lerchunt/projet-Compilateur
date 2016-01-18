@@ -532,7 +532,7 @@ class App extends Exp {
         this.e = e;
         this.es = es;
     }
-
+    
     <E> E accept(ObjVisitor<E> v) {
         return v.visit(this);
     }
