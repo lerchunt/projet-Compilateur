@@ -202,7 +202,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		return retour;
 	}
 
-
+	
 	@Override
 	public LinkedList<Equations> visit(Let e) {
 		e.t = Type.gen();
@@ -222,7 +222,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 	public LinkedList<Equations> visit(Var e) {
 		Type Tvar = e.rechercheEnv();
 		if (Tvar == null) {
-			System.err.println("error "+e.id.id+" if not defined");
+			System.err.println("error "+e.id.id+" is not defined");
 			System.exit(1);
 		} else {
 			LinkedList<Equations> retour = new LinkedList<Equations>();
@@ -234,11 +234,17 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(LetRec e) {
+		if ((e.isDefineAs() != null) && !(e.isDefineAs() instanceof TFun)) {
+			System.err.println(e.fd.id + " is already defined as a variable");
+			System.exit(1);
+		}
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		e.fd.type = new TFun();
 		Type newT = Type.gen();
 		((TFun)e.fd.type).typeRetour = newT;
-		e.fd.e.typeAttendu = newT;
+		Type newT2 = Type.gen();
+		e.fd.e.typeAttendu = newT2;
+		retour.add(new Equations(newT, newT2));
 		e.fd.e.env.addAll(e.env);
 		for (Id id : e.fd.args) {
 			Type newP = Type.gen();
@@ -249,13 +255,13 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		for (Id id : e.fd.args) {
 			e.fd.e.env.removeFirst();
 		}
-
+		
 		e.e.typeAttendu = e.typeAttendu;
 		e.e.env.addAll(e.env);
 		e.e.addEnv(e.fd.id, e.fd.type);
 		retour.addAll(e.e.accept(this));
 		e.e.env.removeFirst();
-
+		
 		return retour;
 	}
 
@@ -269,7 +275,6 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 			if (tFun instanceof TFun) {
 				Equations eq = new Equations(((TFun)tFun).typeRetour , e.typeAttendu);
 				retour.add(eq);
-				LinkedList<Type> tParams = new LinkedList<Type>();
 				if (e.es.size() == ((TFun)tFun).typeArgs.size()) {
 					int cmp = 0;
 					for (Exp param : e.es) {
@@ -284,8 +289,15 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 					System.err.println("error "+((Var)e.e).id.id+" expected "+((TFun)tFun).typeArgs.size()+" arguments");
 					System.exit(1);
 				}
+			} else if (tFun == null) {
+				System.err.println("error "+((Var)e.e).id+" is not defined");
+				System.exit(1);
 			} else {
-				System.err.println("error "+((Var)e.e).id.id+" expected as function and found as "+ tFun.toString());
+				if (tFun instanceof TVar) {
+					System.err.println("error "+((Var)e.e).id.id+" expected as function and found as var");
+				} else {
+					System.err.println("error "+((Var)e.e).id.id+" expected as function and found as "+ tFun.toString());
+				}
 				System.exit(1);
 			}
 		} else {
@@ -356,13 +368,14 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 					if (eq.t2 instanceof TVar) {
 						Equations toInsert = lEq.remove(i);
 						lEq.addLast(toInsert);
+						i--;
 					} else {
 						// on parcourt la liste en remplacant var pas son type
-						for (int j = 1; j< lEq.size(); j++) {
+						for (int j = i+1; j< lEq.size(); j++) {
 							Equations eq2 = lEq.get(j);
-							if (eq2.t1.equals(eq.t1)) {
+							if (eq.t1.equals(eq2.t1)) {
 								eq2.t1 = eq.t2;
-							} else if (eq2.t2.equals(eq.t1)) {
+							} else if (eq.t1.equals(eq2.t2)) {
 								eq2.t2 = eq.t2;
 							}
 						}
@@ -370,11 +383,11 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 				} else {
 					if (eq.t2 instanceof TVar) {
 						// on parcourt la liste en remplacant var pas son type
-						for (int j = 1; j< lEq.size(); j++) {
+						for (int j = i+1; j< lEq.size(); j++) {
 							Equations eq2 = lEq.get(j);
-							if (eq2.t1.equals(eq.t2)) {
+							if (eq.t2.equals(eq2.t1)) {
 								eq2.t1 = eq.t1;
-							} else if (eq2.t2.equals(eq.t2)) {
+							} else if (eq.t2.equals(eq2.t2)) {
 								eq2.t2 = eq.t1;
 							}
 						}

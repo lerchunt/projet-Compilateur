@@ -1,0 +1,25 @@
+< Projet Compilation , équipe HighFive > 
+
+Le projet est développé en Java
+
+Depuis le dossier java :
+
+compiler avec make
+
+Pour afficher de l'aide sur les options disponibles, vous pouvez lancer ./min-ml avec l'option -h
+
+Pour compiler un seul fichier :
+make run testFile=<YourFile>.ml
+
+Il est possible de lancer nos différents fichiers de tests avec make test
+
+Les tests sont répartis dans deux dossiers : 
+
+TestsOk:
+	contient des fichiers ml correctement écris.
+	
+TestsErreur:
+	contient des fichiers ml mal écris.
+	
+On vérifie la validité d'un test si le résultat retourné correspond à la première ligne (en commentaire) du fichier ml correspondant.
+Cette ligne commentée correspond au résultat attendu.

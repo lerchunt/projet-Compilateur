@@ -26,6 +26,11 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	@Override
 	public Exp visit(Not e) {
 		e.e = e.e.accept(this) ; 
+		if (e.e instanceof Bool) {
+			return new Bool(!((Bool)e.e).b);
+		} else if (e.e instanceof Not) {
+			return ((Not)e.e).e.accept(this);
+		}
 		return e ;
 	}
 
@@ -79,20 +84,24 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(FMul e) {
-		OpBin newExp = (OpBin)CFolding(e);
-		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
-			return new Float(((Float)newExp.e1).f * ((Float)newExp.e2).f);
+		if (e.e1 instanceof Var) {
+			tabVar.remove(((Var)e.e1).id.id);
 		}
-		return newExp;
+		if (e.e2 instanceof Var) {
+			tabVar.remove(((Var)e.e2).id.id);
+		}
+		return e;
 	}
 
 	@Override
 	public Exp visit(Mul e) {
-		OpBin newExp = (OpBin)CFolding(e);
-		if (newExp.e1 instanceof Int && newExp.e2 instanceof Int) {
-			return new Int(((Int)newExp.e1).i * ((Int)newExp.e2).i);
+		if (e.e1 instanceof Var) {
+			tabVar.remove(((Var)e.e1).id.id);
 		}
-		return newExp;
+		if (e.e2 instanceof Var) {
+			tabVar.remove(((Var)e.e2).id.id);
+		}
+		return e;
 	}
 
 	@Override
@@ -111,6 +120,8 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 			return new Bool(((Float)newExp.e1).f == ((Float)newExp.e2).f);
 		} else if (newExp.e1 instanceof Int && newExp.e2 instanceof Int) {
 			return new Bool(((Int)newExp.e1).i == ((Int)newExp.e2).i);
+		} else if (newExp.e1 instanceof Bool && newExp.e2 instanceof Bool) {
+			return new Bool(((Bool)newExp.e1).b == ((Bool)newExp.e2).b);
 		}
 		return newExp;
 	}
@@ -122,6 +133,8 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 			return new Bool(((Float)newExp.e1).f <= ((Float)newExp.e2).f);
 		} else if (newExp.e1 instanceof Int && newExp.e2 instanceof Int) {
 			return new Bool(((Int)newExp.e1).i <= ((Int)newExp.e2).i);
+		} else if (newExp.e1 instanceof Bool && newExp.e2 instanceof Bool) {
+			return new Bool(((Bool)newExp.e1).b == ((Bool)newExp.e2).b);
 		}
 		return newExp;
 	}

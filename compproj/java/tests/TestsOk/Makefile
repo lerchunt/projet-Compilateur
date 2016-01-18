@@ -22,4 +22,3 @@ test: ${PRG}
 	  echo "*** Launching $$p"; \
 	  qemu-arm ./$$p ; \
 	done
-
