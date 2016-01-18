@@ -1,5 +1,7 @@
-public class InlineExpansion implements ObjVisitor<Exp> {
+import java.util.LinkedList;
 
+public class InlineExpansion implements ObjVisitor<Exp> {
+	private static LinkedList<LetRec > listeLetRec= new LinkedList<LetRec>();
 	private static int threshold = 5;
 	public InlineExpansion() {
 
@@ -16,25 +18,25 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 	}
 
 	@Override
-	public Exp visit(Int e) {
+	public Exp visit(Int e){
 		return e;
 	}
 
 	@Override
-	public Exp visit(Float e) {
+	public Exp visit(Float e){
 		return e;
 	}
 
 	@Override
 	public Exp visit(Not e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e=e.e.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Neg e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e=e.e.accept(this);
+		return e;
 	}
 
 	@Override
@@ -53,8 +55,8 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(FNeg e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e=e.e.accept(this);
+		return e;
 	}
 
 	@Override
@@ -101,17 +103,23 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(LE e) {
+		e.e1= e.e1.accept(this);
+		e.e2=e.e2.accept(this);
 		return e;
 	}
 
 	@Override
 	public Exp visit(If e) {
+		e.e1=e.e1.accept(this);
+		e.e2=e.e2.accept(this);
+		e.e3=e.e3.accept(this);
 		return e;
 	}
 
 	@Override
 	public Exp visit(Let e) {
-
+		e.e1=e.e1.accept(this);
+		e.e2=e.e2.accept(this);
 		return e;
 	}
 
@@ -124,6 +132,10 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 	public Exp visit(LetRec e) {
 		int height = Height.computeHeight(e);
 		if (height<=threshold){
+			if (listeLetRec.contains(e)==false){
+				listeLetRec.add(e);
+			}
+			
 			return e;
 		}
 		else{
@@ -133,6 +145,9 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(App e) {
+		if(e.e.isVar()){
+
+		}
 		return e;
 	}
 
