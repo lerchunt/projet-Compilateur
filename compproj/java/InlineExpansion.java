@@ -3,8 +3,9 @@ import java.util.LinkedList;
 public class InlineExpansion implements ObjVisitor<Exp> {
 	private static LinkedList<LetRec > listeLetRec= new LinkedList<LetRec>();
 	private static int threshold = 5;
-	public InlineExpansion() {
-
+	private Exp base;
+	public InlineExpansion(Exp base) {
+		this.base=base;
 	}
 	
 	@Override
@@ -145,9 +146,22 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(App e) {
-		if(e.e.isVar()){
-
+		if(e.e instanceof Var) {
+			Id varId = ((Var)e.e).id;
+			for(LetRec lt : listeLetRec){
+				if(lt.fd.id.equals(varId)){
+					int cmp =0;
+					Exp exp=(Exp)lt.fd.e.clone();
+					for(Id i :lt.fd.args){
+						Id newId = Id.gen();
+						exp = new Let(i, new TVar(newId.id), e.es.get(cmp),exp);
+						cmp ++;
+					}
+				}
+						
+			}
 		}
+		this.base.accept(new AlphaConversion());
 		return e;
 	}
 
