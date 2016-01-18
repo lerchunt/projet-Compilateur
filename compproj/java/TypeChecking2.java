@@ -320,14 +320,36 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(Tuple e) {
-		// TODO Auto-generated method stub
-		return null;
+		LinkedList<Equations> retour = new LinkedList<Equations>();
+		LinkedList<Type> tParams = new LinkedList<Type>();
+		for (Exp param : e.es) {
+			Type ts = Type.gen();
+			param.env = e.env;
+			param.typeAttendu = ts;
+			retour.addAll(param.accept(this));
+			tParams.add(ts);
+		}
+		Equations eq = new Equations(new TTuple(), e.typeAttendu);
+		retour.add(eq);
+		return retour;
 	}
 
 	@Override
 	public LinkedList<Equations> visit(LetTuple e) {
-		// TODO Auto-generated method stub
-		return null;
+		Type ts = Type.gen();
+		LinkedList<Equations> retour = new LinkedList<Equations>();
+		e.e1.typeAttendu =  ts;
+		e.e1.env = e.env;
+		e.e2.typeAttendu = e.typeAttendu;
+		e.e2.env = e.env;
+		LinkedList<Id> tParams = new LinkedList<Id>();
+		for (Id param : e.ids) {
+			e.e2.addEnv(param, ts);
+		}
+		retour.addAll(e.e1.accept(this));
+		retour.addAll(e.e2.accept(this));
+		e.e2.env.removeFirst();
+		return retour;
 	}
 
 	@Override

@@ -77,7 +77,7 @@ public class Main {
 				}
 				try {
 
-					/*expression.initiateEnv();
+					expression.initiateEnv();
 					expression.typeAttendu = new TUnit();
 					LinkedList<Equations> retour = expression.accept(new TypeChecking2());
 					if (verbose) {
@@ -92,7 +92,7 @@ public class Main {
 						for (Equations e : retour) {
 							System.out.println(e.toString());
 						}
-					}*/
+					}
 					
 					/*if (!(expression.accept(new TypeChecking()) instanceof TUnit)) {
 						throw new Exception();
@@ -123,8 +123,8 @@ public class Main {
 						expression.accept(new PrintVisitor());
 						System.out.println();
 					}
-					/*
-					expression = expression.accept(new ConstantFolding());*/
+					
+					expression = expression.accept(new ConstantFolding());
 					if (verbose) {
 						System.out.println("------ AST ConstantFolding ------");
 						expression.accept(new PrintVisitor());
