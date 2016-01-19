@@ -348,13 +348,6 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(LetTuple e) {
-		int cpt = 0;
-		LinkedList<Type> Ttype = new LinkedList<Type>();
-		LinkedList<Equations> retour = new LinkedList<Equations>();
-		for (Id param : e.ids) {
-			Ttype.add(Type.gen());
-		}	
-		e.ts = Ttype;
 		if(!(e.e1 instanceof Tuple)){
 			System.err.println("error "+e.e1.toString() +" is not a tuple");
 			System.exit(1);
@@ -362,6 +355,13 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 			System.err.println("error size of tuple");
 			System.exit(1);
 		}
+		int cpt = 0;
+		LinkedList<Type> Ttype = new LinkedList<Type>();
+		LinkedList<Equations> retour = new LinkedList<Equations>();
+		for (Id param : e.ids) {
+			Ttype.add(Type.gen());
+		}	
+		e.ts = Ttype;
 		for (Exp param : ((Tuple)e.e1).es) {
 			param.typeAttendu = e.ts.get(cpt);
 			cpt++;
@@ -383,14 +383,42 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(Array e) {
-		// TODO Auto-generated method stub
-		return null;
+		LinkedList<Equations> retour = new LinkedList<Equations>();
+		if(e.e1 instanceof App){
+			System.err.println("expected one argument or operation");
+			System.exit(1);
+		} else {
+			e.typeAttendu = new TArray();
+			e.e1.typeAttendu = Type.gen();
+			e.e2.typeAttendu = Type.gen();
+			Equations eq = new Equations(new TInt(), e.e1.typeAttendu);
+			retour.add(eq);
+			e.e1.env = e.env ;
+			e.e2.env.addAll(e.env);
+			retour.addAll(e.e1.accept(this));
+			retour.addAll(e.e2.accept(this));
+			e.e2.env.removeFirst();
+		}
+		return retour;
 	}
 
 	@Override
 	public LinkedList<Equations> visit(Get e) {
-		// TODO Auto-generated method stub
-		return null;
+		LinkedList<Equations> retour = new LinkedList<Equations>();
+		e.e1.typeAttendu = Type.gen();
+		e.e2.typeAttendu = Type.gen();
+		Equations eq = new Equations(new TInt(), e.e2.typeAttendu);
+		retour.add(eq);
+		eq = new Equations(new TArray(), e.e1.typeAttendu);
+		retour.add(eq);
+		eq = new Equations(Type.gen(), e.typeAttendu);
+		retour.add(eq);
+		e.e1.env = e.env ;
+		e.e2.env.addAll(e.env);
+		retour.addAll(e.e1.accept(this));
+		retour.addAll(e.e2.accept(this));
+		e.e2.env.removeFirst();
+		return retour;
 	}
 
 	@Override

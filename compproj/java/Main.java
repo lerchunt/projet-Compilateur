@@ -105,12 +105,14 @@ public class Main {
 				}
 				// Type Checking
 				if (!stopAfterTypeChecking) {
+
 					expression = expression.accept(new InlineExpansion());
 					if (verbose) {
 						System.out.println("------ AST InlineExpansion ------");
 						expression.accept(new PrintVisitor());
 						System.out.println();
 					}
+
 					expression  = expression.accept(new KNormalization());
 					if (verbose) {
 						System.out.println("------ AST Knorm ------");
@@ -129,8 +131,7 @@ public class Main {
 						expression.accept(new PrintVisitor());
 						System.out.println();
 					}
-					
-	
+
 					/*
 					AlphaConversion.procedures.clear();
 					AlphaConversion.variables.clear();

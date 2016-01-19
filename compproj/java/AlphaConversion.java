@@ -2,9 +2,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class AlphaConversion implements ObjVisitor<Exp> {
-	static	LinkedList <BindVar> variables = new LinkedList<BindVar>();
-	static  LinkedList <BindVar> procedures = new LinkedList<BindVar>();
-	
+
+	LinkedList <BindVar> variables = new LinkedList<BindVar>();
+	LinkedList <BindVar> procedures = new LinkedList<BindVar>();
+
+
 	@Override
 	public Exp visit(Unit e) {
 		return e;
@@ -88,10 +90,10 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 			e.e2 = new Var(newId);
 			newExp = newLet;
 		}
-		
+
 		return newExp;
 	}
-	
+
 	@Override
 	public Exp visit(Mul e) {
 		Exp newExp = e;
@@ -109,7 +111,7 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 			e.e2 = new Var(newId);
 			newExp = newLet;
 		}
-		
+
 		return newExp;
 	}
 
@@ -146,7 +148,7 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 	public Exp visit(Let e) {
 		e.e1 = e.e1.accept(this);
 		Id newVar = e.id;
-		
+
 		if (isInVar(e.id)) {
 			newVar = Id.gen();
 			while (isInProc(newVar) || isInVar(newVar)) {
@@ -178,10 +180,10 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 		}
 		e.fd.id = newProc;
 		procedures.addLast(new BindVar(e.fd.id, newProc));
-		
+
 		// renommage des params
 		List<Id> newArgs = new LinkedList<Id>() ;
-		
+
 		for(Id id : e.fd.args){
 			Id newVar = id;
 			if (isInVar(id)) {
@@ -195,8 +197,9 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 		}
 		e.fd.args = newArgs;
 
-		e.fd.e.accept(this);
-		e.e.accept(this);
+
+		e.fd.e = e.fd.e.accept(this);
+		e.e = e.e.accept(this);
 		return e;
 
 	}
@@ -222,39 +225,57 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(LetTuple e) {
-		e.e1.accept(this);
-		e.e2.accept(this);
+		e.e1 = e.e1.accept(this);
+		List<Id> newIds= new LinkedList<Id>();
+		for (Id id : e.ids) {
+			Id newVar = id;
+
+			if (isInVar(id)) { 
+				newVar = Id.gen();
+				while (isInProc(newVar) || isInVar(newVar)) {
+					newVar = Id.gen();
+				}
+			}
+			variables.addLast(new BindVar(id, newVar));
+			newIds.add(newVar);
+		}
+		e.ids = newIds;
+		e.e2 = e.e2.accept(this);
 		return e;
 	}
 
 	@Override
 	public Exp visit(Array e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Get e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Put e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		e.e3 = e.e3.accept(this);
+		return e;
 	}
 
 	private class BindVar{
 		Id IdPrec;
 		Id IdNew;
-		
+
 		private BindVar(Id idold,Id idnew){
 			this.IdNew=idnew;
 			this.IdPrec=idold;
 		}
 	}
-	
+
 
 	private boolean isInVar(Id id) {
 		for (BindVar bv : variables) {
