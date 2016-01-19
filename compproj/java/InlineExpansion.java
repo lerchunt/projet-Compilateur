@@ -2,10 +2,9 @@ import java.util.LinkedList;
 
 public class InlineExpansion implements ObjVisitor<Exp> {
 	private static LinkedList<LetRec > listeLetRec= new LinkedList<LetRec>();
-	private static int threshold = 5;
-	private Exp base;
-	public InlineExpansion(Exp base) {
-		this.base=base;
+	private static int threshold = 3;
+	public InlineExpansion() {
+
 	}
 	
 	@Override
@@ -42,15 +41,15 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Add e) {
-		e.e1.accept(this);		
-		e.e2.accept(this);
+		e.e1=e.e1.accept(this);		
+		e.e2=e.e2.accept(this);
 		return e;
 	}
 
 	@Override
 	public Exp visit(Sub e) {
-		e.e1.accept(this);		
-		e.e2.accept(this);
+		e.e1=e.e1.accept(this);		
+		e.e2=e.e2.accept(this);
 		return e;
 	}
 
@@ -90,15 +89,15 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(FDiv e) {
-		e.e1.accept(this);		
-		e.e2.accept(this);
+		e.e1=e.e1.accept(this);		
+		e.e2=e.e2.accept(this);
 		return e;
 	}
 
 	@Override
 	public Exp visit(Eq e) {
-		e.e1.accept(this);		
-		e.e2.accept(this);
+		e.e1=e.e1.accept(this);		
+		e.e2=e.e2.accept(this);
 		return e;
 	}
 
@@ -131,15 +130,17 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(LetRec e) {
-		int height = Height.computeHeight(e);
+		int height = Height.computeHeight(e.fd.e);
+		System.out.println("taille de " +e.fd.id.toString()+ " = "+height);
 		if (height<=threshold){
-			if (listeLetRec.contains(e)==false){
-				listeLetRec.add(e);
-			}
-			
+			listeLetRec.add(e);
+			e.fd.e=e.fd.e.accept(this);
+			e.e=e.e.accept(this);
 			return e;
 		}
 		else{
+			e.fd.e=e.fd.e.accept(this);
+			e.e=e.e.accept(this);
 			return e;	
 		}
 	}
@@ -157,30 +158,31 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 						exp = new Let(i, new TVar(newId.id), e.es.get(cmp),exp);
 						cmp ++;
 					}
+					exp.accept(this);
+					return exp;
 				}
 						
-			}
-		}
-		this.base.accept(new AlphaConversion());
-		return e;
+			}		
+		}		
+			return e;
 	}
 
 	@Override
 	public Exp visit(Tuple e) {
 		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
 	public Exp visit(LetTuple e) {
 		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
 	public Exp visit(Array e) {
 		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
