@@ -325,7 +325,9 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 			Type arg;
 			param.env = e.env;
 			Type ts = Type.gen();
-			//param.typeAttendu = ts;
+			if(param.typeAttendu == null){
+				param.typeAttendu = ts;
+			}
 			if(param instanceof Var){
 				arg = ((Var)param).rechercheEnv();
 				if (arg == null) {
@@ -355,6 +357,9 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		e.ts = Ttype;
 		if(!(e.e1 instanceof Tuple)){
 			System.err.println("error "+e.e1.toString() +" is not a tuple");
+			System.exit(1);
+		} else if( ((Tuple)e.e1).es.size() != e.ids.size()){
+			System.err.println("error size of tuple");
 			System.exit(1);
 		}
 		for (Exp param : ((Tuple)e.e1).es) {
