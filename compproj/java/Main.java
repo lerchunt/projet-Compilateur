@@ -105,6 +105,12 @@ public class Main {
 				}
 				// Type Checking
 				if (!stopAfterTypeChecking) {
+					expression = expression.accept(new InlineExpansion());
+					if (verbose) {
+						System.out.println("------ AST InlineExpansion ------");
+						expression.accept(new PrintVisitor());
+						System.out.println();
+					}
 					expression  = expression.accept(new KNormalization());
 					if (verbose) {
 						System.out.println("------ AST Knorm ------");
@@ -124,13 +130,8 @@ public class Main {
 						System.out.println();
 					}
 					
-					expression = expression.accept(new InlineExpansion());
-					if (verbose) {
-						System.out.println("------ AST InlineExpansion ------");
-						expression.accept(new PrintVisitor());
-						System.out.println();
-					}
-					
+	
+					/*
 					AlphaConversion.procedures.clear();
 					AlphaConversion.variables.clear();
 					expression = expression.accept(new AlphaConversion());
@@ -138,7 +139,7 @@ public class Main {
 						System.out.println("------ AST AlphaConv ------");
 						expression.accept(new PrintVisitor());
 						System.out.println();
-					}
+					}*/
 					
 					expression = expression.accept(new ConstantFolding());
 					if (verbose) {
