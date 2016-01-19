@@ -158,35 +158,31 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 						exp = new Let(i, new TVar(newId.id), e.es.get(cmp),exp);
 						cmp ++;
 					}
-					
+					exp.accept(this);
 					return exp;
 				}
 						
-			}
-			/*this.base.accept(new AlphaConversion());*/
-			
-		}
-			/*this.base.accept(new AlphaConversion());*/
+			}		
+		}		
 			return e;
-
 	}
 
 	@Override
 	public Exp visit(Tuple e) {
 		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
 	public Exp visit(LetTuple e) {
 		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
 	public Exp visit(Array e) {
 		// TODO Auto-generated method stub
-		return null;
+		return e;
 	}
 
 	@Override
