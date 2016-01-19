@@ -2,8 +2,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class AlphaConversion implements ObjVisitor<Exp> {
-	static LinkedList <BindVar> variables = new LinkedList<BindVar>();
-	static LinkedList <BindVar> procedures = new LinkedList<BindVar>();
+	LinkedList <BindVar> variables = new LinkedList<BindVar>();
+	LinkedList <BindVar> procedures = new LinkedList<BindVar>();
 
 	@Override
 	public Exp visit(Unit e) {
@@ -195,8 +195,8 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 		}
 		e.fd.args = newArgs;
 
-		e.fd.e.accept(this);
-		e.e.accept(this);
+		e.fd.e = e.fd.e.accept(this);
+		e.e = e.e.accept(this);
 		return e;
 
 	}
@@ -237,7 +237,7 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 			newIds.add(newVar);
 		}
 		e.ids = newIds;
-		e.e2.accept(this);
+		e.e2 = e.e2.accept(this);
 		return e;
 	}
 
