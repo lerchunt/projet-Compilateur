@@ -141,7 +141,6 @@ public class Main {
 					}
 					
 					expression = expression.accept(new ConstantFolding());
-					
 					if (verbose) {
 						System.out.println("------ AST ConstantFolding ------");
 						expression.accept(new PrintVisitor());
