@@ -227,16 +227,15 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		return args;
 	}
 	
-	// print sequence of identifiers 
+	// spe Tuple
     public <E> List<E>  printInfix(List<E> ids, Exp e1) {
         
     	int cpt = 0 ;
 		while(cpt < ids.size()){
 			E arg = ids.get(cpt);
 			if(!tabSym.containsKey(arg.toString())) {
-				
-				Var v = new Var((Id)arg); // REFAIRE par rapport à e1. 
-				tabSym.put(arg.toString(), v);
+				Exp exp = ((Tuple)e1).es.get(cpt) ;
+				tabSym.put(arg.toString(), exp);
 				tabVar.put(arg.toString(), true) ;
 			}
 			cpt++;

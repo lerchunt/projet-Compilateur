@@ -1,8 +1,11 @@
+import java.util.LinkedList;
+
 public class InlineExpansion implements ObjVisitor<Exp> {
-
+	private static LinkedList<LetRec > listeLetRec= new LinkedList<LetRec>();
 	private static int threshold = 5;
-	public InlineExpansion() {
-
+	private Exp base;
+	public InlineExpansion(Exp base) {
+		this.base=base;
 	}
 	
 	@Override
@@ -16,25 +19,25 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 	}
 
 	@Override
-	public Exp visit(Int e) {
+	public Exp visit(Int e){
 		return e;
 	}
 
 	@Override
-	public Exp visit(Float e) {
+	public Exp visit(Float e){
 		return e;
 	}
 
 	@Override
 	public Exp visit(Not e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e=e.e.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Neg e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e=e.e.accept(this);
+		return e;
 	}
 
 	@Override
@@ -53,8 +56,8 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(FNeg e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e=e.e.accept(this);
+		return e;
 	}
 
 	@Override
@@ -101,17 +104,23 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(LE e) {
+		e.e1= e.e1.accept(this);
+		e.e2=e.e2.accept(this);
 		return e;
 	}
 
 	@Override
 	public Exp visit(If e) {
+		e.e1=e.e1.accept(this);
+		e.e2=e.e2.accept(this);
+		e.e3=e.e3.accept(this);
 		return e;
 	}
 
 	@Override
 	public Exp visit(Let e) {
-
+		e.e1=e.e1.accept(this);
+		e.e2=e.e2.accept(this);
 		return e;
 	}
 
@@ -124,6 +133,10 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 	public Exp visit(LetRec e) {
 		int height = Height.computeHeight(e);
 		if (height<=threshold){
+			if (listeLetRec.contains(e)==false){
+				listeLetRec.add(e);
+			}
+			
 			return e;
 		}
 		else{
@@ -133,6 +146,22 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(App e) {
+		if(e.e instanceof Var) {
+			Id varId = ((Var)e.e).id;
+			for(LetRec lt : listeLetRec){
+				if(lt.fd.id.equals(varId)){
+					int cmp =0;
+					Exp exp=(Exp)lt.fd.e.clone();
+					for(Id i :lt.fd.args){
+						Id newId = Id.gen();
+						exp = new Let(i, new TVar(newId.id), e.es.get(cmp),exp);
+						cmp ++;
+					}
+				}
+						
+			}
+		}
+		this.base.accept(new AlphaConversion());
 		return e;
 	}
 

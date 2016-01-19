@@ -80,7 +80,11 @@ class TFun extends Type {
 }
 
 class TTuple extends Type { 
-	
+	String v;
+    TTuple(String v) {
+        this.v = v;
+    }
+    
 	@Override
 	public boolean equalsType(Type g) {
 		return g instanceof TTuple ;

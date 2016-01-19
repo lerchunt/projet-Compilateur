@@ -320,14 +320,60 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(Tuple e) {
-		// TODO Auto-generated method stub
-		return null;
+		LinkedList<Equations> retour = new LinkedList<Equations>();
+		for (Exp param : e.es) {
+			Type arg;
+			param.env = e.env;
+			Type ts = Type.gen();
+			//param.typeAttendu = ts;
+			if(param instanceof Var){
+				arg = ((Var)param).rechercheEnv();
+				if (arg == null) {
+					System.err.println("error "+((Var)param).id+" is not defined");
+					System.exit(1);
+				}
+				Equations eq = new Equations(param.typeAttendu,arg);
+				retour.add(eq);
+			} else {
+				retour.addAll(param.accept(this));
+			}
+			
+		}
+		Equations eq = new Equations(new TTuple(Type.gen().toString()), e.typeAttendu);
+		retour.add(eq);
+		return retour;
 	}
 
 	@Override
 	public LinkedList<Equations> visit(LetTuple e) {
-		// TODO Auto-generated method stub
-		return null;
+		int cpt = 0;
+		LinkedList<Type> Ttype = new LinkedList<Type>();
+		LinkedList<Equations> retour = new LinkedList<Equations>();
+		for (Id param : e.ids) {
+			Ttype.add(Type.gen());
+		}	
+		e.ts = Ttype;
+		if(!(e.e1 instanceof Tuple)){
+			System.err.println("error "+e.e1.toString() +" is not a tuple");
+			System.exit(1);
+		}
+		for (Exp param : ((Tuple)e.e1).es) {
+			param.typeAttendu = e.ts.get(cpt);
+			cpt++;
+		}	
+		e.e1.typeAttendu = new TTuple(Type.gen().toString());
+		e.e1.env = e.env;
+		e.e2.typeAttendu = e.typeAttendu;
+		e.e2.env.addAll(e.env);
+		cpt = 0;
+		for (Id param : e.ids) {
+			e.e2.addEnv(param, e.ts.get(cpt));
+			cpt++;
+		}
+		retour.addAll(e.e1.accept(this));
+		retour.addAll(e.e2.accept(this));
+		e.e2.env.removeFirst();
+		return retour;
 	}
 
 	@Override
