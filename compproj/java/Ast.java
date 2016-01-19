@@ -533,9 +533,7 @@ class App extends Exp {
         this.es = es;
     }
     
-
-    //liste des variables libres de App
-    LinkedList<Var> closure;
+    LinkedList<String> closure = new LinkedList<String>();
 
     <E> E accept(ObjVisitor<E> v) {
         return v.visit(this);
