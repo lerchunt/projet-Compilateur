@@ -168,20 +168,24 @@ public class UnDefinition extends ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Array e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Get e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		return e;
 	}
 
 	@Override
 	public Exp visit(Put e) {
-		// TODO Auto-generated method stub
-		return null;
+		e.e1 = e.e1.accept(this);
+		e.e2 = e.e2.accept(this);
+		e.e3 = e.e3.accept(this);
+		return e;
 	}
 
 	@Override
