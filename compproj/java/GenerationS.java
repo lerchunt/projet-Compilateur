@@ -1,14 +1,16 @@
 import java.util.Hashtable;
+import java.util.LinkedList;
 
 
 public class GenerationS implements ObjVisitor<String> {
+	
 	public static String defFunc = "";
 	public static String defVar = "";
 	private boolean data = false; 
 	private int nbFloat=0;
 
 	private static int cmpIf = 0;
-
+	
 	@Override
 	public String visit(Bool e) {
 		if (e.b){
@@ -34,16 +36,17 @@ public class GenerationS implements ObjVisitor<String> {
 		if (e.e instanceof Not){
 			return ((Not)e.e).e.accept(this);
 		} else if (e.e instanceof Eq){
-			return e.e.accept(this).replaceAll("beq", "bne");
+			return e.e.accept(this).replaceAll("bne", "beq");
 		} else if (e.e instanceof LE){
-			return e.e.accept(this).replaceAll("ble", "bne");
+			return e.e.accept(this).replaceAll("bgt", "ble");
 		} else if (e.e instanceof Bool){
-			((Bool)e.e).b = !((Bool)e.e).b;
-			return e.e.accept(this);
+			if (!((Bool)e.e).b) {
+				return String.format("\tb\tifFalse%d\n", cmpIf);
+			} 
 		}else if (e.e instanceof Var){
 			String reg = e.registreDeRetour;
 			return String.format("\trsc\t%s,%s\n\tmul\t%s,%s\n",reg,e.e.accept(this),reg,reg);
-			
+
 		} else {
 			System.err.println("internal error -- GenerationS not");
 			System.exit(1);
@@ -240,14 +243,14 @@ public class GenerationS implements ObjVisitor<String> {
 	@Override
 	public String visit(Eq e) {
 		String retour=String.format("\tcmp\t%s,%s\n", e.e1.accept(this),e.e2.accept(this));
-		retour += "\tbeq\tifTrue\n";
+		retour += "\tbne\tifFalse"+cmpIf+"\n";
 		return retour;
 	}
 
 	@Override
 	public String visit(LE e) {
 		String retour=String.format("\tcmp\t%s,%s\n", e.e1.accept(this),e.e2.accept(this));
-		retour += "\tble\tifTrue\n";
+		retour += "\tbgt\tifFlase"+cmpIf+"\n";
 		return retour;
 	}
 
@@ -257,7 +260,7 @@ public class GenerationS implements ObjVisitor<String> {
 		String retour ="";		
 		String ifTrue="ifTrue"+cmpIf+":\n";
 		String ifFalse="ifFalse"+cmpIf+":\n";
-		
+
 		if(e.e1 instanceof OpBin || e.e1 instanceof OpUn){
 			e.e1.registreDeRetour = e.registreDeRetour;
 			retour += e.e1.accept(this);
@@ -265,14 +268,18 @@ public class GenerationS implements ObjVisitor<String> {
 			if (!((Bool)e.e1).b) {
 				retour += "\tb\tifFalse"+cmpIf+"\n";
 			}
-		}else {
+		} else if (e.e1 instanceof Var) {
+			e.e1.registreDeRetour = e.registreDeRetour;
+			retour += String.format("\tcmp\t%s,#1\n", e.e1.accept(this));
+			retour += "\tbne\tifFalse"+cmpIf+"\n";
+		} else {
 			System.err.println("internal error - If e1 (GenerationS)");
 			System.exit(1);
 		}
 		if (e.e1 instanceof Not){
 			e.e1.accept(this);
 		}
-		
+
 		if (e.e2 instanceof Var){			
 			ifTrue+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e2.accept(this));			
 		} else if (e.e2 instanceof App){
@@ -292,7 +299,7 @@ public class GenerationS implements ObjVisitor<String> {
 		} else { //entier +float +bool
 			ifTrue+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e2.accept(this));	
 		}
-		
+
 		if (e.e3 instanceof Var){
 			ifFalse+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e3.accept(this));			
 		} else if (e.e3 instanceof App){
@@ -356,7 +363,7 @@ public class GenerationS implements ObjVisitor<String> {
 		}else{
 			retour += String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		}
-		
+
 		if (e.e2 instanceof OpBin){
 			Id idretour = Id.gen();
 			String regRetour = RegistreAllocation.getRegistre(idretour);
@@ -393,7 +400,7 @@ public class GenerationS implements ObjVisitor<String> {
 		String retour = "";
 		int nbreg = 0;
 		defFunc +=String.format("\nmin_caml_%s:\n",e.fd.id);
-		defFunc += String.format("\t@prologue\n%s\n",prologue());
+		defFunc += String.format("\t@prologue\n%s\n",prologue(0));
 		for (Id id : e.fd.args){
 			if (nbreg <4){
 				reg = RegistreAllocation.getRegistre(id);
@@ -405,11 +412,11 @@ public class GenerationS implements ObjVisitor<String> {
 				System.exit(1);
 			}
 		}
-		
-		defFunc += String.format("\n\t@push: empiler registre\n%s\n",push());
+
+		/*defFunc += String.format("\n\t@push: empiler registre\n%s\n",push(0));
 		defFunc += "\n\tsub\tr13,r13,#4 @place pour le résultat\n";
-		defFunc +=String.format("\n\t@pushFP:\n%s\n",pushFP());
-		
+		defFunc +=String.format("\n\t@pushFP:\n%s\n",pushFP());*/
+
 		if (e.fd.e instanceof OpBin){
 			Id idretour = Id.gen();
 			String regRetour = RegistreAllocation.getRegistre(idretour);
@@ -431,6 +438,7 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(App e) {
+		LinkedList<Id> listeid = new LinkedList<Id>();
 		String retour="";
 		String registre="";
 		int nbParam = 0;
@@ -444,30 +452,65 @@ public class GenerationS implements ObjVisitor<String> {
 				if (param instanceof Var){
 					nbParam ++;
 					registre = strP;
-					retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  registre);
+					if (e.e instanceof Var) {
+						retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  registre);
+					} else if (e.e instanceof App){
+						Id idretour = Id.gen();
+						listeid.add(idretour);
+						String reg = RegistreAllocation.getRegistre(idretour);
+						retour +=String.format("\tmov\t%s,%s\n",reg,  registre);
+						((App)e.e).closure.add(reg);
+					} else{
+						System.err.println("internal error - definition function (GenerationS)");
+						System.exit(1);
+					}
 				} else if (param instanceof App) {
-					nbParam ++;
-					retour += strP;
+					if (e.e instanceof Var){
+						nbParam ++;
+						retour += strP;
+					} else if (e.e instanceof App){
+						Id idretour = Id.gen();
+						listeid.add(idretour);
+						String reg = RegistreAllocation.getRegistre(idretour);
+						retour +=String.format("\tmov\t%s,%s\n",reg,  registre);
+						((App)e.e).closure.add(reg);
+					}else{
+						System.err.println("internal error - definition function (GenerationS)");
+						System.exit(1);
+					}
 				} else {
-					nbParam++;
-					retour +=String.format("\tmov\tr%d,%s\n", nbParam-1, strP);
+					if (e.e instanceof Var){
+						nbParam++;
+						retour +=String.format("\tmov\tr%d,%s\n", nbParam-1, strP);
+					} else if (e.e instanceof App){
+						nbParam++;
+						Id idretour = Id.gen();
+						listeid.add(idretour);
+						String reg = RegistreAllocation.getRegistre(idretour);
+						retour +=String.format("\tmov\t%s,%s\n",reg,  strP);
+						((App)e.e).closure.add(reg);
+					}else{
+						System.err.println("internal error - definition function (GenerationS)");
+						System.exit(1);
+					}
 				}
 			}
 		}
 		if (e.e instanceof Var) {
+			for (String s : e.closure) {
+				nbParam++;
+				retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  s);
+			}
 			retour = String.format("%s\tbl\tmin_caml_%s\n",retour,((Var)e.e).id.id);
 		} else if (e.e instanceof App){
-			for (Var var : e.closure){
-				registre = RegistreAllocation.getRegistre(var.id);
-				retour +=String.format("\tmov\t%s,%s\n", registre, RegistreAllocation.getRegistre(var.id));
-			}
 			retour+=e.e.accept(this);
-			for (Var var: e.closure){
-				RegistreAllocation.sup(var.id);
-			}			
 		}else{
 			System.err.println("internal error - definition function (GenerationS)");
 			System.exit(1);
+		}
+
+		for (Id id : listeid){
+			RegistreAllocation.sup(id);
 		}
 
 		return retour;
@@ -516,19 +559,27 @@ public class GenerationS implements ObjVisitor<String> {
 	}	
 
 	private String epilogue() {
-		return "\tadd\tr13,r11,#0\n\tldr\tr11,[r13]\n\tadd\tr13,r13,#4";
+		//return "\tadd\tr13,r11,#0\n\tldr\tr11,[r13]\n\tadd\tr13,r13,#4";
+		return "\tnop\n\tldmfd\tsp!, {lr}";
 	}
-	
-	private String prologue() {
-		return "\tadd\tr13,r13,#-4\n\tstr\tr11,[r13]\n\tadd\tr11,r13,#0\n\tadd\tr13,r13,#-4 @taille des variables locales\n";
+
+	private String prologue(int nbVL) {
+		//return String.format("\tadd\tr13,r13,#-4\n\tstr\tr11,[r13]\n\tadd\tr11,r13,#0\n\tadd\tr13,r13,#-%d @taille des variables locales\n", 4*nbVL);
+		return "\tstmfd\tsp!, {lr}";
 	}
-	
-	private String push() {
-		return "\tsub\tr13,r13,#4\n\tstr\tr0,[r13]";
+
+	private String push(int nbParam) {
+		/*String retour = "";
+		for (int i = 0; i<nbParam; i++) {
+			retour += "\tsub\tr13,r13,#4\n\tstr\tr0,[r13]";
+		}
+		return retour;*/
+		return "";
 	}
-	
+
 	private String pushFP() {
-		return "\tadd\tr13,r13,#12\n\tstr\tr11,[r13]\n";
+		//return "\tadd\tr13,r13,#12\n\tstr\tr11,[r13]\n";
+		return "";
 	}
 
 }

@@ -141,6 +141,7 @@ public class Main {
 					}
 					
 					expression = expression.accept(new ConstantFolding());
+					
 					if (verbose) {
 						System.out.println("------ AST ConstantFolding ------");
 						expression.accept(new PrintVisitor());
@@ -149,6 +150,13 @@ public class Main {
 					expression = expression.accept(new UnDefinition());
 					if (verbose) {
 						System.out.println("------ AST UnecessaryDefinition ------");
+						expression.accept(new PrintVisitor());
+						System.out.println();
+					}
+
+					expression = expression.accept(new ClosureConversion());
+					if (verbose) {
+						System.out.println("------ AST ClosureConversion ------");
 						expression.accept(new PrintVisitor());
 						System.out.println();
 					}
@@ -169,7 +177,6 @@ public class Main {
 						ReadFile(pathAsml);
 					}
 					
-					expression = expression.accept(new ClosureConversion());
 
 					String retour = "\t.text\n\t.global _start\n"; // init
 					expression.accept(new RegistreAllocation());
