@@ -50,6 +50,9 @@ class Height {
         } else if (exp instanceof FSub) {
             FSub e = (FSub) exp;
             res = Math.max(computeHeight(e.e1), computeHeight(e.e2)) + 1;
+        } else if (exp instanceof Mul) {
+            Mul e = (Mul) exp;
+            res = Math.max(computeHeight(e.e1), computeHeight(e.e2)) + 1;
         } else if (exp instanceof FMul) {
             FMul e = (FMul) exp;
             res = Math.max(computeHeight(e.e1), computeHeight(e.e2)) + 1;

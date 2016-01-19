@@ -158,7 +158,7 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 						exp = new Let(i, new TVar(newId.id), e.es.get(cmp),exp);
 						cmp ++;
 					}
-					exp=exp.accept(this);
+					
 					return exp;
 				}
 						
