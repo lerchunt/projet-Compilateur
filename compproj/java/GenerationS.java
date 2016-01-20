@@ -1,5 +1,6 @@
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.List;
 
 
 public class GenerationS implements ObjVisitor<String> {
@@ -452,6 +453,7 @@ public class GenerationS implements ObjVisitor<String> {
 				if (param instanceof Var){
 					nbParam ++;
 					registre = strP;
+					System.out.println(strP);
 					if (e.e instanceof Var) {
 						retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  registre);
 					} else if (e.e instanceof App){
@@ -519,15 +521,30 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Tuple e) {
-
-		return null;
+		String tuple="";
+		for(Exp exp : e.es){
+			tuple += String.format("%s",exp.accept(this));
+		}
+		return tuple;
 	}
 
 	@Override
 	public String visit(LetTuple e) {
-		e.e1.accept(this);
-		e.e2.accept(this);
-		return null;
+		String retour ="";
+		String registre="";
+		int cpt=0;
+		for (Id id : e.ids) {
+				registre = RegistreAllocation.getRegistre(id);
+				//String res = e.e1.accept(this).substring(cpt,cpt+2);
+				if ( e.e1 instanceof Tuple) {
+					retour += String.format("\tmov\t%s,%s\n", registre, ((Tuple)e.e1).es.get(cpt));	
+				} else {
+					retour += String.format("\tmov\t%s,%s\n", registre, e.e1.accept(this));	
+				}
+				cpt++;
+		}
+		retour += e.e2.accept(this);
+		return retour;
 	}
 
 	@Override
