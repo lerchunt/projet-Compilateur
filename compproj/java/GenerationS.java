@@ -242,14 +242,48 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Eq e) {
-		String retour=String.format("\tcmp\t%s,%s\n", e.e1.accept(this),e.e2.accept(this));
+		String retour = "";
+		String s1 = e.e1.accept(this);
+		String s2 = e.e2.accept(this);
+		if (e.e1 instanceof App) {
+			Id idretour = Id.gen();
+			String regRetour = RegistreAllocation.getRegistre(idretour);
+			e.e1.registreDeRetour = regRetour;
+			retour += s1;
+			s1 = regRetour;
+		}
+		if (e.e2 instanceof App) {
+			Id idretour = Id.gen();
+			String regRetour = RegistreAllocation.getRegistre(idretour);
+			e.e2.registreDeRetour = regRetour;
+			retour += s2;
+			s2 = regRetour;
+		}
+		retour += String.format("\tcmp\t%s,%s\n", s1,s2);
 		retour += "\tbne\tifFalse"+cmpIf+"\n";
 		return retour;
 	}
 
 	@Override
 	public String visit(LE e) {
-		String retour=String.format("\tcmp\t%s,%s\n", e.e1.accept(this),e.e2.accept(this));
+		String retour = "";
+		String s1 = e.e1.accept(this);
+		String s2 = e.e2.accept(this);
+		if (e.e1 instanceof App) {
+			Id idretour = Id.gen();
+			String regRetour = RegistreAllocation.getRegistre(idretour);
+			e.e1.registreDeRetour = regRetour;
+			retour += s1;
+			s1 = regRetour;
+		}
+		if (e.e2 instanceof App) {
+			Id idretour = Id.gen();
+			String regRetour = RegistreAllocation.getRegistre(idretour);
+			e.e2.registreDeRetour = regRetour;
+			retour += s2;
+			s2 = regRetour;
+		}
+		retour =String.format("\tcmp\t%s,%s\n", s1,s2);
 		retour += "\tbgt\tifFlase"+cmpIf+"\n";
 		return retour;
 	}
