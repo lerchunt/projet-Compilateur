@@ -1,4 +1,4 @@
-(*2*)
+(*6*)
 let rec fct x y z = x + y - z in
 let y = 5 in
 let rec f x = x + 1 in

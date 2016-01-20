@@ -130,7 +130,7 @@ class PrintVisitor implements Visitor {
     }
 
     public void visit(Var e){
-        System.out.print(e.id);
+        System.out.print(e.id.id);
     }
 
 

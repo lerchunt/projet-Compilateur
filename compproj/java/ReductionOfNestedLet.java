@@ -32,14 +32,14 @@ public class ReductionOfNestedLet implements ObjVisitor<Exp> {
 	public Exp visit(Add e) {
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
-		return e;
+		return ReducOpBin(e);
 	}
 
 	@Override
 	public Exp visit(Sub e) {
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
-		return e;
+		return ReducOpBin(e);
 	}
 
 	@Override
@@ -52,49 +52,49 @@ public class ReductionOfNestedLet implements ObjVisitor<Exp> {
 	public Exp visit(FAdd e) {
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
-		return e;
+		return ReducOpBin(e);
 	}
 
 	@Override
 	public Exp visit(FSub e) {
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
-		return e;
+		return ReducOpBin(e);
 	}
 
 	@Override
 	public Exp visit(FMul e) {
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
-		return e;
+		return ReducOpBin(e);
 	}
 
 	@Override
 	public Exp visit(Mul e) {
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
-		return e;
+		return ReducOpBin(e);
 	}
 
 	@Override
 	public Exp visit(FDiv e) {
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
-		return e;
+		return ReducOpBin(e);
 	}
 
 	@Override
 	public Exp visit(Eq e) {
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
-		return e;
+		return ReducOpBin(e);
 	}
 
 	@Override
 	public Exp visit(LE e) {
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
-		return e;
+		return ReducOpBin(e);
 	}
 
 	@Override
@@ -109,7 +109,7 @@ public class ReductionOfNestedLet implements ObjVisitor<Exp> {
 	public Exp visit(Let e) {
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
-		return KNormLet(e);
+		return ReducLet(e);
 	}
 
 	@Override
@@ -176,7 +176,7 @@ public class ReductionOfNestedLet implements ObjVisitor<Exp> {
 	}
 
 
-	private Exp KNormLet(Let e) {
+	private Exp ReducLet(Let e) {
 		if (!e.e1.isVar()) {
 			if (e.e1 instanceof Let) {
 				Let cour = (Let)e.e1;
@@ -194,5 +194,61 @@ public class ReductionOfNestedLet implements ObjVisitor<Exp> {
 			} 
 		}
 		return e;
+	}
+	
+	private Exp ReducOpBin(OpBin e) {
+		Exp retour = e;
+		
+		if (e.e2 instanceof Let) {
+			Let newExp = (Let)e.e2.clone();
+			Exp cour = e.e2;
+			while (cour instanceof Let) {
+				cour = ((Let)cour).e2;
+			}
+			Exp tmpE2 = cour;
+			e.e2 = tmpE2;
+			cour = newExp;
+			while (((Let)cour).e2 instanceof Let) {
+				cour = ((Let)cour).e2;
+			}
+			((Let)cour).e2 = e;
+			retour=newExp;
+		}
+		if (e.e1 instanceof Let) {
+			Let newExp = (Let)e.e1.clone();
+			Exp cour = e.e1;
+			while (cour instanceof Let) {
+				cour = ((Let)cour).e2;
+			}
+			Exp tmpE2 = cour;
+			e.e1 = tmpE2;
+			cour = newExp;
+			while (((Let)cour).e2 instanceof Let) {
+				cour = ((Let)cour).e2;
+			}
+			((Let)cour).e2 = retour;
+			retour=newExp;
+		}
+		return retour;
+	}
+	private Exp ReducOpUn(OpUn e) {
+		Exp retour = e;
+		
+		if (e.e instanceof Let) {
+			Let newExp = (Let)e.e.clone();
+			Exp cour = e.e;
+			while (cour instanceof Let) {
+				cour = ((Let)cour).e2;
+			}
+			Exp tmpE2 = cour;
+			e.e = tmpE2;
+			cour = newExp;
+			while (((Let)cour).e2 instanceof Let) {
+				cour = ((Let)cour).e2;
+			}
+			((Let)cour).e2 = e;
+			retour=newExp;
+		}
+		return retour;
 	}
 }
