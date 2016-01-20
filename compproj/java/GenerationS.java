@@ -10,6 +10,7 @@ public class GenerationS implements ObjVisitor<String> {
 	private int nbFloat=0;
 
 	private static int cmpIf = 0;
+	private static int cmpTab =0;
 	
 	@Override
 	public String visit(Bool e) {
@@ -360,7 +361,20 @@ public class GenerationS implements ObjVisitor<String> {
 		}else if (e.e1 instanceof Neg){
 			e.e1.registreDeRetour = registre;
 			retour += String.format("%s", e.e1.accept(this));
-		}else{
+		}else if (e.e1 instanceof Array) {
+			if(!data){
+				defVar += ".data\n";
+				data = true;
+			}
+			retour+=String.format("%s", e.e1.accept(this));
+		}else if (e.e1 instanceof Get){
+			if(!data){
+				defVar += ".data\n";
+				data = true;
+			}
+			e.e1.registreDeRetour = registre;
+			retour+=String.format("%s", e.e1.accept(this));			
+		}else{		
 			retour += String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		}
 
@@ -532,24 +546,104 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Array e) {
-		e.e1.accept(this);
-		e.e2.accept(this);
-		return null;
+		LinkedList<Id> listeid = new LinkedList<Id>();
+		String retour="";
+		cmpTab++;
+		
+		if (e.e1 instanceof Int){
+			Id idretour = Id.gen();
+			e.registreDeRetour= RegistreAllocation.getRegistre(idretour);
+			idretour = Id.gen();
+			listeid.add(idretour);
+			String reg1 = RegistreAllocation.getRegistre(idretour);
+			
+			int tailleT = ((Int)(e.e1)).i;
+			defVar+=String.format("array%d:\t.skip %d\n\n",cmpTab,tailleT *100);
+			defFunc+=String.format("addr:\t.word array%d\n\n",cmpTab);
+			retour+=String.format("\tldr\t%s,addr\n\tmov\t%s,#0\n",e.registreDeRetour,reg1);
+			retour+="loop:\n";		
+			
+			idretour = Id.gen();
+			listeid.add(idretour);
+			String reg2 = RegistreAllocation.getRegistre(idretour);
+			idretour = Id.gen();
+			listeid.add(idretour);
+			String nvReg = RegistreAllocation.getRegistre(idretour);
+			
+			
+			retour+=String.format("\tcmp\t%s,#%d\n",reg1,tailleT);
+			retour+="\tbeq\tend\n";
+			retour+=String.format("\tadd\t%s,%s,%s,LSL #2\n",reg2,e.registreDeRetour,reg1);
+			retour+=String.format("\tmov\t%s,%s\n",nvReg,e.e2.accept(this));
+			retour+=String.format("\tstr\t%s,[%s]\n",nvReg,reg2);
+			retour+=String.format("\tadd\t%s,%s,#1\n",reg1,reg1);
+			retour+="\tb\tloop\n";
+			
+			retour+="end:\n";
+			
+			
+		}else{
+			System.err.println("internal error - Array (GenerationS)");
+			System.exit(1);
+		}
+		
+		for (Id id : listeid){
+			RegistreAllocation.sup(id);
+		}
+		
+		return retour;
 	}
 
 	@Override
 	public String visit(Get e) {
-		e.e1.accept(this);
-		e.e2.accept(this);
-		return null;
+		LinkedList<Id> listeid = new LinkedList<Id>();
+		String retour = "";
+		if (e.e1 instanceof Array){
+			retour += e.e1.accept(this);
+			String reg0 = e.e1.registreDeRetour;
+			if (e.e2 instanceof Int){
+				Id idretour = Id.gen();
+				listeid.add(idretour);
+				String reg1 = RegistreAllocation.getRegistre(idretour);				
+				retour+=String.format("\tmov\t%s,%s\n",reg1,e.e2.accept(this));
+				retour+=String.format("\tldr\t%s,[%s,%s,LSL #2]\n",e.registreDeRetour,reg0,reg1);				
+			}else{
+				System.err.println("internal error - Array (GenerationS)");
+				System.exit(1);
+			}
+		}
+		
+		for (Id id : listeid){
+			RegistreAllocation.sup(id);
+		}
+		
+		return retour;
 	}
 
 	@Override
 	public String visit(Put e) {
-		e.e1.accept(this);
-		e.e2.accept(this);
-		e.e3.accept(this);
-		return null;
+		LinkedList<Id> listeid = new LinkedList<Id>();
+		String retour = "";
+		if (e.e1 instanceof Array){
+			retour += e.e1.accept(this);
+			String reg0 = e.e1.registreDeRetour;
+			if (e.e2 instanceof Int){
+				Id idretour = Id.gen();
+				listeid.add(idretour);
+				String reg1 = RegistreAllocation.getRegistre(idretour);	
+				retour+=String.format("\tmov\t%s,%s\n",reg1,e.e2.accept(this));
+				retour+=String.format("\tstr\t%s,[%s,%s,LSL #2]\n",e.registreDeRetour,reg0,reg1);				
+			}else{
+				System.err.println("internal error - Array (GenerationS)");
+				System.exit(1);
+			}
+		}
+				
+		for (Id id : listeid){
+			RegistreAllocation.sup(id);
+		}
+		
+		return retour;
 	}
 
 	@Override
