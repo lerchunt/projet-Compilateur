@@ -96,6 +96,14 @@ class TTuple extends Type {
 }
 
 class TArray extends Type { 
+	Type typeParamArray;
+	
+	public TArray(){
+	}
+	
+	public TArray(Type t){
+		this.typeParamArray = t ;
+	}
 	
 	@Override
 	public boolean equalsType(Type g) {
@@ -108,10 +116,13 @@ class TArray extends Type {
 }
 
 class TVar extends Type {
+	// only for an equation with TArray
+	Type typeParamArray;
     String v;
     TVar(String v) {
         this.v = v;
     }
+    
     @Override
     public String toString() {
         return v; 
