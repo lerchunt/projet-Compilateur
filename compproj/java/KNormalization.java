@@ -133,7 +133,7 @@ public class KNormalization implements ObjVisitor<Exp> {
 	public Exp visit(Let e) {
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
-		return KNormLet(e);
+		return e;
 	}
 
 	@Override
@@ -338,24 +338,5 @@ public class KNormalization implements ObjVisitor<Exp> {
 		return retour;
 	}
 
-	private Exp KNormLet(Let e) {
-		if (!e.e1.isVar()) {
-			if (e.e1 instanceof Let) {
-				Let cour = (Let)e.e1;
-				while (cour.e2 instanceof Let) {
-					cour = (Let)cour.e2;
-				}
-				Let newExp = (Let)e.e1.clone();
-				e.e1 = cour.e2;
-				cour = newExp;
-				while (cour.e2 instanceof Let) {
-					cour = (Let)cour.e2;
-				}
-				cour.e2 = e;
-				return newExp;
-			} 
-		}
-		return e;
-	}
 	
 }
