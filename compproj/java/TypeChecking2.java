@@ -205,13 +205,18 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 	
 	@Override
 	public LinkedList<Equations> visit(Let e) {
+		LinkedList<Equations> retour = new LinkedList<Equations>();
 		e.t = Type.gen();
 		e.e1.typeAttendu = e.t;
 		e.e1.env = e.env;
 		e.e2.typeAttendu = e.typeAttendu;
 		e.e2.env.addAll(e.env);
 		e.e2.addEnv(e.id, e.t);
-		LinkedList<Equations> retour = new LinkedList<Equations>();
+		if(e.e1 instanceof Array){
+			//Type ts = Type.gen();
+			Type t = Type.gen();
+			((TVar)e.t).typeParamArray = t ;
+		}
 		retour.addAll(e.e1.accept(this));
 		retour.addAll(e.e2.accept(this));
 		e.e2.env.removeFirst();
@@ -388,11 +393,23 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 			System.err.println("expected one argument or operation");
 			System.exit(1);
 		} else {
-			e.typeAttendu = new TArray();
+			Type ts = Type.gen();
 			e.e1.typeAttendu = Type.gen();
-			e.e2.typeAttendu = Type.gen();
+			if(e.e2.typeAttendu instanceof TVar){
+				
+			} else {
+				e.e2.typeAttendu = Type.gen();
+			}
 			Equations eq = new Equations(new TInt(), e.e1.typeAttendu);
 			retour.add(eq);
+			eq = new Equations(new TArray(), e.typeAttendu);
+			retour.add(eq);
+			eq = new Equations(ts, e.e2.typeAttendu);
+			retour.add(eq);
+			if(((TVar)e.typeAttendu).typeParamArray != null){
+				eq = new Equations(((TVar)e.typeAttendu).typeParamArray, e.e2.typeAttendu);
+				retour.add(eq);
+			}
 			e.e1.env = e.env ;
 			e.e2.env.addAll(e.env);
 			retour.addAll(e.e1.accept(this));
@@ -407,14 +424,36 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		e.e1.typeAttendu = Type.gen();
 		e.e2.typeAttendu = Type.gen();
-		Equations eq = new Equations(new TInt(), e.e2.typeAttendu);
-		retour.add(eq);
-		eq = new Equations(new TArray(), e.e1.typeAttendu);
-		retour.add(eq);
-		eq = new Equations(Type.gen(), e.typeAttendu);
-		retour.add(eq);
 		e.e1.env = e.env ;
 		e.e2.env.addAll(e.env);
+		if(e.e1 instanceof Array){
+			((Array)e.e1).e2.typeAttendu = Type.gen();
+			Equations eq = new Equations(new TArray(e.typeAttendu), e.e1.typeAttendu);
+			retour.add(eq);
+			eq = new Equations(new TInt(), e.e2.typeAttendu);
+			retour.add(eq);
+			eq = new Equations(e.typeAttendu, ((Array)e.e1).e2.typeAttendu);
+			retour.add(eq);
+		} else if (e.e1 instanceof Var){
+			Type ts = ((Var)e.e1).rechercheEnv();
+			if(ts instanceof TVar){
+				Equations eq = new Equations(e.typeAttendu, ((TVar)ts).typeParamArray);
+				retour.add(eq);
+				eq = new Equations(new TInt(), e.e2.typeAttendu);
+				retour.add(eq);
+			} else if (ts instanceof TArray) {
+				Equations eq = new Equations(e.typeAttendu, ((TArray)ts).typeParamArray);
+				retour.add(eq);
+				eq = new Equations(new TInt(), e.e2.typeAttendu);
+				retour.add(eq);
+			} else {
+				System.err.println("expected a type var");
+				System.exit(1);
+			}
+		} else {
+			System.err.println("expected an array");
+			System.exit(1);
+		}
 		retour.addAll(e.e1.accept(this));
 		retour.addAll(e.e2.accept(this));
 		e.e2.env.removeFirst();
