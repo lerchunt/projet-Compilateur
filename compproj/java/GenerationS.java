@@ -286,7 +286,7 @@ public class GenerationS implements ObjVisitor<String> {
 			s2 = regRetour;
 		}
 		retour =String.format("\tcmp\t%s,%s\n", s1,s2);
-		retour += "\tbgt\tifFlase"+cmpIf+"\n";
+		retour += "\tbgt\tifFalse"+cmpIf+"\n";
 		return retour;
 	}
 
@@ -475,6 +475,8 @@ public class GenerationS implements ObjVisitor<String> {
 			for (Id id : e.fd.args){
 				RegistreAllocation.sup(id);
 			}
+		} else if (e.fd.e instanceof Var) {
+			retour += String.format("\tmov\tr0,%s",e.fd.e.accept(this));
 		} else {
 			retour += e.fd.e.accept(this);
 		}
@@ -501,7 +503,6 @@ public class GenerationS implements ObjVisitor<String> {
 				if (param instanceof Var){
 					nbParam ++;
 					registre = strP;
-					System.out.println(strP);
 					if (e.e instanceof Var) {
 						retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  registre);
 					} else if (e.e instanceof App){
@@ -585,7 +586,7 @@ public class GenerationS implements ObjVisitor<String> {
 				registre = RegistreAllocation.getRegistre(id);
 				//String res = e.e1.accept(this).substring(cpt,cpt+2);
 				if ( e.e1 instanceof Tuple) {
-					retour += String.format("\tmov\t%s,%s\n", registre, ((Tuple)e.e1).es.get(cpt));	
+					retour += String.format("\tmov\t%s,%s\n", registre, ((Tuple)e.e1).es.get(cpt).accept(this));	
 				} else {
 					retour += String.format("\tmov\t%s,%s\n", registre, e.e1.accept(this));	
 				}
