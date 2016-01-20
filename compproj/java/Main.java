@@ -124,14 +124,14 @@ public class Main {
 						expression.accept(new PrintVisitor());
 						System.out.println();
 					}
-
+/*
 					expression = expression.accept(new InlineExpansion());
 					if (verbose) {
 						System.out.println("------ AST InlineExpansion ------");
 						expression.accept(new PrintVisitor());
 						System.out.println();
 					}
-
+*/
 					expression = expression.accept(new ReductionOfNestedLet());
 					if (verbose) {
 						System.out.println("------ AST ReductionOfNestedLet ------");
@@ -186,7 +186,7 @@ public class Main {
 					}
 					
 
-					String retour = "\t.text\n\t.global _start\n"; // init
+					String init = "\t.text\n\t.global _start\n\n"; // init
 					expression.accept(new RegistreAllocation());
 					if (verbose) {
 						System.out.println("------ Tableau des variables -- nb d'occurence ------");
@@ -194,9 +194,9 @@ public class Main {
 					}
 					String main = expression.accept(new GenerationS());
 					main += "\tbl\tmin_caml_print_newline\n\tbl\tmin_caml_exit\n";
+					String retour = GenerationS.defVar+init;
 					retour += GenerationS.defFunc;
-					retour += "\n_start:\n"+main;
-					retour += GenerationS.defVar;
+					retour += "_start:\n"+main;
 					PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(Main.Path+Main.OutName+".s")));
 					writer.print(retour);
 					writer.close();
