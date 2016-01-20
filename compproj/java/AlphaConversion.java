@@ -2,9 +2,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class AlphaConversion implements ObjVisitor<Exp> {
+	static LinkedList<Id> varSeen = new LinkedList<Id>();
 
-	LinkedList <BindVar> variables = new LinkedList<BindVar>();
-	LinkedList <BindVar> procedures = new LinkedList<BindVar>();
+	static LinkedList <BindVar> envVariables = new LinkedList<BindVar>();
+	static LinkedList <BindVar> envProcedures = new LinkedList<BindVar>();
 
 
 	@Override
@@ -78,15 +79,15 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 		Exp newExp = e;
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
-		if (e.e1 instanceof Int) {
+		if (e.e1 instanceof Float) {
 			Id newId = Id.gen();
-			Let newLet = new Let(newId, new TInt(), (Exp)e.e1.clone(), e);
+			Let newLet = new Let(newId, new TFloat(), (Exp)e.e1.clone(), e);
 			e.e1 = new Var(newId);
 			newExp = newLet;
 		}
-		if (e.e2 instanceof Int) {
+		if (e.e2 instanceof Float) {
 			Id newId = Id.gen();
-			Let newLet = new Let(newId, new TInt(), (Exp)e.e2.clone(), newExp);
+			Let newLet = new Let(newId, new TFloat(), (Exp)e.e2.clone(), newExp);
 			e.e2 = new Var(newId);
 			newExp = newLet;
 		}
@@ -151,13 +152,15 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 
 		if (isInVar(e.id)) {
 			newVar = Id.gen();
-			while (isInProc(newVar) || isInVar(newVar)) {
+			while (/*isInProc(newVar) ||*/ isInVar(newVar)) {
 				newVar = Id.gen();
 			}
 		}
-		variables.addLast(new BindVar(e.id, newVar));
+		envVariables.addLast(new BindVar(e.id, newVar));
+		varSeen.add(newVar);
 		e.id = newVar;
 		e.e2 = e.e2.accept(this);
+		envVariables.removeLast();
 		return e;
 	}
 
@@ -171,15 +174,16 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 	public Exp visit(LetRec e) {
 		// renommage des noms de proc
 		Id newProc = e.fd.id;
-		if (isInProc(e.fd.id)) {
+		if (isInVar(e.fd.id)) {
 			newProc = Id.gen();
-			while (isInProc(newProc) || isInVar(newProc)) {
+			while (/*isInProc(newProc) ||*/ isInVar(newProc)) {
 				newProc = Id.gen();
 			}
 			newProc.id = "_proc" + newProc;
 		}
 		e.fd.id = newProc;
-		procedures.addLast(new BindVar(e.fd.id, newProc));
+		varSeen.add(newProc);
+		envProcedures.addLast(new BindVar(e.fd.id, newProc));
 
 		// renommage des params
 		List<Id> newArgs = new LinkedList<Id>() ;
@@ -188,18 +192,23 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 			Id newVar = id;
 			if (isInVar(id)) {
 				newVar = Id.gen();
-				while (isInProc(newVar) || isInVar(newVar)) {
+				while (/*isInProc(newVar) ||*/ isInVar(newVar)) {
 					newVar = Id.gen();
 				}
 			}
-			variables.addLast(new BindVar(id, newVar));
+			varSeen.add(newVar);
+			envVariables.addLast(new BindVar(id, newVar));
 			newArgs.add(newVar);
 		}
 		e.fd.args = newArgs;
 
 
 		e.fd.e = e.fd.e.accept(this);
+		for(Id id : e.fd.args){
+			envVariables.removeLast();
+		}
 		e.e = e.e.accept(this);
+		
 		return e;
 
 	}
@@ -232,15 +241,19 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 
 			if (isInVar(id)) { 
 				newVar = Id.gen();
-				while (isInProc(newVar) || isInVar(newVar)) {
+				while (/*isInProc(newVar) ||*/ isInVar(newVar)) {
 					newVar = Id.gen();
 				}
 			}
-			variables.addLast(new BindVar(id, newVar));
+			envVariables.addLast(new BindVar(id, newVar));
+			varSeen.add(newVar);
 			newIds.add(newVar);
 		}
 		e.ids = newIds;
 		e.e2 = e.e2.accept(this);
+		for (Id id : e.ids) {
+			envVariables.removeLast();
+		}
 		return e;
 	}
 
@@ -278,31 +291,32 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 
 
 	private boolean isInVar(Id id) {
-		for (BindVar bv : variables) {
-			if (bv.IdPrec.equals(id) || bv.IdNew.equals(id)) {
+		for (Id i : varSeen) {
+			if (i.equals(id)) {
 				return true;
 			}
 		}
 		return false;
 	}
-	private boolean isInProc(Id id) {
+	
+	/*private boolean isInProc(Id id) {
 		for (BindVar bv : procedures) {
 			if (bv.IdPrec.equals(id) || bv.IdNew.equals(id)) {
 				return true;
 			}
 		}
 		return false;
-	}
+	}*/
 
 
 	private Id getNewId(Id id) {
 		Id newId = id;
-		for (BindVar bv : variables) {
+		for (BindVar bv : envVariables) {
 			if (bv.IdPrec.equals(id)) {
 				newId =  bv.IdNew;
 			}
 		}
-		for (BindVar bv : procedures) {
+		for (BindVar bv : envProcedures) {
 			if (bv.IdPrec.equals(id)) {
 				newId =  bv.IdNew;
 			}
