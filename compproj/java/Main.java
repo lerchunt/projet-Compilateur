@@ -189,6 +189,7 @@ public class Main {
 
 					String init = "\t.text\n\t.global _start\n\n"; // init
 					expression.accept(new RegistreAllocation());
+					RegistreAllocation.finaliseArc();
 					if (verbose) {
 						System.out.println("------ Tableau des variables -- nb d'occurence ------");
 						RegistreAllocation.printTabVar();
