@@ -186,7 +186,9 @@ public class KNormalization implements ObjVisitor<Exp> {
 			}
 			newEs.add(argOpt);
 		}
-		e.es = newEs;
+		if (!newEs.isEmpty()) {
+			e.es = newEs;
+		}
 		Collections.reverse(e.es);
 		return newExp;
 	}

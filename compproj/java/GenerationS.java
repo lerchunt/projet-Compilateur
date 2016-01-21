@@ -285,7 +285,7 @@ public class GenerationS implements ObjVisitor<String> {
 			s2 = regRetour;
 		}
 		retour =String.format("\tcmp\t%s,%s\n", s1,s2);
-		retour += "\tbgt\tifFlase"+cmpIf+"\n";
+		retour += "\tbgt\tifFalse"+cmpIf+"\n";
 		return retour;
 	}
 

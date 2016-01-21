@@ -256,10 +256,12 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 			e.fd.e.addEnv(id, newP);
 			((TFun)e.fd.type).typeArgs.add(newP);
 		}
+		e.fd.e.addEnv(e.fd.id, e.fd.type);
 		retour.addAll(e.fd.e.accept(this));
 		for (Id id : e.fd.args) {
 			e.fd.e.env.removeFirst();
 		}
+		e.fd.e.env.removeFirst();
 		
 		e.e.typeAttendu = e.typeAttendu;
 		e.e.env.addAll(e.env);
@@ -299,7 +301,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 				System.exit(1);
 			} else {
 				if (tFun instanceof TVar) {
-					System.err.println("error "+((Var)e.e).id.id+" expected as function and found as var");
+					//System.err.println("error "+((Var)e.e).id.id+" expected as function and found as var");
 				} else {
 					System.err.println("error "+((Var)e.e).id.id+" expected as function and found as "+ tFun.toString());
 				}

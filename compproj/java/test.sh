@@ -11,6 +11,7 @@ echo "lancement de .arm"
 qemu-arm ./${arg%%.*}.arm
 done
 fi
+
 if [ $# -eq 0 ]
 then
 	echo "\033[36m******* TEST DE TOUS LES FICHIERS  ******* \033[0m\n"
@@ -38,8 +39,10 @@ cd ../../
 		#cp ${i%%.*}.s ${i%%.*}.arm
 		#echo "lancement de .arm"
 		echo -n "(*" > tmp.txt
-		retour=`qemu-arm ./${i%%.*}.arm`
-		echo -n "$retour">> tmp.txt
+
+		# Set du time out
+		( echo -n `qemu-arm ./${i%%.*}.arm` >> tmp.txt ) & sleep 0.1 ; if [ $? -eq 0 ]; then kill $! 2> /dev/null; fi
+
 		echo "*)" >> tmp.txt
 		sed -n 1p $i > tmp2.txt
 		test=`diff -q tmp.txt tmp2.txt | grep on`
@@ -50,7 +53,7 @@ cd ../../
 			echo "$test"
 			cat tmp.txt
 			cat tmp2.txt
-		fi
+		fi 
 	done
 	echo ""
 	echo "\033[36m******* TEST DES FICHIERS INCORRECTS ******* \n"

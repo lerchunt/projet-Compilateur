@@ -1,3 +1,7 @@
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 
 public class ReductionOfNestedLet implements ObjVisitor<Exp> {
 
@@ -19,13 +23,13 @@ public class ReductionOfNestedLet implements ObjVisitor<Exp> {
 	@Override
 	public Exp visit(Not e) {
 		e.e = e.e.accept(this);
-		return e;
+		return ReducOpUn(e);
 	}
 
 	@Override
 	public Exp visit(Neg e) {
 		e.e = e.e.accept(this);
-		return e;
+		return ReducOpUn(e);
 	}
 
 	@Override
@@ -45,7 +49,7 @@ public class ReductionOfNestedLet implements ObjVisitor<Exp> {
 	@Override
 	public Exp visit(FNeg e) {
 		e.e = e.e.accept(this);
-		return e;
+		return ReducOpUn(e);
 	}
 
 	@Override
@@ -138,7 +142,7 @@ public class ReductionOfNestedLet implements ObjVisitor<Exp> {
 		for (Exp exp : e.es) {
 			exp = exp.accept(this);
 		}
-		return e;
+		return ReducTuple(e);
 	}
 
 	@Override
@@ -250,5 +254,33 @@ public class ReductionOfNestedLet implements ObjVisitor<Exp> {
 			retour=newExp;
 		}
 		return retour;
+	}
+
+	private Exp ReducTuple(Tuple e) {
+		List<Exp> liste = new LinkedList<Exp>();
+		Exp newExp = e;
+		Collections.reverse(e.es);
+		for (Exp arg : e.es) {
+			if (arg instanceof Let) {
+				Let cour = (Let) arg;
+				while (cour.e2 instanceof Let) {
+					cour = (Let)cour.e2;
+				}
+				Let newExp2 = (Let)arg.clone();
+				arg = cour.e2;
+				cour = newExp2;
+				while (cour.e2 instanceof Let) {
+					cour = (Let)cour.e2;
+				}
+				cour.e2 = newExp;
+				newExp = newExp2;
+			}
+			liste.add(arg);
+		}
+		if (!liste.isEmpty()) {
+			e.es = liste;
+		}
+		Collections.reverse(e.es);
+		return newExp;
 	}
 }
