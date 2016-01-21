@@ -190,8 +190,7 @@ public class UnDefinition extends ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Unit unit) {
-		// TODO Auto-generated method stub
-		return null;
+		return unit;
 	}
 
 }
