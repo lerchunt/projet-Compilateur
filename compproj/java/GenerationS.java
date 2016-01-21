@@ -607,30 +607,13 @@ public class GenerationS implements ObjVisitor<String> {
 			
 			Id idretour = Id.gen();
 			e.registreDeRetour= RegistreAllocation.getRegistre(idretour);
-			idretour = Id.gen();
-			listeid.add(idretour);
-			String reg1 = RegistreAllocation.getRegistre(idretour);
-			
 			defVar+=String.format("array%d:\t.skip %d\n\n",cmpTab,tailleT *100);
 			defFunc+=String.format("addr:\t.word array%d\n\n",cmpTab);
-			retour+=String.format("\tldr\t%s,addr\n\tmov\t%s,#0\n",e.registreDeRetour,reg1);
-			retour+="loop:\n";		
 			
-			idretour = Id.gen();
-			listeid.add(idretour);
-			String reg2 = RegistreAllocation.getRegistre(idretour);
-			idretour = Id.gen();
-			listeid.add(idretour);
-			String nvReg = RegistreAllocation.getRegistre(idretour);
+			retour+=String.format("\tldr\t%s,addr\n\tmov\tr0,%s\n",e.registreDeRetour,e.registreDeRetour);
+			retour+=String.format("\tmov\tr1,%s\n",e.e2.accept(this));
+			retour+="\tbl\tmin_caml_create_array\n";
 			
-			retour+=String.format("\tcmp\t%s,#%d\n",reg1,tailleT);
-			retour+="\tbeq\tend\n";
-			retour+=String.format("\tadd\t%s,%s,%s,LSL #2\n",reg2,e.registreDeRetour,reg1);
-			retour+=String.format("\tmov\t%s,%s\n",nvReg,e.e2.accept(this));
-			retour+=String.format("\tstr\t%s,[%s]\n",nvReg,reg2);
-			retour+=String.format("\tadd\t%s,%s,#1\n",reg1,reg1);
-			retour+="\tb\tloop\n";			
-			retour+="end:\n";				
 		}else{
 			System.err.println("internal error - Array (GenerationS)");
 			System.exit(1);
