@@ -1,21 +1,22 @@
 export PATH := /opt/gnu/arm/bin:$(PATH)
 
 AS=arm-none-eabi-as
-LD=arm-none-eabi-gcc
+LD=arm-none-eabi-ld
 ASM=$(wildcard *.s)
 PRG=$(subst .s,.arm,${ASM})
+
 
 all: ${PRG}
 
 echo:
-	echo ${ASM}
+	echo ${A SM}
 	echo ${PRG}
 
-%.o : %.s libmincaml.S 
-	${AS} -o $@ $^ 
+%.o : %.s libmincaml.S
+	${AS} -o $@ $^
 
 %.arm : %.o
-	${LD} -o $@ $^ -lc --specs=rdimon.specs
+	${LD} -o $@ $^ -lm
 
 test: ${PRG}
 	@for p in ${PRG} ; do \
