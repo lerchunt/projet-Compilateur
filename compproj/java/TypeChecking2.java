@@ -4,7 +4,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(Bool e) {
-		Equations eq = new Equations(new TBool(), e.typeAttendu);
+		Equations eq = new Equations(new TBool(), e.typeAttendu,e.toString());
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		retour.add(eq);
 		return retour;
@@ -12,7 +12,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(Int e) {
-		Equations eq = new Equations(new TInt(), e.typeAttendu);
+		Equations eq = new Equations(new TInt(), e.typeAttendu,e.toString());
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		retour.add(eq);
 		return retour;
@@ -20,7 +20,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(Float e) {
-		Equations eq = new Equations(new TFloat(), e.typeAttendu);
+		Equations eq = new Equations(new TFloat(), e.typeAttendu,e.toString());
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		retour.add(eq);
 		return retour;
@@ -28,7 +28,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(Not e) {
-		Equations eq = new Equations(new TBool(), e.typeAttendu);
+		Equations eq = new Equations(new TBool(), e.typeAttendu,e.toString());
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		retour.add(eq);
 		e.e.typeAttendu = new TBool();
@@ -39,7 +39,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(Neg e) {
-		Equations eq = new Equations(new TInt(), e.typeAttendu);
+		Equations eq = new Equations(new TInt(), e.typeAttendu,e.toString());
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		retour.add(eq);
 		e.e.typeAttendu = new TInt();
@@ -50,7 +50,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(Add e) {
-		Equations eq = new Equations(new TInt(), e.typeAttendu);
+		Equations eq = new Equations(new TInt(), e.typeAttendu,e.toString());
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		retour.add(eq);
 		e.e1.typeAttendu = new TInt();
@@ -64,7 +64,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(Sub e) {
-		Equations eq = new Equations(new TInt(), e.typeAttendu);
+		Equations eq = new Equations(new TInt(), e.typeAttendu,e.toString());
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		retour.add(eq);
 		e.e1.typeAttendu = new TInt();
@@ -78,7 +78,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(FNeg e) {
-		Equations eq = new Equations(new TFloat(), e.typeAttendu);
+		Equations eq = new Equations(new TFloat(), e.typeAttendu,e.toString());
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		retour.add(eq);
 		e.e.typeAttendu = new TFloat();
@@ -89,7 +89,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(FAdd e) {
-		Equations eq = new Equations(new TFloat(), e.typeAttendu);
+		Equations eq = new Equations(new TFloat(), e.typeAttendu,e.toString());
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		retour.add(eq);
 		e.e1.typeAttendu = new TFloat();
@@ -103,7 +103,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(FSub e) {
-		Equations eq = new Equations(new TFloat(), e.typeAttendu);
+		Equations eq = new Equations(new TFloat(), e.typeAttendu,e.toString());
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		retour.add(eq);
 		e.e1.typeAttendu = new TFloat();
@@ -117,7 +117,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(FMul e) {
-		Equations eq = new Equations(new TFloat(), e.typeAttendu);
+		Equations eq = new Equations(new TFloat(), e.typeAttendu,e.toString());
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		retour.add(eq);
 		e.e1.typeAttendu = new TFloat();
@@ -131,7 +131,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(Mul e) {
-		Equations eq = new Equations(new TInt(), e.typeAttendu);
+		Equations eq = new Equations(new TInt(), e.typeAttendu,e.toString());
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		retour.add(eq);
 		e.e1.typeAttendu = new TInt();
@@ -145,7 +145,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(FDiv e) {
-		Equations eq = new Equations(new TFloat(), e.typeAttendu);
+		Equations eq = new Equations(new TFloat(), e.typeAttendu,e.toString());
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		retour.add(eq);
 		e.e1.typeAttendu = new TFloat();
@@ -159,7 +159,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(Eq e) {
-		Equations eq = new Equations(new TBool(), e.typeAttendu);
+		Equations eq = new Equations(new TBool(), e.typeAttendu,e.toString());
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		retour.add(eq);
 		Type same = Type.gen();
@@ -174,7 +174,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(LE e) {
-		Equations eq = new Equations(new TBool(), e.typeAttendu);
+		Equations eq = new Equations(new TBool(), e.typeAttendu,e.toString());
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		retour.add(eq);
 		Type same = Type.gen();
@@ -231,7 +231,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 			System.exit(1);
 		} else {
 			LinkedList<Equations> retour = new LinkedList<Equations>();
-			retour.add(new Equations(e.typeAttendu, Tvar));
+			retour.add(new Equations(e.typeAttendu, Tvar,e.toString()));
 			return retour;
 		}
 		return null;
@@ -249,7 +249,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		((TFun)e.fd.type).typeRetour = newT;
 		Type newT2 = Type.gen();
 		e.fd.e.typeAttendu = newT2;
-		retour.add(new Equations(newT, newT2));
+		retour.add(new Equations(newT, newT2,e.toString()));
 		e.fd.e.env.addAll(e.env);
 		for (Id id : e.fd.args) {
 			Type newP = Type.gen();
@@ -280,17 +280,18 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 			e.e.env = e.env;
 			tFun = ((Var)e.e).rechercheEnv();
 			if (tFun instanceof TFun) {
-				Equations eq = new Equations(((TFun)tFun).typeRetour , e.typeAttendu);
+				Equations eq = new Equations(((TFun)tFun).typeRetour , e.typeAttendu,e.toString());
 				retour.add(eq);
 				if (e.es.size() == ((TFun)tFun).typeArgs.size()) {
 					int cmp = 0;
 					for (Exp param : e.es) {
 						Type ts = Type.gen();
-						eq = new Equations(ts, ((TFun)tFun).typeArgs.get(cmp));
+						eq = new Equations(ts, ((TFun)tFun).typeArgs.get(cmp),e.toString());
 						retour.add(eq);
 						param.env = e.env;
 						param.typeAttendu = ts;
 						retour.addAll(param.accept(this));
+						cmp++;
 					}
 				} else {
 					System.err.println("error "+((Var)e.e).id.id+" expected "+((TFun)tFun).typeArgs.size()+" arguments");
@@ -344,7 +345,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 					System.err.println("error "+((Var)param).id+" is not defined");
 					System.exit(1);
 				}
-				Equations eq = new Equations(param.typeAttendu,arg);
+				Equations eq = new Equations(param.typeAttendu,arg,e.toString());
 				retour.add(eq);
 			} else {
 				retour.addAll(param.accept(this));
@@ -352,18 +353,39 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 			
 		}
 		tuple.typeArgs = tParams;
-		((TVar)e.typeAttendu).typeArgs = tParams;
-		Equations eq = new Equations(tuple, e.typeAttendu);
+		if(e.typeAttendu instanceof TVar){
+			((TVar)e.typeAttendu).typeArgs = tParams;
+		} else if (e.typeAttendu instanceof TTuple){
+			((TTuple)e.typeAttendu).typeArgs = tParams;
+		}
+		Equations eq = new Equations(tuple, e.typeAttendu,e.toString());
 		retour.add(eq);
 		return retour;
 	}
 
 	@Override
 	public LinkedList<Equations> visit(LetTuple e) {
+		LinkedList<Equations> retour = new LinkedList<Equations>();
 		if(!(e.e1 instanceof Tuple)){
 			if(e.e1 instanceof App){
 				
 				
+			} else if (e.e1 instanceof Var){
+				Type ts = Type.gen();
+				e.e1.typeAttendu = ts ;
+				e.e1.env = e.env;
+				e.e2.typeAttendu = e.typeAttendu;
+				e.e2.env.addAll(e.env);
+				int cpt = 0;
+				LinkedList<Type> Ttype = new LinkedList<Type>();
+				for (Id param : e.ids) {
+					Ttype.add(Type.gen());
+				}	
+				e.ts = Ttype;
+				for (Id param : e.ids) {
+					e.e2.addEnv(param, e.ts.get(cpt));
+					cpt++;
+				}
 			}
 			else{
 				System.err.println("error "+e.e1.toString() +" is not a tuple");
@@ -372,26 +394,26 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		} else if( ((Tuple)e.e1).es.size() != e.ids.size()){
 			System.err.println("error size of tuple");
 			System.exit(1);
-		}
-		int cpt = 0;
-		LinkedList<Type> Ttype = new LinkedList<Type>();
-		LinkedList<Equations> retour = new LinkedList<Equations>();
-		for (Id param : e.ids) {
-			Ttype.add(Type.gen());
-		}	
-		e.ts = Ttype;
-		for (Exp param : ((Tuple)e.e1).es) {
-			param.typeAttendu = e.ts.get(cpt);
-			cpt++;
-		}	
-		e.e1.typeAttendu = new TTuple(Type.gen().toString());
-		e.e1.env = e.env;
-		e.e2.typeAttendu = e.typeAttendu;
-		e.e2.env.addAll(e.env);
-		cpt = 0;
-		for (Id param : e.ids) {
-			e.e2.addEnv(param, e.ts.get(cpt));
-			cpt++;
+		} else {
+			int cpt = 0;
+			LinkedList<Type> Ttype = new LinkedList<Type>();
+			for (Id param : e.ids) {
+				Ttype.add(Type.gen());
+			}	
+			e.ts = Ttype;
+			for (Exp param : ((Tuple)e.e1).es) {
+				param.typeAttendu = e.ts.get(cpt);
+				cpt++;
+			}	
+			e.e1.typeAttendu = new TTuple(Type.gen().toString());
+			e.e1.env = e.env;
+			e.e2.typeAttendu = e.typeAttendu;
+			e.e2.env.addAll(e.env);
+			cpt = 0;
+			for (Id param : e.ids) {
+				e.e2.addEnv(param, e.ts.get(cpt));
+				cpt++;
+			}
 		}
 		retour.addAll(e.e1.accept(this));
 		retour.addAll(e.e2.accept(this));
@@ -414,14 +436,14 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 			} else {
 				e.e2.typeAttendu = Type.gen();
 			}
-			Equations eq = new Equations(new TInt(), e.e1.typeAttendu);
+			Equations eq = new Equations(new TInt(), e.e1.typeAttendu,e.toString());
 			retour.add(eq);
-			eq = new Equations(new TArray(), e.typeAttendu);
+			eq = new Equations(new TArray(), e.typeAttendu,e.toString());
 			retour.add(eq);
-			eq = new Equations(ts, e.e2.typeAttendu);
+			eq = new Equations(ts, e.e2.typeAttendu,e.toString());
 			retour.add(eq);
 			if(((TVar)e.typeAttendu).typeParamArray != null){
-				eq = new Equations(((TVar)e.typeAttendu).typeParamArray, e.e2.typeAttendu);
+				eq = new Equations(((TVar)e.typeAttendu).typeParamArray, e.e2.typeAttendu,e.toString());
 				retour.add(eq);
 			}
 			e.e1.env = e.env ;
@@ -451,23 +473,24 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		e.e2.env.addAll(e.env);
 		if(e.e1 instanceof Array){
 			((Array)e.e1).e2.typeAttendu = Type.gen();
-			Equations eq = new Equations(new TArray(e.typeAttendu), e.e1.typeAttendu);
+			Equations eq = new Equations(new TArray(e.typeAttendu), e.e1.typeAttendu,e.toString());
 			retour.add(eq);
-			eq = new Equations(new TInt(), e.e2.typeAttendu);
+			eq = new Equations(new TInt(), e.e2.typeAttendu,e.toString());
 			retour.add(eq);
-			eq = new Equations(e.typeAttendu, ((Array)e.e1).e2.typeAttendu);
+			eq = new Equations(e.typeAttendu, ((Array)e.e1).e2.typeAttendu,e.toString());
 			retour.add(eq);
 		} else if (e.e1 instanceof Var){
 			Type ts = ((Var)e.e1).rechercheEnv();
 			if(ts instanceof TVar){
-				Equations eq = new Equations(e.typeAttendu, ((TVar)ts).typeParamArray);
+				((TVar)ts).typeParamArray = Type.gen();
+				Equations eq = new Equations(e.typeAttendu, ((TVar)ts).typeParamArray,e.toString());
 				retour.add(eq);
-				eq = new Equations(new TInt(), e.e2.typeAttendu);
+				eq = new Equations(new TInt(), e.e2.typeAttendu,e.toString());
 				retour.add(eq);
 			} else if (ts instanceof TArray) {
-				Equations eq = new Equations(e.typeAttendu, ((TArray)ts).typeParamArray);
+				Equations eq = new Equations(e.typeAttendu, ((TArray)ts).typeParamArray,e.toString());
 				retour.add(eq);
-				eq = new Equations(new TInt(), e.e2.typeAttendu);
+				eq = new Equations(new TInt(), e.e2.typeAttendu,e.toString());
 				retour.add(eq);
 			} else {
 				System.err.println("expected a type var");
@@ -495,38 +518,38 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		e.e3.env = e.env;
 		if(e.e1 instanceof Array){
 			((Array)e.e1).e2.typeAttendu = Type.gen();
-			Equations eq = new Equations(new TArray(), e.e1.typeAttendu);
+			Equations eq = new Equations(new TArray(), e.e1.typeAttendu,e.toString());
 			retour.add(eq);
-			eq = new Equations(new TInt(), e.e2.typeAttendu);
+			eq = new Equations(new TInt(), e.e2.typeAttendu,e.toString());
 			retour.add(eq);
 			if(e.e3 instanceof Var) {
 				Type ts = ((Var)e.e3).rechercheEnv();
-				eq = new Equations(ts, ((Array)e.e1).e2.typeAttendu);
+				eq = new Equations(ts, ((Array)e.e1).e2.typeAttendu,e.toString());
 				retour.add(eq);
 			} else if(e.e3 instanceof Int){
 				((Int)e.e3).typeAttendu= Type.gen();
-				eq = new Equations(((Int)e.e3).typeAttendu, ((Array)e.e1).e2.typeAttendu);
+				eq = new Equations(((Int)e.e3).typeAttendu, ((Array)e.e1).e2.typeAttendu,e.toString());
 				retour.add(eq);
 			} else if(e.e3 instanceof Float){
 				((Float)e.e3).typeAttendu= Type.gen();
-				eq = new Equations(((Float)e.e3).typeAttendu, ((Array)e.e1).e2.typeAttendu);
+				eq = new Equations(((Float)e.e3).typeAttendu, ((Array)e.e1).e2.typeAttendu,e.toString());
 				retour.add(eq);
 			} else if(e.e3 instanceof Bool){
 				((Bool)e.e3).typeAttendu= Type.gen();
-				eq = new Equations(((Bool)e.e3).typeAttendu, ((Array)e.e1).e2.typeAttendu);
+				eq = new Equations(((Bool)e.e3).typeAttendu, ((Array)e.e1).e2.typeAttendu,e.toString());
 				retour.add(eq);
 			} else if(e.e3 instanceof Tuple){
 				((Tuple)e.e3).typeAttendu= Type.gen();
-				eq = new Equations(((Tuple)e.e3).typeAttendu, ((Array)e.e1).e2.typeAttendu);
+				eq = new Equations(((Tuple)e.e3).typeAttendu, ((Array)e.e1).e2.typeAttendu,e.toString());
 				retour.add(eq);
 			}
 		} else if (e.e1 instanceof Var){
 			Type ts = ((Var)e.e1).rechercheEnv();
 			if(ts instanceof TVar){
-				Equations eq = new Equations(new TInt(), e.e2.typeAttendu);
+				Equations eq = new Equations(new TInt(), e.e2.typeAttendu,e.toString());
 				retour.add(eq);
 			} else if (ts instanceof TArray) {
-				Equations eq = new Equations(new TInt(), e.e2.typeAttendu);
+				Equations eq = new Equations(new TInt(), e.e2.typeAttendu,e.toString());
 				retour.add(eq);
 			} else {
 				System.err.println("expected a type var");
@@ -548,7 +571,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 						while(cpt < ((TVar)ts).typeArgs.size()){
 							Type r = ((TVar)ts).typeArgs.get(cpt);
 							Type s = (((Tuple)e.e3).es.get(cpt)).typeAttendu ;
-							Equations eq = new Equations(s, r);
+							Equations eq = new Equations(s, r,e.toString());
 							retour.add(eq);
 							cpt++;
 						}
@@ -565,7 +588,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 							while(cpt < ((TVar)ts).typeArgs.size()){
 								Type r = ((TVar)ts).typeArgs.get(cpt);
 								Type s = ((TVar)t).typeArgs.get(cpt);
-								Equations eq = new Equations(s, r);
+								Equations eq = new Equations(s, r,e.toString());
 								retour.add(eq);
 								cpt++;
 							}
@@ -589,7 +612,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 						while(cpt < ((TVar)ra).typeArgs.size()){
 							Type r = ((TVar)ra).typeArgs.get(cpt);
 							Type s = (((Tuple)((Array)e.e1).e2).es.get(cpt)).typeAttendu ;
-							Equations eq = new Equations(s, r);
+							Equations eq = new Equations(s, r,e.toString());
 							retour.add(eq);
 							cpt++;
 						}
@@ -604,7 +627,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 					while(cpt < ((Tuple)e.e3).es.size()){
 						Type r = (((Tuple)e.e3).es.get(cpt)).typeAttendu ;
 						Type s = (((Tuple)((Array)e.e1).e2).es.get(cpt)).typeAttendu ;
-						Equations eq = new Equations(s, r);
+						Equations eq = new Equations(s, r,e.toString());
 						retour.add(eq);
 						cpt++;
 					}
@@ -620,7 +643,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(Unit unit) {
-		Equations eq = new Equations(new TUnit(), unit.typeAttendu);
+		Equations eq = new Equations(new TUnit(), unit.typeAttendu,unit.toString());
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		retour.add(eq);
 		return retour;
@@ -663,7 +686,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 						}
 					} else {
 						if (!eq.t1.equalsType(eq.t2)) {
-							System.err.println("type error : " + eq.t1.toString() + " != " + eq.t2.toString());
+							System.err.println(eq.v.toString() + " > type error : " + eq.t1.toString() + " != " + eq.t2.toString());
 							System.exit(1);
 						} 
 					}

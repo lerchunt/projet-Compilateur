@@ -233,7 +233,7 @@ public class ClosureConversion implements ObjVisitor<Exp> {
 
 		// TODO Auto-generated method stub
 
-		return null;
+		return e;
 	}
 
 	@Override
