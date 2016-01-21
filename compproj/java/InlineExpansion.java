@@ -149,7 +149,6 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(App e) {
-		System.out.println("je suis dans App");
 		if(e.e instanceof Var) {
 			Id varId = ((Var)e.e).id;
 			for(LetRec lt : listeLetRec){
