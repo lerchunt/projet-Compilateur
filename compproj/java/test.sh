@@ -19,7 +19,7 @@ then
 echo "\033[36m******* TEST DES FICHIERS CORRECTS ******* \033[0m\n"
 for i in tests/TestsOk/*.ml
 do
-echo "génération de $i.s"
+echo "génération de ${i%%.*}.s"
 ./min-ml $i > journal.log
 done
 

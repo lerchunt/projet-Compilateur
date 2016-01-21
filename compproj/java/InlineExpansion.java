@@ -1,4 +1,5 @@
 import java.util.LinkedList;
+import java.util.List;
 
 public class InlineExpansion implements ObjVisitor<Exp> {
 	private static LinkedList<LetRec > listeLetRec= new LinkedList<LetRec>();
@@ -131,8 +132,9 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 	@Override
 	public Exp visit(LetRec e) {
 		int height = Height.computeHeight(e.fd.e);
-		System.out.println("taille de " +e.fd.id.toString()+ " = "+height);
+		
 		if (height<=threshold){
+			
 			listeLetRec.add(e);
 			e.fd.e=e.fd.e.accept(this);
 			e.e=e.e.accept(this);
@@ -147,6 +149,7 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(App e) {
+		System.out.println("je suis dans App");
 		if(e.e instanceof Var) {
 			Id varId = ((Var)e.e).id;
 			for(LetRec lt : listeLetRec){
@@ -169,9 +172,12 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Tuple e) {
+		List<Exp> newExp = new LinkedList<Exp>();
 		for (Exp exp : e.es) {
-			exp = exp.accept(this);
+			newExp.add(exp.accept(this));
+			
 		}
+		e.es=newExp;
 		return e;
 	}
 

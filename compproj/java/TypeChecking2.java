@@ -354,8 +354,14 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 	@Override
 	public LinkedList<Equations> visit(LetTuple e) {
 		if(!(e.e1 instanceof Tuple)){
-			System.err.println("error "+e.e1.toString() +" is not a tuple");
-			System.exit(1);
+			if(e.e1 instanceof App){
+				
+				
+			}
+			else{
+				System.err.println("error "+e.e1.toString() +" is not a tuple");
+				System.exit(1);
+			}
 		} else if( ((Tuple)e.e1).es.size() != e.ids.size()){
 			System.err.println("error size of tuple");
 			System.exit(1);
