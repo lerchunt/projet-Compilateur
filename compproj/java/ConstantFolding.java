@@ -201,10 +201,6 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Var e) {
-		/*if(tabSym.containsKey(e.id.toString())){
-			System.out.println("lààààààààààààà :"+e.id.id);
-			return tabSym.get(e.id.toString());
-		}*/
 		return e;
 	}
 
@@ -255,14 +251,16 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(App e) {
-		if(tabSym.containsKey(((Var)e.e).id.toString())){
-			tabVar.remove(((Var)e.e).id.toString()) ;
-		}
-		String ap = ((Var)e.e).id.toString();
-		if(!ap.equals("print_int") && !ap.equals("print_float")) {
-			e.e = e.e.accept(this);
-			e.es = printIntFix(e.es);
-			return e ;
+		if (e.e instanceof Var) {
+			if(tabSym.containsKey(((Var)e.e).id.toString())){
+				tabVar.remove(((Var)e.e).id.toString()) ;
+			}
+			String ap = ((Var)e.e).id.toString();
+			if(!ap.equals("print_int") && !ap.equals("print_float")) {
+				e.e = e.e.accept(this);
+				e.es = printIntFix(e.es);
+				return e ;
+			}
 		}
 		e.e = e.e.accept(this);
 		e.es = printIntFix(e.es);

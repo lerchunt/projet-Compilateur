@@ -196,7 +196,7 @@ public class ClosureConversion implements ObjVisitor<Exp> {
 				} 
 			}
 			// liaison avec le nouveau fils
-			Exp E2Prec = (Var)newLetRec.e.clone();
+			Exp E2Prec = (Exp)newLetRec.e.clone();
 			newLetRec.e = (LetRec)e.clone();
 			((LetRec)newLetRec.e).fd.e = e.fd.e;
 			e.fd.e = E2Prec;

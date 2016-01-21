@@ -142,6 +142,7 @@ public class Main {
 					AlphaConversion.varSeen.clear();
 					AlphaConversion.envProcedures.clear();
 					AlphaConversion.envVariables.clear();
+
 					expression = expression.accept(new AlphaConversion());
 					if (verbose) {
 						System.out.println("------ AST AlphaConv ------");

@@ -79,10 +79,16 @@ class TFun extends Type {
     }
 }
 
-class TTuple extends Type { 
+class TTuple extends Type { 	
+	LinkedList<Type> typeArgs = new LinkedList<Type>();
+
 	String v;
     TTuple(String v) {
         this.v = v;
+    }
+    
+    TTuple(LinkedList<Type> A) {
+        this.typeArgs = A;
     }
     
 	@Override
@@ -118,6 +124,7 @@ class TArray extends Type {
 class TVar extends Type {
 	// only for an equation with TArray
 	Type typeParamArray;
+	LinkedList<Type> typeArgs = new LinkedList<Type>();
     String v;
     TVar(String v) {
         this.v = v;
