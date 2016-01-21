@@ -124,14 +124,14 @@ public class Main {
 						expression.accept(new PrintVisitor());
 						System.out.println();
 					}
-/*
+
 					expression = expression.accept(new InlineExpansion());
 					if (verbose) {
 						System.out.println("------ AST InlineExpansion ------");
 						expression.accept(new PrintVisitor());
 						System.out.println();
 					}
-*/
+
 					expression = expression.accept(new ReductionOfNestedLet());
 					if (verbose) {
 						System.out.println("------ AST ReductionOfNestedLet ------");
@@ -142,6 +142,7 @@ public class Main {
 					AlphaConversion.varSeen.clear();
 					AlphaConversion.envProcedures.clear();
 					AlphaConversion.envVariables.clear();
+
 					expression = expression.accept(new AlphaConversion());
 					if (verbose) {
 						System.out.println("------ AST AlphaConv ------");

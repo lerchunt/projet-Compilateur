@@ -201,10 +201,6 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Var e) {
-		/*if(tabSym.containsKey(e.id.toString())){
-			System.out.println("lààààààààààààà :"+e.id.id);
-			return tabSym.get(e.id.toString());
-		}*/
 		return e;
 	}
 

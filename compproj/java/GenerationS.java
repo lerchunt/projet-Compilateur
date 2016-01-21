@@ -1,5 +1,6 @@
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.List;
 
 
 public class GenerationS implements ObjVisitor<String> {
@@ -474,6 +475,8 @@ public class GenerationS implements ObjVisitor<String> {
 			for (Id id : e.fd.args){
 				RegistreAllocation.sup(id);
 			}
+		} else if (e.fd.e instanceof Var) {
+			retour += String.format("\tmov\tr0,%s",e.fd.e.accept(this));
 		} else {
 			retour += e.fd.e.accept(this);
 		}
@@ -567,15 +570,30 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Tuple e) {
-
-		return null;
+		String tuple="";
+		for(Exp exp : e.es){
+			tuple += String.format("%s",exp.accept(this));
+		}
+		return tuple;
 	}
 
 	@Override
 	public String visit(LetTuple e) {
-		e.e1.accept(this);
-		e.e2.accept(this);
-		return null;
+		String retour ="";
+		String registre="";
+		int cpt=0;
+		for (Id id : e.ids) {
+				registre = RegistreAllocation.getRegistre(id);
+				//String res = e.e1.accept(this).substring(cpt,cpt+2);
+				if ( e.e1 instanceof Tuple) {
+					retour += String.format("\tmov\t%s,%s\n", registre, ((Tuple)e.e1).es.get(cpt).accept(this));	
+				} else {
+					retour += String.format("\tmov\t%s,%s\n", registre, e.e1.accept(this));	
+				}
+				cpt++;
+		}
+		retour += e.e2.accept(this);
+		return retour;
 	}
 
 	@Override
@@ -585,13 +603,14 @@ public class GenerationS implements ObjVisitor<String> {
 		cmpTab++;
 		
 		if (e.e1 instanceof Int){
+			int tailleT = ((Int)(e.e1)).i;
+			
 			Id idretour = Id.gen();
 			e.registreDeRetour= RegistreAllocation.getRegistre(idretour);
 			idretour = Id.gen();
 			listeid.add(idretour);
 			String reg1 = RegistreAllocation.getRegistre(idretour);
 			
-			int tailleT = ((Int)(e.e1)).i;
 			defVar+=String.format("array%d:\t.skip %d\n\n",cmpTab,tailleT *100);
 			defFunc+=String.format("addr:\t.word array%d\n\n",cmpTab);
 			retour+=String.format("\tldr\t%s,addr\n\tmov\t%s,#0\n",e.registreDeRetour,reg1);
@@ -604,27 +623,21 @@ public class GenerationS implements ObjVisitor<String> {
 			listeid.add(idretour);
 			String nvReg = RegistreAllocation.getRegistre(idretour);
 			
-			
 			retour+=String.format("\tcmp\t%s,#%d\n",reg1,tailleT);
 			retour+="\tbeq\tend\n";
 			retour+=String.format("\tadd\t%s,%s,%s,LSL #2\n",reg2,e.registreDeRetour,reg1);
 			retour+=String.format("\tmov\t%s,%s\n",nvReg,e.e2.accept(this));
 			retour+=String.format("\tstr\t%s,[%s]\n",nvReg,reg2);
 			retour+=String.format("\tadd\t%s,%s,#1\n",reg1,reg1);
-			retour+="\tb\tloop\n";
-			
-			retour+="end:\n";
-			
-			
+			retour+="\tb\tloop\n";			
+			retour+="end:\n";				
 		}else{
 			System.err.println("internal error - Array (GenerationS)");
 			System.exit(1);
-		}
-		
+		}		
 		for (Id id : listeid){
 			RegistreAllocation.sup(id);
-		}
-		
+		}		
 		return retour;
 	}
 
@@ -642,15 +655,13 @@ public class GenerationS implements ObjVisitor<String> {
 				retour+=String.format("\tmov\t%s,%s\n",reg1,e.e2.accept(this));
 				retour+=String.format("\tldr\t%s,[%s,%s,LSL #2]\n",e.registreDeRetour,reg0,reg1);				
 			}else{
-				System.err.println("internal error - Array (GenerationS)");
+				System.err.println("internal error - Get (GenerationS)");
 				System.exit(1);
 			}
-		}
-		
+		}		
 		for (Id id : listeid){
 			RegistreAllocation.sup(id);
 		}
-		
 		return retour;
 	}
 
@@ -668,21 +679,18 @@ public class GenerationS implements ObjVisitor<String> {
 				retour+=String.format("\tmov\t%s,%s\n",reg1,e.e2.accept(this));
 				retour+=String.format("\tstr\t%s,[%s,%s,LSL #2]\n",e.registreDeRetour,reg0,reg1);				
 			}else{
-				System.err.println("internal error - Array (GenerationS)");
+				System.err.println("internal error - Put (GenerationS)");
 				System.exit(1);
 			}
 		}
-				
 		for (Id id : listeid){
 			RegistreAllocation.sup(id);
-		}
-		
+		}		
 		return retour;
 	}
 
 	@Override
 	public String visit(Unit unit) {
-
 		return null;
 	}	
 
@@ -695,19 +703,4 @@ public class GenerationS implements ObjVisitor<String> {
 		//return String.format("\tadd\tr13,r13,#-4\n\tstr\tr11,[r13]\n\tadd\tr11,r13,#0\n\tadd\tr13,r13,#-%d @taille des variables locales\n", 4*nbVL);
 		return "\tstmfd\tsp!, {lr}";
 	}
-
-	private String push(int nbParam) {
-		/*String retour = "";
-		for (int i = 0; i<nbParam; i++) {
-			retour += "\tsub\tr13,r13,#4\n\tstr\tr0,[r13]";
-		}
-		return retour;*/
-		return "";
-	}
-
-	private String pushFP() {
-		//return "\tadd\tr13,r13,#12\n\tstr\tr11,[r13]\n";
-		return "";
-	}
-
 }
