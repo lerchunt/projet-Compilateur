@@ -537,6 +537,17 @@ class Var extends Exp {
 		return true ;
 	}
 
+    @Override
+    public Object clone() {
+    	Object o = null;
+    	// On récupère l'instance à renvoyer par l'appel de la 
+		// méthode super.clone()
+		o = super.clone();
+		((Var)o).id = new Id(id.id);
+	    // on renvoie le clone
+	    return o;
+  	}
+
 	public Type rechercheEnv() {
 		for (Environnement e : env) {
 			if (e.nom.equals(id)) {

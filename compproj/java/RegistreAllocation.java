@@ -207,6 +207,9 @@ public class RegistreAllocation implements Visitor {
 
 	@Override
 	public void visit(LetTuple e) {
+		for (Id id : e.ids) {
+			tabVar.add(new Var(id));
+		}
 		e.e1.accept(this);
 		e.e2.accept(this);
 	}

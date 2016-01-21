@@ -131,10 +131,31 @@ public class Main {
 						expression.accept(new PrintVisitor());
 						System.out.println();
 					}
+<<<<<<< HEAD
 
 					/*
 					AlphaConversion.procedures.clear();
 					AlphaConversion.variables.clear();
+=======
+/*
+					expression = expression.accept(new InlineExpansion());
+					if (verbose) {
+						System.out.println("------ AST InlineExpansion ------");
+						expression.accept(new PrintVisitor());
+						System.out.println();
+					}
+*/
+					expression = expression.accept(new ReductionOfNestedLet());
+					if (verbose) {
+						System.out.println("------ AST ReductionOfNestedLet ------");
+						expression.accept(new PrintVisitor());
+						System.out.println();
+					}
+					
+					AlphaConversion.varSeen.clear();
+					AlphaConversion.envProcedures.clear();
+					AlphaConversion.envVariables.clear();
+>>>>>>> bc39e4f02699a6c48df47152ae66eaee51826910
 					expression = expression.accept(new AlphaConversion());
 					if (verbose) {
 						System.out.println("------ AST AlphaConv ------");
@@ -179,7 +200,7 @@ public class Main {
 					}
 					
 
-					String retour = "\t.text\n\t.global _start\n"; // init
+					String init = "\t.text\n\t.global _start\n\n"; // init
 					expression.accept(new RegistreAllocation());
 					if (verbose) {
 						System.out.println("------ Tableau des variables -- nb d'occurence ------");
@@ -187,9 +208,9 @@ public class Main {
 					}
 					String main = expression.accept(new GenerationS());
 					main += "\tbl\tmin_caml_print_newline\n\tbl\tmin_caml_exit\n";
+					String retour = GenerationS.defVar+init;
 					retour += GenerationS.defFunc;
-					retour += "\n_start:\n"+main;
-					retour += GenerationS.defVar;
+					retour += "_start:\n"+main;
 					PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(Main.Path+Main.OutName+".s")));
 					writer.print(retour);
 					writer.close();
