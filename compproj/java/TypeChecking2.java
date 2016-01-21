@@ -322,17 +322,20 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		}
 		return retour;
 	}
-
+	
 	@Override
 	public LinkedList<Equations> visit(Tuple e) {
 		LinkedList<Equations> retour = new LinkedList<Equations>();
+		LinkedList<Type> tParams = new LinkedList<Type>();
+		TTuple tuple = new TTuple(Type.gen().toString());
 		for (Exp param : e.es) {
 			Type arg;
 			param.env = e.env;
 			Type ts = Type.gen();
 			if(param.typeAttendu == null){
 				param.typeAttendu = ts;
-			}
+			} 
+			tParams.add(param.typeAttendu);
 			if(param instanceof Var){
 				arg = ((Var)param).rechercheEnv();
 				if (arg == null) {
@@ -346,7 +349,9 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 			}
 			
 		}
-		Equations eq = new Equations(new TTuple(Type.gen().toString()), e.typeAttendu);
+		tuple.typeArgs = tParams;
+		((TVar)e.typeAttendu).typeArgs = tParams;
+		Equations eq = new Equations(tuple, e.typeAttendu);
 		retour.add(eq);
 		return retour;
 	}
@@ -389,6 +394,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 	@Override
 	public LinkedList<Equations> visit(Array e) {
 		LinkedList<Equations> retour = new LinkedList<Equations>();
+		LinkedList<Type> tParams = new LinkedList<Type>();
 		if(e.e1 instanceof App){
 			System.err.println("expected one argument or operation");
 			System.exit(1);
@@ -415,6 +421,15 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 			retour.addAll(e.e1.accept(this));
 			retour.addAll(e.e2.accept(this));
 			e.e2.env.removeFirst();
+			
+			if(e.e2 instanceof Tuple){
+				int cpt = 0 ;
+				while (cpt < ((Tuple)e.e2).es.size() ){
+					tParams.add((((Tuple)e.e2).es.get(cpt)).typeAttendu);
+					cpt++;
+				}
+				((TVar)e.typeAttendu).typeArgs = tParams ;
+			}
 		}
 		return retour;
 	}
@@ -463,29 +478,47 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 	@Override
 	public LinkedList<Equations> visit(Put e) {
 		LinkedList<Equations> retour = new LinkedList<Equations>();
+		LinkedList<Type> tParams = new LinkedList<Type>();
 		e.e1.typeAttendu = Type.gen();
 		e.e2.typeAttendu = Type.gen();
+		e.e3.typeAttendu = Type.gen();
 		e.e1.env = e.env ;
 		e.e2.env.addAll(e.env);
+		e.e3.env = e.env;
 		if(e.e1 instanceof Array){
 			((Array)e.e1).e2.typeAttendu = Type.gen();
-			Equations eq = new Equations(new TArray(e.typeAttendu), e.e1.typeAttendu);
+			Equations eq = new Equations(new TArray(), e.e1.typeAttendu);
 			retour.add(eq);
 			eq = new Equations(new TInt(), e.e2.typeAttendu);
 			retour.add(eq);
-			eq = new Equations(e.typeAttendu, ((Array)e.e1).e2.typeAttendu);
-			retour.add(eq);
+			if(e.e3 instanceof Var) {
+				Type ts = ((Var)e.e3).rechercheEnv();
+				eq = new Equations(ts, ((Array)e.e1).e2.typeAttendu);
+				retour.add(eq);
+			} else if(e.e3 instanceof Int){
+				((Int)e.e3).typeAttendu= Type.gen();
+				eq = new Equations(((Int)e.e3).typeAttendu, ((Array)e.e1).e2.typeAttendu);
+				retour.add(eq);
+			} else if(e.e3 instanceof Float){
+				((Float)e.e3).typeAttendu= Type.gen();
+				eq = new Equations(((Float)e.e3).typeAttendu, ((Array)e.e1).e2.typeAttendu);
+				retour.add(eq);
+			} else if(e.e3 instanceof Bool){
+				((Bool)e.e3).typeAttendu= Type.gen();
+				eq = new Equations(((Bool)e.e3).typeAttendu, ((Array)e.e1).e2.typeAttendu);
+				retour.add(eq);
+			} else if(e.e3 instanceof Tuple){
+				((Tuple)e.e3).typeAttendu= Type.gen();
+				eq = new Equations(((Tuple)e.e3).typeAttendu, ((Array)e.e1).e2.typeAttendu);
+				retour.add(eq);
+			}
 		} else if (e.e1 instanceof Var){
 			Type ts = ((Var)e.e1).rechercheEnv();
 			if(ts instanceof TVar){
-				Equations eq = new Equations(e.typeAttendu, ((TVar)ts).typeParamArray);
-				retour.add(eq);
-				eq = new Equations(new TInt(), e.e2.typeAttendu);
+				Equations eq = new Equations(new TInt(), e.e2.typeAttendu);
 				retour.add(eq);
 			} else if (ts instanceof TArray) {
-				Equations eq = new Equations(e.typeAttendu, ((TArray)ts).typeParamArray);
-				retour.add(eq);
-				eq = new Equations(new TInt(), e.e2.typeAttendu);
+				Equations eq = new Equations(new TInt(), e.e2.typeAttendu);
 				retour.add(eq);
 			} else {
 				System.err.println("expected a type var");
@@ -497,6 +530,82 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		}
 		retour.addAll(e.e1.accept(this));
 		retour.addAll(e.e2.accept(this));
+		retour.addAll(e.e3.accept(this));
+		if(e.e1 instanceof Var ) {
+			Type ts = ((Var)e.e1).rechercheEnv();
+			if (ts instanceof TVar && ((TVar)ts).typeArgs != null){
+				if(e.e3 instanceof Tuple){
+					if(((Tuple)e.e3).es.size() == ((TVar)ts).typeArgs.size()){
+						int cpt =0 ;
+						while(cpt < ((TVar)ts).typeArgs.size()){
+							Type r = ((TVar)ts).typeArgs.get(cpt);
+							Type s = (((Tuple)e.e3).es.get(cpt)).typeAttendu ;
+							Equations eq = new Equations(s, r);
+							retour.add(eq);
+							cpt++;
+						}
+					} else {
+						System.err.println("expected similar size of tuple");
+						System.exit(1);
+					}
+					
+				} else if(e.e3 instanceof Var){
+					Type t = ((Var)e.e3).rechercheEnv();
+					if (t instanceof TVar && ((TVar)t).typeArgs != null){
+						if(((TVar)t).typeArgs.size() == ((TVar)ts).typeArgs.size()){
+							int cpt =0 ;
+							while(cpt < ((TVar)ts).typeArgs.size()){
+								Type r = ((TVar)ts).typeArgs.get(cpt);
+								Type s = ((TVar)t).typeArgs.get(cpt);
+								Equations eq = new Equations(s, r);
+								retour.add(eq);
+								cpt++;
+							}
+						} else {
+							System.err.println("expected similar size of tuple");
+							System.exit(1);
+						}
+					}
+				}
+			}
+		}
+		if((e.e3 instanceof Tuple || e.e3 instanceof Var )&& e.e1 instanceof Array && ((Array)e.e1).e2 instanceof Tuple){
+			if(e.e3 instanceof Var){
+				Type ra = ((Var)e.e3).rechercheEnv();
+				if( ra == null ){
+					System.err.println("error "+((Var)e.e3).id+" is not defined");
+					System.exit(1);
+				} else if ( ra instanceof TVar && ((TVar)ra).typeArgs != null){
+					if(((TVar)ra).typeArgs.size() == ((Tuple)((Array)e.e1).e2).es.size()){
+						int cpt =0 ;
+						while(cpt < ((TVar)ra).typeArgs.size()){
+							Type r = ((TVar)ra).typeArgs.get(cpt);
+							Type s = (((Tuple)((Array)e.e1).e2).es.get(cpt)).typeAttendu ;
+							Equations eq = new Equations(s, r);
+							retour.add(eq);
+							cpt++;
+						}
+					} else {
+						System.err.println("expected similar size of tuple");
+						System.exit(1);
+					}
+				}
+			} else if(e.e3 instanceof Tuple) {
+				if(((Tuple)e.e3).es.size() == ((Tuple)((Array)e.e1).e2).es.size() ){
+					int cpt =0 ;
+					while(cpt < ((Tuple)e.e3).es.size()){
+						Type r = (((Tuple)e.e3).es.get(cpt)).typeAttendu ;
+						Type s = (((Tuple)((Array)e.e1).e2).es.get(cpt)).typeAttendu ;
+						Equations eq = new Equations(s, r);
+						retour.add(eq);
+						cpt++;
+					}
+				} else {
+					System.err.println("expected similar size of tuple");
+					System.exit(1);
+				}
+			}
+		}
 		e.e2.env.removeFirst();
 		return retour;
 	}
