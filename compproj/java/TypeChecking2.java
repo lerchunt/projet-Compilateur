@@ -468,8 +468,43 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 
 	@Override
 	public LinkedList<Equations> visit(Put e) {
-		// TODO Auto-generated method stub
-		return null;
+		LinkedList<Equations> retour = new LinkedList<Equations>();
+		e.e1.typeAttendu = Type.gen();
+		e.e2.typeAttendu = Type.gen();
+		e.e1.env = e.env ;
+		e.e2.env.addAll(e.env);
+		if(e.e1 instanceof Array){
+			((Array)e.e1).e2.typeAttendu = Type.gen();
+			Equations eq = new Equations(new TArray(e.typeAttendu), e.e1.typeAttendu);
+			retour.add(eq);
+			eq = new Equations(new TInt(), e.e2.typeAttendu);
+			retour.add(eq);
+			eq = new Equations(e.typeAttendu, ((Array)e.e1).e2.typeAttendu);
+			retour.add(eq);
+		} else if (e.e1 instanceof Var){
+			Type ts = ((Var)e.e1).rechercheEnv();
+			if(ts instanceof TVar){
+				Equations eq = new Equations(e.typeAttendu, ((TVar)ts).typeParamArray);
+				retour.add(eq);
+				eq = new Equations(new TInt(), e.e2.typeAttendu);
+				retour.add(eq);
+			} else if (ts instanceof TArray) {
+				Equations eq = new Equations(e.typeAttendu, ((TArray)ts).typeParamArray);
+				retour.add(eq);
+				eq = new Equations(new TInt(), e.e2.typeAttendu);
+				retour.add(eq);
+			} else {
+				System.err.println("expected a type var");
+				System.exit(1);
+			}
+		} else {
+			System.err.println("expected an array");
+			System.exit(1);
+		}
+		retour.addAll(e.e1.accept(this));
+		retour.addAll(e.e2.accept(this));
+		e.e2.env.removeFirst();
+		return retour;
 	}
 
 	@Override
