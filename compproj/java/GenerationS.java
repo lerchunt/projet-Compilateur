@@ -245,21 +245,45 @@ public class GenerationS implements ObjVisitor<String> {
 	@Override
 	public String visit(Eq e) {
 		String retour = "";
-		String s1 = e.e1.accept(this);
-		String s2 = e.e2.accept(this);
+		String s1 = "";
+		String s2 = "";
 		if (e.e1 instanceof App) {
+			boolean isSpill = false;
 			Id idretour = Id.gen();
 			String regRetour = RegistreAllocation.getRegistre(idretour);
+			if (regRetour == null) {
+				isSpill = true;
+				regRetour = RegistreAllocation.spillInit(idretour);
+				retour += RegistreAllocation.spillStart(regRetour);
+			}
 			e.e1.registreDeRetour = regRetour;
+			s1 = e.e1.accept(this);
 			retour += s1;
 			s1 = regRetour;
+			if (isSpill) {
+				retour += RegistreAllocation.spillEnd(regRetour);
+			}
+		} else  {
+			s1 = e.e1.accept(this);
 		}
 		if (e.e2 instanceof App) {
+			boolean isSpill = false;
 			Id idretour = Id.gen();
 			String regRetour = RegistreAllocation.getRegistre(idretour);
+			if (regRetour == null) {
+				isSpill = true;
+				regRetour = RegistreAllocation.spillInit(idretour);
+				retour += RegistreAllocation.spillStart(regRetour);
+			}
 			e.e2.registreDeRetour = regRetour;
+			s2 = e.e2.accept(this);
 			retour += s2;
 			s2 = regRetour;
+			if (isSpill) {
+				retour += RegistreAllocation.spillEnd(regRetour);
+			}
+		} else {
+			s2 = e.e2.accept(this);
 		}
 		retour += String.format("\tcmp\t%s,%s\n", s1,s2);
 		retour += "\tbne\tifFalse"+cmpIf+"\n";
@@ -269,21 +293,45 @@ public class GenerationS implements ObjVisitor<String> {
 	@Override
 	public String visit(LE e) {
 		String retour = "";
-		String s1 = e.e1.accept(this);
-		String s2 = e.e2.accept(this);
+		String s1 = "";
+		String s2 = "";
 		if (e.e1 instanceof App) {
+			boolean isSpill = false;
 			Id idretour = Id.gen();
 			String regRetour = RegistreAllocation.getRegistre(idretour);
+			if (regRetour == null) {
+				isSpill = true;
+				regRetour = RegistreAllocation.spillInit(idretour);
+				retour += RegistreAllocation.spillStart(regRetour);
+			}
 			e.e1.registreDeRetour = regRetour;
+			s1 = e.e1.accept(this);
 			retour += s1;
 			s1 = regRetour;
+			if (isSpill) {
+				retour += RegistreAllocation.spillEnd(regRetour);
+			}
+		} else  {
+			s1 = e.e1.accept(this);
 		}
 		if (e.e2 instanceof App) {
+			boolean isSpill = false;
 			Id idretour = Id.gen();
 			String regRetour = RegistreAllocation.getRegistre(idretour);
+			if (regRetour == null) {
+				isSpill = true;
+				regRetour = RegistreAllocation.spillInit(idretour);
+				retour += RegistreAllocation.spillStart(regRetour);
+			}
 			e.e2.registreDeRetour = regRetour;
+			s2 = e.e2.accept(this);
 			retour += s2;
 			s2 = regRetour;
+			if (isSpill) {
+				retour += RegistreAllocation.spillEnd(regRetour);
+			}
+		} else {
+			s2 = e.e2.accept(this);
 		}
 		retour =String.format("\tcmp\t%s,%s\n", s1,s2);
 		retour += "\tbgt\tifFalse"+cmpIf+"\n";
@@ -368,8 +416,14 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Let e) {
+		boolean isSpill1 = false;
 		String retour ="";
 		String registre = RegistreAllocation.getRegistre(e.id);
+		if (registre == null) {
+			isSpill1 = true;
+			registre = RegistreAllocation.spillInit(e.id);
+			retour += RegistreAllocation.spillStart(registre);
+		}
 		if (e.e1 instanceof OpBin){
 			e.e1.registreDeRetour = registre;
 			retour += e.e1.accept(this);
@@ -414,16 +468,28 @@ public class GenerationS implements ObjVisitor<String> {
 		}
 
 		if (e.e2 instanceof OpBin){
+			boolean isSpill = false;
 			Id idretour = Id.gen();
 			String regRetour = RegistreAllocation.getRegistre(idretour);
+			if (regRetour == null) {
+				isSpill = true;
+				regRetour = RegistreAllocation.spillInit(idretour);
+				retour += RegistreAllocation.spillStart(regRetour);
+			}
 			e.e2.registreDeRetour = regRetour;
 			retour += e.e2.accept(this);
 			retour += String.format("\tmov\t%s,%s\n",e.registreDeRetour,regRetour);
+			if (isSpill) {
+				retour += RegistreAllocation.spillEnd(regRetour);
+			}
 		} else if (e.e2 instanceof Var) {
 			String regE1 = e.e2.accept(this);
 			retour += String.format("\tmov\t%s,%s\n",e.registreDeRetour,regE1);
 		} else {
 			retour += e.e2.accept(this);
+		}
+		if (isSpill1) {
+			retour += RegistreAllocation.spillEnd(registre);
 		}
 		return retour;
 	}
@@ -436,11 +502,18 @@ public class GenerationS implements ObjVisitor<String> {
 				isVar = true;
 			}
 		}
-		if(isVar){			
-			return RegistreAllocation.getRegistre(e.id); 
+		if(isVar){
+			String reg = RegistreAllocation.getRegistre(e.id);
+			if (reg != null) {
+				return reg; 
+			} else {
+				System.err.println("register null for "+e.id.id);
+				System.exit(1);
+			}
 		}else{
 			return String.format("\tbl\tmin_caml_%s\n",e.id);
 		}
+		return null;
 	}
 
 	@Override
@@ -453,6 +526,10 @@ public class GenerationS implements ObjVisitor<String> {
 		for (Id id : e.fd.args){
 			if (nbreg <4){
 				reg = RegistreAllocation.getRegistre(id);
+				if (reg == null) {
+					reg = RegistreAllocation.spillInit(id);
+					defFunc += RegistreAllocation.spillStart(reg);
+				}
 				defFunc += String.format("\tmov\t%s,r%d\n",reg,nbreg);
 				nbreg++;
 			}
@@ -467,13 +544,22 @@ public class GenerationS implements ObjVisitor<String> {
 		defFunc +=String.format("\n\t@pushFP:\n%s\n",pushFP());*/
 
 		if (e.fd.e instanceof OpBin){
+			boolean isSpill = false;
 			Id idretour = Id.gen();
 			String regRetour = RegistreAllocation.getRegistre(idretour);
+			if (regRetour == null) {
+				isSpill = true;
+				regRetour = RegistreAllocation.spillInit(idretour);
+				retour += RegistreAllocation.spillStart(regRetour);
+			}
 			((OpBin)e.fd.e).registreDeRetour = regRetour;
 			retour += e.fd.e.accept(this);
 			retour += String.format("\tmov\tr0,%s",regRetour);
 			for (Id id : e.fd.args){
 				RegistreAllocation.sup(id);
+			}
+			if (isSpill) {
+				retour += RegistreAllocation.spillEnd(regRetour);
 			}
 		} else if (e.fd.e instanceof Var) {
 			retour += String.format("\tmov\tr0,%s",e.fd.e.accept(this));
@@ -490,10 +576,12 @@ public class GenerationS implements ObjVisitor<String> {
 	@Override
 	public String visit(App e) {
 		LinkedList<Id> listeid = new LinkedList<Id>();
+		LinkedList<Boolean> isSpill = new LinkedList<Boolean>();
 		String retour="";
 		String registre="";
 		int nbParam = 0;
 		for(Exp param : e.es){
+			isSpill.add(true);
 			if (nbParam >3) {
 				System.err.println("invalid argument number (>3) in function call");
 				System.exit(1);
@@ -509,6 +597,11 @@ public class GenerationS implements ObjVisitor<String> {
 						Id idretour = Id.gen();
 						listeid.add(idretour);
 						String reg = RegistreAllocation.getRegistre(idretour);
+						if (reg == null) {
+							isSpill.set(e.es.indexOf(param), true);
+							reg = RegistreAllocation.spillInit(idretour);
+							retour += RegistreAllocation.spillStart(reg);
+						}
 						retour +=String.format("\tmov\t%s,%s\n",reg,  registre);
 						((App)e.e).closure.add(reg);
 					} else{
@@ -523,6 +616,11 @@ public class GenerationS implements ObjVisitor<String> {
 						Id idretour = Id.gen();
 						listeid.add(idretour);
 						String reg = RegistreAllocation.getRegistre(idretour);
+						if (reg == null) {
+							isSpill.set(e.es.indexOf(param), true);
+							reg = RegistreAllocation.spillInit(idretour);
+							retour += RegistreAllocation.spillStart(reg);
+						}
 						retour +=String.format("\tmov\t%s,%s\n",reg,  registre);
 						((App)e.e).closure.add(reg);
 					}else{
@@ -538,6 +636,11 @@ public class GenerationS implements ObjVisitor<String> {
 						Id idretour = Id.gen();
 						listeid.add(idretour);
 						String reg = RegistreAllocation.getRegistre(idretour);
+						if (reg == null) {
+							isSpill.set(e.es.indexOf(param), true);
+							reg = RegistreAllocation.spillInit(idretour);
+							retour += RegistreAllocation.spillStart(reg);
+						}
 						retour +=String.format("\tmov\t%s,%s\n",reg,  strP);
 						((App)e.e).closure.add(reg);
 					}else{
@@ -561,6 +664,9 @@ public class GenerationS implements ObjVisitor<String> {
 		}
 
 		for (Id id : listeid){
+			if (isSpill.get(listeid.indexOf(id))) {
+				retour += RegistreAllocation.spillEnd(RegistreAllocation.getRegistre(id));
+			}
 			RegistreAllocation.sup(id);
 		}
 

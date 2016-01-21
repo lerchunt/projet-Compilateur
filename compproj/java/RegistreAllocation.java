@@ -12,6 +12,7 @@ public class RegistreAllocation implements Visitor {
 	
 	static LinkedList<Var> tabVar = new LinkedList<>();
 	static LinkedList<Registre> tabReg= new LinkedList<>();
+	static int spillCmp = 16;
 	
 	static String getRegistre(Id v) {
 		Var var = null;
@@ -23,8 +24,10 @@ public class RegistreAllocation implements Visitor {
 		for (Registre r : tabReg) {
 			if (r.var != null) {
 				if (r.var.id.equals(v)) {
-					var.dec();
-					if (var.nbOccurence <= 0) {
+					if (var != null) {
+						var.dec();
+					}
+					if (var != null && var.nbOccurence <= 0) {
 						r.var = null;
 					}
 					return r.nom;
@@ -39,7 +42,9 @@ public class RegistreAllocation implements Visitor {
 			if (r.var == null) {
 				for (Var var : tabVar) {
 					if (var.id.equals(v)) {
-						var.dec();
+						if (var != null) {
+							var.dec();
+						}
 						r.var = var;
 						return r.nom;
 					} 
@@ -50,6 +55,29 @@ public class RegistreAllocation implements Visitor {
 			}
 		}
 		return null;
+	}
+	
+	static public String spillInit(Id v) {
+		String id_registre = String.format("r%d", spillCmp); 
+		Registre newR= new Registre(id_registre);
+		newR.var = new Var(v);
+		tabReg.addLast(newR);
+		spillCmp++;
+		return id_registre;
+	}
+
+	static public String spillStart(String id_registre) {
+		String retour = "\tSUB\tsp, sp, #4\n";
+		retour = String.format("%s\tSTR\t%s, [sp,#0]\n",retour, id_registre);
+		return retour;
+	}
+	
+	static public String spillEnd(String id_registre) {
+		String retour = "\tADD\tsp, sp, #4\n";
+		retour += String.format("\tLDR\t%s, [sp,#0]\n", id_registre);
+		tabReg.removeLast();
+		spillCmp--;
+		return retour;
 	}
 
 	static void add(Id v, String reg) {
