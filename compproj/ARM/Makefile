@@ -1,7 +1,7 @@
 export PATH := /opt/gnu/arm/bin:$(PATH)
 
 AS=arm-none-eabi-as
-LD=arm-none-eabi-gcc
+LD=arm-none-eabi-ld
 ASM=$(wildcard *.s)
 PRG=$(subst .s,.arm,${ASM})
 
@@ -15,7 +15,7 @@ echo:
 	${AS} -o $@ $^ 
 
 %.arm : %.o
-	${LD} -o $@ $^ -lc --specs=rdimon.specs
+	${LD} -o $@ $^
 
 test: ${PRG}
 	@for p in ${PRG} ; do \

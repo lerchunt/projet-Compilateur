@@ -584,7 +584,6 @@ public class GenerationS implements ObjVisitor<String> {
 		int cpt=0;
 		for (Id id : e.ids) {
 				registre = RegistreAllocation.getRegistre(id);
-				//String res = e.e1.accept(this).substring(cpt,cpt+2);
 				if ( e.e1 instanceof Tuple) {
 					retour += String.format("\tmov\t%s,%s\n", registre, ((Tuple)e.e1).es.get(cpt).accept(this));	
 				} else {
@@ -592,7 +591,18 @@ public class GenerationS implements ObjVisitor<String> {
 				}
 				cpt++;
 		}
-		retour += e.e2.accept(this);
+		if (e.e2 instanceof OpBin){
+			Id idretour = Id.gen();
+			String regRetour = RegistreAllocation.getRegistre(idretour);
+			e.e2.registreDeRetour = regRetour;
+			retour += e.e2.accept(this);
+			retour += String.format("\tmov\t%s,%s\n",e.registreDeRetour,regRetour);
+		} else if (e.e2 instanceof Var) {
+			String regE1 = e.e2.accept(this);
+			retour += String.format("\tmov\t%s,%s\n",e.registreDeRetour,regE1);
+		} else {
+			retour += e.e2.accept(this);
+		}
 		return retour;
 	}
 
