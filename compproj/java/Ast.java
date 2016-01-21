@@ -27,6 +27,13 @@ abstract class Exp implements Cloneable {
     	tP1.typeArgs.add(new TInt());
 		 */
 		this.env.add(new Environnement(new Id("print_int"), tP1));
+		
+		TFun tP2 = new TFun();
+		tP2.typeRetour = new TInt();
+		tP2.typeArgs = new LinkedList<Type>();
+		tP2.typeArgs.add(new TFloat());
+
+		this.env.add(new Environnement(new Id("truncate"), tP2));
 	}
 	// ***********************************************************
 
@@ -281,6 +288,11 @@ class Add extends OpBin {
 	Add(Exp e1, Exp e2) {
 		super(e1,e2);
 	}
+	
+	@Override
+	public String toString(){
+		return "add" ;
+	}
 
 	<E> E accept(ObjVisitor<E> v) {
 		return v.visit(this);
@@ -294,6 +306,11 @@ class Sub extends OpBin {
 
 	Sub(Exp e1, Exp e2) {
 		super(e1,e2);
+	}
+	
+	@Override
+	public String toString(){
+		return "sub" ;
 	}
 
 	<E> E accept(ObjVisitor<E> v) {
@@ -309,6 +326,11 @@ class FNeg extends OpUn {
 	FNeg(Exp e) {
 		super(e);
 	}
+	
+	@Override
+	public String toString(){
+		return "fneg" ;
+	}
 
 	<E> E accept(ObjVisitor<E> v) {
 		return v.visit(this);
@@ -322,6 +344,11 @@ class FAdd extends OpBin {
 
 	FAdd(Exp e1, Exp e2) {
 		super(e1,e2);
+	}
+	
+	@Override
+	public String toString(){
+		return "fadd" ;
 	}
 
 	<E> E accept(ObjVisitor<E> v) {
@@ -350,6 +377,10 @@ class FMul extends OpBin {
 
 	FMul(Exp e1, Exp e2) {
 		super(e1,e2);
+	}
+	@Override
+	public String toString(){
+		return "fmul" ;
 	}
 
 	<E> E accept(ObjVisitor<E> v) {
@@ -570,6 +601,12 @@ class LetRec extends Exp {
 	<E> E accept(ObjVisitor<E> v) {
 		return v.visit(this);
 	}
+	
+	@Override
+	public String toString(){
+		return "letrec" ;
+	}
+	
 	void accept(Visitor v) {
 		v.visit(this);
 	}
@@ -613,6 +650,10 @@ class App extends Exp {
 		v.visit(this);
 	}
 
+	@Override
+	public String toString(){
+		return "app" ;
+	}
     @Override
     public Object clone() {
     	Object o = null;
@@ -642,6 +683,11 @@ class Tuple extends Exp {
 
 	void accept(Visitor v) {
 		v.visit(this);
+	}
+	
+	@Override
+	public String toString(){
+		return "tuple" ;
 	}
 	
 
@@ -710,6 +756,10 @@ class Array extends Exp {
 		v.visit(this);
 	}
 	
+	@Override
+	public String toString(){
+		return "array" ;
+	}
 
     @Override
     public Object clone() {
@@ -739,6 +789,11 @@ class Get extends Exp {
 
 	void accept(Visitor v) {
 		v.visit(this);
+	}
+	
+	@Override
+	public String toString(){
+		return "get" ;
 	}
 
     @Override
@@ -771,6 +826,11 @@ class Put extends Exp {
 
 	void accept(Visitor v) {
 		v.visit(this);
+	}
+	
+	@Override
+	public String toString(){
+		return "put" ;
 	}
 
     @Override
