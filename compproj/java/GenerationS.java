@@ -227,8 +227,10 @@ public class GenerationS implements ObjVisitor<String> {
 		String r1 = "";
 		String r2 = "";
 		String retour = "";
-
-		if (e.e1 instanceof Var){
+		if(e.e1 instanceof Float){
+			r1 = e.e1.registreDeRetour;
+			retour += String.format("%s\tmov\tr1,%s\n",e.e1.accept(this),r1);
+		} else if (e.e1 instanceof Var){
 			r1 = e.e1.accept(this);
 			retour += String.format("\tmov\tr1,%s\n",r1);
 		} else {
@@ -236,7 +238,10 @@ public class GenerationS implements ObjVisitor<String> {
 			System.exit(1);
 			return null;
 		}
-		if (e.e1 instanceof Var){
+		if(e.e2 instanceof Float){
+			r1 = e.e2.registreDeRetour;
+			retour += String.format("%s\tmov\tr0,%s\n",e.e2.accept(this),r1);
+		}else if (e.e1 instanceof Var){
 			r2 = e.e2.accept(this);
 			retour += String.format("\tmov\tr0,%s\n",r2);
 		} 
@@ -254,8 +259,10 @@ public class GenerationS implements ObjVisitor<String> {
 		String r1 = "";
 		String r2 = "";
 		String retour = "";
-
-		if (e.e1 instanceof Var){
+		if(e.e1 instanceof Float){
+			r1 = e.e1.registreDeRetour;
+			retour += String.format("%s\tmov\tr1,%s\n",e.e1.accept(this),r1);
+		} else if (e.e1 instanceof Var){
 			r1 = e.e1.accept(this);
 			retour += String.format("\tmov\tr1,%s\n",r1);
 		} else {
@@ -263,7 +270,10 @@ public class GenerationS implements ObjVisitor<String> {
 			System.exit(1);
 			return null;
 		}
-		if (e.e1 instanceof Var){
+		if(e.e2 instanceof Float){
+			r1 = e.e2.registreDeRetour;
+			retour += String.format("%s\tmov\tr0,%s\n",e.e2.accept(this),r1);
+		}else if (e.e1 instanceof Var){
 			r2 = e.e2.accept(this);
 			retour += String.format("\tmov\tr0,%s\n",r2);
 		} 
@@ -311,8 +321,10 @@ public class GenerationS implements ObjVisitor<String> {
 		String r1 = "";
 		String r2 = "";
 		String retour = "";
-
-		if (e.e1 instanceof Var){
+		if(e.e1 instanceof Float){
+			r1 = e.e1.registreDeRetour;
+			retour += String.format("%s\tmov\tr1,%s\n",e.e1.accept(this),r1);
+		} else if (e.e1 instanceof Var){
 			r1 = e.e1.accept(this);
 			retour += String.format("\tmov\tr1,%s\n",r1);
 		} else {
@@ -320,7 +332,10 @@ public class GenerationS implements ObjVisitor<String> {
 			System.exit(1);
 			return null;
 		}
-		if (e.e1 instanceof Var){
+		if(e.e2 instanceof Float){
+			r1 = e.e2.registreDeRetour;
+			retour += String.format("%s\tmov\tr0,%s\n",e.e2.accept(this),r1);
+		}else if (e.e1 instanceof Var){
 			r2 = e.e2.accept(this);
 			retour += String.format("\tmov\tr0,%s\n",r2);
 		} 
@@ -808,7 +823,7 @@ public class GenerationS implements ObjVisitor<String> {
 				retour+="\tbl\tmin_caml_create_float_array\n";
 			}else if(e.e2 instanceof Tuple){
 				//save r0,r1 :
-				retour+=String.format("\tmov\t%s,r1",); 
+				//retour+=String.format("\tmov\t%s,r1",); 
 				
 				
 				
