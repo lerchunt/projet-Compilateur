@@ -148,6 +148,8 @@ min_caml_cos:
         bx	lr
         .size min_caml_cos, .-min_caml_cos
 
+
+
 	.globl min_caml_create_array
 min_caml_create_array: 
 @r0: début tab  r1: taille du tableau
@@ -164,7 +166,7 @@ loop_array:
 end_array:
 	ldmfd	sp!, {lr}
 	bx	lr
-      @  .size min_caml_create_array, .-min_caml_create_array
+        .size min_caml_create_array, .-min_caml_create_array
 
 
 
