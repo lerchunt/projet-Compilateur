@@ -34,6 +34,13 @@ abstract class Exp implements Cloneable {
 		tP2.typeArgs.add(new TFloat());
 
 		this.env.add(new Environnement(new Id("truncate"), tP2));
+		
+		TFun tP3 = new TFun();
+		tP3.typeRetour = new TUnit();
+		tP3.typeArgs = new LinkedList<Type>();
+		tP3.typeArgs.add(new TUnit());
+
+		this.env.add(new Environnement(new Id("print_newline"), tP3));
 	}
 	// ***********************************************************
 
@@ -160,6 +167,12 @@ class Unit extends Exp {
 	void accept(Visitor v) {
 		v.visit(this);
 	}
+	
+	@Override
+    public String toString()
+    {
+    	return "unit";
+    }
 }
 
 class Bool extends Exp {

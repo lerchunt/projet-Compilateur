@@ -1,8 +1,6 @@
 	
 	.text
         .globl min_caml_exit
-	.global	__aeabi_f2iz
-	.global	__aeabi_i2f
 
 /* exit syscall */
 min_caml_exit:
@@ -197,33 +195,34 @@ min_caml_float_of_int:
         bx	lr
         .size min_caml_float_of_int, .-min_caml_float_of_int
 
-min_caml_div:
+
+min_caml_fdiv:
 	stmfd	sp!, {lr}
 	bl 	__aeabi_fdiv
 	ldmfd	sp!, {lr}
         bx	lr
-        .size min_caml_div, .-min_caml_div
+        .size min_caml_fdiv, .-min_caml_fdiv
 
-min_caml_mul:
+min_caml_fmul:
 	stmfd	sp!, {lr}
 	bl	__aeabi_fmul
 	ldmfd	sp!, {lr}
         bx	lr
-        .size min_caml_mul, .-min_caml_mul
+        .size min_caml_fmul, .-min_caml_fmul
 
-min_caml_add:
+min_caml_fadd:
 	stmfd	sp!, {lr}
 	bl	__aeabi_fadd
 	ldmfd	sp!, {lr}
         bx	lr
-        .size min_caml_add, .-min_caml_add
+        .size min_caml_fadd, .-min_caml_fadd
 
-min_caml_sub:
+min_caml_fsub:
 	stmfd	sp!, {lr}
 	bl	__aeabi_fsub
 	ldmfd	sp!, {lr}
         bx	lr
-        .size min_caml_sub, .-min_caml_sub
+        .size min_caml_fsub, .-min_caml_fsub
 
 min_caml_truncate:
 	stmfd	sp!, {lr}
@@ -240,10 +239,29 @@ min_caml_print_float:
         bx	lr
         .size min_caml_print_float, .-min_caml_print_float
 
+min_caml_abs_float:
+	stmfd	sp!, {lr}
+	bic	r0, r0, #-2147483648
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_abs_float, .-min_caml_abs_float
 
 
-@min_caml_create_float_array
-@_min_caml_abs_float
-
+min_caml_create_float_array:
+@r0: début tab  r1: taille du tableau  r2:contenu
+	stmfd	sp!, {lr}
+	mov	r6,#0
+loop_array_float:
+	cmp	r6,r1
+	beq	end_array_float
+	add	r7,r0,r6,LSL #2
+	mov	r8,r2
+	str	r8,[r7]
+	add	r6,r6,#1
+	b	loop_array_float
+end_array_float:
+	ldmfd	sp!, {lr}
+	bx	lr
+        .size min_caml_create_float_array, .-min_caml_create_float_array
 
 
