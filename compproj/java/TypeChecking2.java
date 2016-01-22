@@ -496,7 +496,22 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 				System.err.println("expected a type var");
 				System.exit(1);
 			}
-		} else {
+		} else if(e.e1 instanceof App) {
+			Equations eq = new Equations(new TInt(), e.e2.typeAttendu,e.toString());
+			retour.add(eq);
+			eq = new Equations(new TArray(e.typeAttendu), e.e1.typeAttendu,e.toString());
+			retour.add(eq);
+		} else if(e.e1 instanceof Get) {
+			Equations eq = new Equations(new TInt(), e.e2.typeAttendu,e.toString());
+			retour.add(eq);
+			eq = new Equations(new TArray(e.typeAttendu), e.e1.typeAttendu,e.toString());
+			retour.add(eq);
+		} else if(e.e1 instanceof Put) {
+			Equations eq = new Equations(new TInt(), e.e2.typeAttendu,e.toString());
+			retour.add(eq);
+			eq = new Equations(new TArray(e.typeAttendu), e.e1.typeAttendu,e.toString());
+			retour.add(eq);
+		}else {
 			System.err.println("expected an array");
 			System.exit(1);
 		}
@@ -526,21 +541,8 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 				Type ts = ((Var)e.e3).rechercheEnv();
 				eq = new Equations(ts, ((Array)e.e1).e2.typeAttendu,e.toString());
 				retour.add(eq);
-			} else if(e.e3 instanceof Int){
-				((Int)e.e3).typeAttendu= Type.gen();
-				eq = new Equations(((Int)e.e3).typeAttendu, ((Array)e.e1).e2.typeAttendu,e.toString());
-				retour.add(eq);
-			} else if(e.e3 instanceof Float){
-				((Float)e.e3).typeAttendu= Type.gen();
-				eq = new Equations(((Float)e.e3).typeAttendu, ((Array)e.e1).e2.typeAttendu,e.toString());
-				retour.add(eq);
-			} else if(e.e3 instanceof Bool){
-				((Bool)e.e3).typeAttendu= Type.gen();
-				eq = new Equations(((Bool)e.e3).typeAttendu, ((Array)e.e1).e2.typeAttendu,e.toString());
-				retour.add(eq);
-			} else if(e.e3 instanceof Tuple){
-				((Tuple)e.e3).typeAttendu= Type.gen();
-				eq = new Equations(((Tuple)e.e3).typeAttendu, ((Array)e.e1).e2.typeAttendu,e.toString());
+			} else {
+				eq = new Equations(e.e3.typeAttendu, ((Array)e.e1).e2.typeAttendu,e.toString());
 				retour.add(eq);
 			}
 		} else if (e.e1 instanceof Var){
@@ -548,21 +550,52 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 			if(ts instanceof TVar){
 				Equations eq = new Equations(new TInt(), e.e2.typeAttendu,e.toString());
 				retour.add(eq);
+				eq = new Equations(new TArray(), e.e1.typeAttendu,e.toString());
+				retour.add(eq);
 			} else if (ts instanceof TArray) {
 				Equations eq = new Equations(new TInt(), e.e2.typeAttendu,e.toString());
+				retour.add(eq);
+				eq = new Equations(new TArray(), ts,e.toString());
 				retour.add(eq);
 			} else {
 				System.err.println("expected a type var");
 				System.exit(1);
 			}
-		} else {
+		} else if(e.e1 instanceof Get) {
+			Equations eq = new Equations(e.e1.typeAttendu, new TArray(e.e3.typeAttendu),e.toString());
+			retour.add(eq);
+			eq = new Equations(new TInt(), e.e2.typeAttendu,e.toString());
+			retour.add(eq);
+		} else if (e.e1 instanceof App) {
+			Equations eq = new Equations(e.e1.typeAttendu, new TArray(e.e3.typeAttendu),e.toString());
+			retour.add(eq);
+			eq = new Equations(new TInt(), e.e2.typeAttendu,e.toString());
+			retour.add(eq);
+			
+		} else if (e.e1 instanceof Put) {
+			Equations eq = new Equations(e.e1.typeAttendu, new TArray(e.e3.typeAttendu),e.toString());
+			retour.add(eq);
+			eq = new Equations(new TInt(), e.e2.typeAttendu,e.toString());
+			retour.add(eq);
+		}
+		else {
 			System.err.println("expected an array");
 			System.exit(1);
 		}
 		retour.addAll(e.e1.accept(this));
 		retour.addAll(e.e2.accept(this));
 		retour.addAll(e.e3.accept(this));
-		if(e.e1 instanceof Var ) {
+		if(e.e1 instanceof Get ){
+			if(((TVar)e.e1.typeAttendu).typeParamArray != null) {
+				Equations eq = new Equations(((TVar)e.e1.typeAttendu).typeParamArray, e.e3.typeAttendu,e.toString());
+				retour.add(eq);
+			} else {
+				((TVar)e.e1.typeAttendu).typeParamArray = Type.gen();
+				Equations eq = new Equations(((TVar)e.e1.typeAttendu).typeParamArray, e.e3.typeAttendu,e.toString());
+				retour.add(eq);
+			}
+		}
+		if(e.e1 instanceof Var) {
 			Type ts = ((Var)e.e1).rechercheEnv();
 			if (ts instanceof TVar && ((TVar)ts).typeArgs != null){
 				if(e.e3 instanceof Tuple){
@@ -636,7 +669,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 					System.exit(1);
 				}
 			}
-		}
+		} 
 		e.e2.env.removeFirst();
 		return retour;
 	}

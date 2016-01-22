@@ -197,9 +197,53 @@ min_caml_float_of_int:
         bx	lr
         .size min_caml_float_of_int, .-min_caml_float_of_int
 
+min_caml_div:
+	stmfd	sp!, {lr}
+	bl 	__aeabi_fdiv
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_div, .-min_caml_div
+
+min_caml_mul:
+	stmfd	sp!, {lr}
+	bl	__aeabi_fmul
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_mul, .-min_caml_mul
+
+min_caml_add:
+	stmfd	sp!, {lr}
+	bl	__aeabi_fadd
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_add, .-min_caml_add
+
+min_caml_sub:
+	stmfd	sp!, {lr}
+	bl	__aeabi_fsub
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_sub, .-min_caml_sub
+
+min_caml_truncate:
+	stmfd	sp!, {lr}
+	bl	__aeabi_f2iz
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_truncate, .-min_caml_truncate
+
+min_caml_print_float:
+	stmfd	sp!, {lr}
+	bl	min_caml_truncate
+	bl	min_caml_print_int
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_print_float, .-min_caml_print_float
+
+
 
 @min_caml_create_float_array
 @_min_caml_abs_float
-@_min_caml_truncate
+
 
 
