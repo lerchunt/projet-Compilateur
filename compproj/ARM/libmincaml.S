@@ -166,7 +166,7 @@ loop_array:
 end_array:
 	ldmfd	sp!, {lr}
 	bx	lr
-      @  .size min_caml_create_array, .-min_caml_create_array
+        .size min_caml_create_array, .-min_caml_create_array
 
 
 
@@ -174,9 +174,6 @@ end_array:
 	.globl min_caml_sin
 min_caml_sin:	@sinus dans r0
 	stmfd	sp!, {lr}
-		
-@loop_sin:
-	
 
 	ldmfd	sp!, {lr}
 	bx	lr
