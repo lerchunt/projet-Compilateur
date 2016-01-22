@@ -495,19 +495,18 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Var e) {
-		boolean isVar = false;
-		for (Var v : RegistreAllocation.tabVar) {
-			if (v.id.equals(e.id)) {
-				isVar = true;
-			}
-		}
+		boolean isVar = RegistreAllocation.isInTabVar(e.id);
+		RegistreAllocation.updateTabVarArc(e);
 		if(isVar){
 			String reg = RegistreAllocation.getRegistre(e.id);
 			if (reg != null) {
 				return reg; 
 			} else {
+				reg = "r11";
+				/*
 				System.err.println("register null for "+e.id.id);
 				System.exit(1);
+				*/
 			}
 		}else{
 			return String.format("\tbl\tmin_caml_%s\n",e.id);

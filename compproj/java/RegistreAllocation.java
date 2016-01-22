@@ -1,34 +1,34 @@
+import java.util.Collections;
 import java.util.LinkedList;
 
 
 public class RegistreAllocation implements Visitor {
 	
 	public RegistreAllocation() {
-		for (int i=4; i<12; i++) {
+		for (int i=4; i<11; i++) {
 			String nom = String.format("r%d", i);
 			tabReg.add(new Registre(nom));
 		}
 	}
 	
-	static LinkedList<Var> tabVar = new LinkedList<>();
+	static LinkedList<Noeud> tabVar = new LinkedList<>();
 	static LinkedList<Registre> tabReg= new LinkedList<>();
-	static int spillCmp = 16;
 	
 	static String getRegistre(Id v) {
 		Var var = null;
-		for (Var vs : tabVar) {
-			if (vs.id.equals(v)) {
-				var = vs;
+		for (Noeud n : tabVar) {
+			if (n.var.id.equals(v)) {
+				var = n.var;
 			}
 		}
 		for (Registre r : tabReg) {
-			if (r.var != null) {
-				if (r.var.id.equals(v)) {
+			if (!r.var.isEmpty()) {
+				if (r.var.getLast().id.equals(v)) {
 					if (var != null) {
 						var.dec();
 					}
 					if (var != null && var.nbOccurence <= 0) {
-						r.var = null;
+						r.var.removeLast();
 					}
 					return r.nom;
 				}
@@ -39,31 +39,38 @@ public class RegistreAllocation implements Visitor {
 	
 	static private String allocRegistre(Id v) {
 		for (Registre r : tabReg) {
-			if (r.var == null) {
-				for (Var var : tabVar) {
-					if (var.id.equals(v)) {
-						if (var != null) {
-							var.dec();
+			if (r.var.isEmpty()) {
+				for (Noeud n : tabVar) {
+					if (n.var.id.equals(v)) {
+						if (n != null) {
+							n.var.dec();
 						}
-						r.var = var;
+
+						r.var.addLast(n.var);
 						return r.nom;
 					} 
 				}
 				Var var = new Var(v);
-				r.var = var;
+				r.var.addLast(var);
 				return r.nom;
 			}
 		}
 		return null;
 	}
 	
-	static public String spillInit(Id v) {
-		String id_registre = String.format("r%d", spillCmp); 
-		Registre newR= new Registre(id_registre);
-		newR.var = new Var(v);
-		tabReg.addLast(newR);
-		spillCmp++;
-		return id_registre;
+	static public String spillInit(Id id) {
+		// on regarde si on peut spiller une variable
+		for (Noeud n : tabVar) {
+			if (id.equals(n.var.id)) {
+				for (Registre reg : tabReg) {
+					if ( !reg.var.isEmpty() && !n.arc.contains(reg.var.getLast().id)) {
+						reg.var.add(n.var);
+						return reg.nom;
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	static public String spillStart(String id_registre) {
@@ -75,30 +82,50 @@ public class RegistreAllocation implements Visitor {
 	static public String spillEnd(String id_registre) {
 		String retour = "\tADD\tsp, sp, #4\n";
 		retour += String.format("\tLDR\t%s, [sp,#0]\n", id_registre);
-		tabReg.removeLast();
-		spillCmp--;
+		for (Registre reg : tabReg) {
+			if (reg.nom.equals(id_registre)) {
+				reg.var.removeLast();
+				return retour;
+			}
+		}
 		return retour;
 	}
 
 	static void add(Id v, String reg) {
 		Var var = new Var(v);
-		tabVar.add(var);
+		tabVar.add(new Noeud(var));
 		Registre r = new Registre(reg);
-		r.var = var;
+		r.var.addLast(var);
 		tabReg.add(r);
 	}
 	
 	static void sup(Id v) {
 		for (Registre r : tabReg) {
-			if (r.var != null) {
-				if (r.var.id.equals(v)) {
-					r.var = null;
+			if (!r.var.isEmpty()) {
+				if (r.var.getLast().id.equals(v)) {
+					r.var.removeLast();
 				}
 			}
 		}
-		for (Var var : (LinkedList<Var>)tabVar.clone()) {
-			if (var.id.equals(v)) {
+		for (Noeud var : (LinkedList<Noeud>)tabVar.clone()) {
+			if (var.var.id.equals(v)) {
 				tabVar.remove(var);
+			}
+		}
+	}
+	
+	static void finaliseArc() {
+		for (Noeud n : tabVar) {
+			boolean endBoucle = false;
+			LinkedList<Id> liste = (LinkedList<Id>)n.arc.clone();
+			Collections.reverse(liste);
+			for (Id id : liste) {
+					if (id.equals(n.var.id)) {
+						endBoucle = true;
+					}
+					if (!endBoucle) {
+						n.arc.removeLast();
+					}
 			}
 		}
 	}
@@ -195,24 +222,27 @@ public class RegistreAllocation implements Visitor {
 
 	@Override
 	public void visit(Let e) {
-		tabVar.add(new Var(e.id));
+		Var newVar = new Var(e.id);
+		tabVar.add(new Noeud(newVar));
 		e.e1.accept(this);
 		e.e2.accept(this);
 	}
 
 	@Override
 	public void visit(Var e) {
-		for (Var v : tabVar) {
-			if (v.id.equals(e.id)) {
-				v.inc();
+		for (Noeud n : tabVar) {
+			if (n.var.id.equals(e.id)) {
+				n.var.inc();
 			}
+			n.arc.add(e.id);
 		}
 	}
 
 	@Override
 	public void visit(LetRec e) {
 		for (Id id : e.fd.args) {
-			tabVar.add(new Var(id));
+			Var newVar = new Var(id);
+			tabVar.add(new Noeud(newVar));
 		}
 		e.e.accept(this);
 		e.fd.e.accept(this);
@@ -236,7 +266,8 @@ public class RegistreAllocation implements Visitor {
 	@Override
 	public void visit(LetTuple e) {
 		for (Id id : e.ids) {
-			tabVar.add(new Var(id));
+			Var newVar = new Var(id);
+			tabVar.add(new Noeud(newVar));
 		}
 		e.e1.accept(this);
 		e.e2.accept(this);
@@ -264,20 +295,52 @@ public class RegistreAllocation implements Visitor {
 	
 	private static class Registre {
 		public String nom;
-		public Var var = null;
+		public LinkedList<Var> var = new LinkedList<Var>();
 		
 		public Registre(String nom) {
 			this.nom = nom;
+		}
+	}
+	
+	private static class Noeud {
+		public Var var;
+		public LinkedList<Id> arc = new LinkedList<Id>();
+		
+		public Noeud(Var var) {
+			this.var = var;
 		}
 	}
 
 
 	public static void printTabVar() {
 		String retour = "TabVar : \n";
-		for (Var v : tabVar) {
-			retour = String.format("%s%s - %d | ", retour, v.id.id, v.nbOccurence);
+		for (Noeud v : tabVar) {
+			retour = String.format("%s%s - %d | ", retour, v.var.id.id, v.var.nbOccurence);
 		}
 		System.out.println(retour);
+	}
+
+	public static boolean isInTabVar(Id id) {
+		for (Noeud n : RegistreAllocation.tabVar) {
+			if (n.var.id.equals(id)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void updateTabVarArc(Var e) {
+		boolean afterE = false;
+		for (Noeud n : tabVar) {
+			if (n.var.id.equals(e.id)) {
+				afterE = true;
+			}
+			if (afterE) {
+				if (!n.arc.isEmpty()){
+					n.arc.removeFirst();
+				}
+			}
+		}
 	}
 
 }
