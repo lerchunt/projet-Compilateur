@@ -386,6 +386,20 @@ public class RegistreAllocation implements Visitor {
 				regCour = String.format("[sp, #%d]",cmpPile);
 			}
 		}
+
+		public void startDefFunc() {
+			if (regCour != null && !regCour.isEmpty() && regCour.contains("[sp,")){
+				cmpPile += 32;
+				regCour = String.format("[sp, #%d]",cmpPile);
+			}
+		}
+
+		public void endDefFunc() {
+			if (regCour != null && !regCour.isEmpty() && regCour.contains("[sp,")){
+				cmpPile -= 32;
+				regCour = String.format("[sp, #%d]",cmpPile);
+			}
+		}
 	}
 
 
@@ -417,6 +431,18 @@ public class RegistreAllocation implements Visitor {
 					n.arc.removeFirst();
 				}
 			}
+		}
+	}
+
+	public static void startDefFunc() {
+		for (Noeud n : tabVar) {
+			n.startDefFunc();
+		}
+	}
+
+	public static void endDefFunc() {
+		for (Noeud n : tabVar) {
+			n.endDefFunc();
 		}
 	}
 

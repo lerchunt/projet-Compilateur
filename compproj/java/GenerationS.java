@@ -326,8 +326,11 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(Mul e) {
 		String r1 = "";
 		String r2 = "";
+		String retour = "";
 		if(e.e1 instanceof Int){
 			r1 = e.e1.accept(this);
+			retour += String.format("\tmov\tr10,%s\n",r1);
+			r1 = "r10";
 		}
 		else if (e.e1 instanceof Var) {
 			r1 = e.e1.accept(this);
@@ -339,6 +342,8 @@ public class GenerationS implements ObjVisitor<String> {
 		}
 		if(e.e2 instanceof Int){
 			r2 = e.e2.accept(this);
+			retour += String.format("\tmov\tr11,%s\n",r2);
+			r2 = "r11";
 		}
 		else if (e.e2 instanceof Var) {
 			r2 = e.e2.accept(this);
@@ -348,7 +353,7 @@ public class GenerationS implements ObjVisitor<String> {
 			System.exit(1);
 			return null;
 		}
-		return String.format("\tmul\t%s,%s,%s\n",e.registreDeRetour, r1, r2);
+		return String.format("%s\tmul\t%s,%s,%s\n",retour ,e.registreDeRetour, r1, r2);
 
 	}
 
@@ -678,6 +683,7 @@ public class GenerationS implements ObjVisitor<String> {
 		String reg="";
 		String retour = "";
 		int nbreg = 0;
+		RegistreAllocation.startDefFunc();
 		defFunc +=String.format("\nmin_caml_%s:\n",e.fd.id);
 		defFunc += String.format("\t@prologue\n%s\n",prologue(0));
 		for (Id id : e.fd.args){
@@ -716,6 +722,7 @@ public class GenerationS implements ObjVisitor<String> {
 		defFunc += retour+"\n";
 		defFunc +=String.format("\n\t@epilogue:\n%s\n",epilogue());
 		defFunc += "\n\tbx\tlr\n";
+		RegistreAllocation.endDefFunc();
 
 		return e.e.accept(this);	
 	}
