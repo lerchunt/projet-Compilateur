@@ -1,2 +1,2 @@
-(*type error : boolean != unit*)
+(*not 1 = 2 > type error : boolean != unit*)
 1<>2 
