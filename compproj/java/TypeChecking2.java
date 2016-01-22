@@ -429,11 +429,9 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 			System.err.println("expected one argument or operation");
 			System.exit(1);
 		} else {
-			if(e.e1 instanceof Int){
-				if(((Int)e.e1).i < 0){
-					System.err.println("expected a int positive");
+			if(e.e1 instanceof Neg){
+					System.err.println("negative argument");
 					System.exit(1);
-				}
 			}
 			Type ts = Type.gen();
 			e.e1.typeAttendu = Type.gen();
