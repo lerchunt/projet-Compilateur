@@ -209,7 +209,8 @@ public class GenerationS implements ObjVisitor<String> {
 			System.exit(1);
 			return null;
 		}
-		return retour + "\tbl\tmin_caml_fadd\n";
+		String reg = e.registreDeRetour;
+		return retour + "\tbl\tmin_caml_fadd\n" + "\tmov\t"+reg+",r0\n";
 	}
 
 	@Override
@@ -235,7 +236,8 @@ public class GenerationS implements ObjVisitor<String> {
 			System.exit(1);
 			return null;
 		}
-		return retour + "\tbl\tmin_caml_fsub\n";
+		String reg = e.registreDeRetour;
+		return retour + "\tbl\tmin_caml_fsub\n" + "\tmov\t"+reg+",r0\n";
 	}
 
 	@Override
@@ -261,7 +263,8 @@ public class GenerationS implements ObjVisitor<String> {
 			System.exit(1);
 			return null;
 		}
-		return retour + "\tbl\tmin_caml_fmul\n";
+		String reg = e.registreDeRetour;
+		return retour + "\tbl\tmin_caml_fmul\n" + "\tmov\t"+reg+",r0\n";
 	}
 
 	@Override
@@ -317,7 +320,8 @@ public class GenerationS implements ObjVisitor<String> {
 			System.exit(1);
 			return null;
 		}
-		return retour + "\tbl\tmin_caml_fdiv\n";
+		String reg = e.registreDeRetour;
+		return retour + "\tbl\tmin_caml_fdiv\n" + "\tmov\t"+reg+",r0\n";
 	}
 
 	@Override
