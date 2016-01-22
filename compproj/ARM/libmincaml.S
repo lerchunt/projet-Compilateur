@@ -1,6 +1,8 @@
 	
 	.text
         .globl min_caml_exit
+	.global	__aeabi_f2iz
+	.global	__aeabi_i2f
 
 /* exit syscall */
 min_caml_exit:
@@ -141,7 +143,28 @@ min_caml_print_int:
         bx	lr
         .size min_caml_print_int, .-min_caml_print_int
 
-	.globl min_caml_create_array
+min_caml_cos:
+	stmfd	sp!, {lr}
+	bl	cos
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_cos, .-min_caml_cos
+
+min_caml_sin:
+	stmfd	sp!, {lr}
+	bl	sin
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_sin, .-min_caml_sin
+
+min_caml_sqrt:
+	stmfd	sp!, {lr}
+	bl	sqrt
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_sqrt, .-min_caml_sqrt
+
+
 min_caml_create_array: 
 @r0: début tab  r1: taille du tableau
 	stmfd	sp!, {lr}
@@ -157,33 +180,26 @@ loop_array:
 end_array:
 	ldmfd	sp!, {lr}
 	bx	lr
-      @  .size min_caml_create_array, .-min_caml_create_array
+        .size min_caml_create_array, .-min_caml_create_array
 
 
-
-
-	.globl min_caml_sin
-min_caml_sin:	@sinus dans r0
+min_caml_int_of_float:
 	stmfd	sp!, {lr}
-		
-@loop_sin:
-	
-
+	bl	__aeabi_f2iz
 	ldmfd	sp!, {lr}
-	bx	lr
-      @  .size min_caml_sin, .-min_caml_sin
+        bx	lr
+        .size min_caml_int_of_float, .-min_caml_int_of_float
+
+min_caml_float_of_int:
+	stmfd	sp!, {lr}
+	bl	__aeabi_i2f
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_float_of_int, .-min_caml_float_of_int
 
 
 @min_caml_create_float_array
-
-@_min_caml_cos
-@_min_caml_sqrt
-@_min_caml_sin
 @_min_caml_abs_float
-@_min_caml_int_of_float
-@_min_caml_float_of_int
 @_min_caml_truncate
-
-
 
 
