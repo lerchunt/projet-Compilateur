@@ -1,13 +1,14 @@
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 
 public class ConstantFolding implements ObjVisitor<Exp> {
 
 	private static Hashtable<String, Exp> tabSym = new Hashtable<String, Exp>();
-	static Hashtable<String, Object> tabVar = new Hashtable<String, Object>();
+	static Hashtable<String, Boolean> tabVar = new Hashtable<String, Boolean>();
 	
 	@Override
 	public Exp visit(Bool e) {
@@ -205,6 +206,9 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Var e) {
+		if(tabSym.containsKey(e.id.toString())){
+			tabVar.put(e.id.toString(), false) ;
+		}
 		return e;
 	}
 
@@ -214,27 +218,26 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 			tabSym.put(e.fd.id.toString(), e);
 			tabVar.put(e.fd.id.toString(), true) ;
 		} 
-		e.e = e.e.accept(this);
 		e.fd.e = e.fd.e.accept(this);
+		e.e = e.e.accept(this);
 		return e;
 	}
 
 	public List<Exp> printIntFix(List<Exp> args){
-		int cpt = 0 ;
-		while(cpt < args.size()){
-			Exp arg = args.get(cpt);
+		List<Exp> retour = new LinkedList<Exp>();
+		for (Exp arg : args) {
+			Exp newArg = arg;
 			if( arg instanceof Var){
 				if(tabSym.containsKey(((Var)arg).id.toString())) {
 					tabVar.put(((Var)arg).id.toString(), true) ;
-					args.set(cpt, tabSym.get(((Var)arg).id.toString()));
+					newArg = tabSym.get(((Var)arg).id.toString());
 				}
 			} else {
-				args.set(cpt,args.get(cpt).accept(this));
+				newArg = arg.accept(this);
 			}
-
-			cpt++;
+			retour.add(newArg);
 		}
-		return args;
+		return retour;
 	}
 	
 	// spe Tuple
