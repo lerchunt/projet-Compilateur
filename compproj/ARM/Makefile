@@ -11,7 +11,7 @@ echo:
 	echo ${PRG}
 
 %.o : %.s libmincaml.S
-	${AS} -o $@ $^ 
+	${AS} -o $@ $^
 
 %.arm : %.o
 	${LD} -o $@ $^ -lm -L/usr/lib/gcc/arm-none-eabi/4.8.2/fpu -lgcc -lc

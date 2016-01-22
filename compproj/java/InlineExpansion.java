@@ -157,7 +157,8 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 					Exp exp=(Exp)lt.fd.e.clone();
 					for(Id i :lt.fd.args){
 						Id newId = Id.gen();
-						exp = new Let(i, new TVar(newId.id), e.es.get(cmp),exp);
+						TVar z = new TVar(newId.id) ;
+						exp = new Let(i, z, e.es.get(cmp),exp);
 						cmp ++;
 					}
 					exp.accept(this);

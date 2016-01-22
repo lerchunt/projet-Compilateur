@@ -28,12 +28,50 @@ abstract class Exp implements Cloneable {
 		 */
 		this.env.add(new Environnement(new Id("print_int"), tP1));
 		
+		
+		
 		TFun tP2 = new TFun();
 		tP2.typeRetour = new TInt();
 		tP2.typeArgs = new LinkedList<Type>();
 		tP2.typeArgs.add(new TFloat());
 
 		this.env.add(new Environnement(new Id("truncate"), tP2));
+		
+		TFun tP3 = new TFun();
+		tP3.typeRetour = new TUnit();
+		tP3.typeArgs = new LinkedList<Type>();
+		tP3.typeArgs.add(new TUnit());
+
+		this.env.add(new Environnement(new Id("print_newline"), tP3));
+		
+		TFun tP4 = new TFun();
+		tP4.typeRetour = new TUnit();
+		tP4.typeArgs = new LinkedList<Type>();
+		tP4.typeArgs.add(new TFloat());
+
+		this.env.add(new Environnement(new Id("print_float"), tP4));
+		
+		TFun tP5 = new TFun();
+		tP5.typeRetour = new TInt();
+		tP5.typeArgs = new LinkedList<Type>();
+		tP5.typeArgs.add(new TFloat());
+
+		this.env.add(new Environnement(new Id("int_of_float"), tP5));
+		
+		TFun tP6 = new TFun();
+		tP6.typeRetour = new TFloat();
+		tP6.typeArgs = new LinkedList<Type>();
+		tP6.typeArgs.add(new TInt());
+
+		this.env.add(new Environnement(new Id("float_of_int"), tP6));
+		
+		TFun tP7 = new TFun();
+		tP7.typeRetour = new TInt();
+		tP7.typeArgs = new LinkedList<Type>();
+		tP7.typeArgs.add(new TFloat());
+
+		this.env.add(new Environnement(new Id("truncate"), tP7));
+		
 	}
 	// ***********************************************************
 
@@ -160,6 +198,12 @@ class Unit extends Exp {
 	void accept(Visitor v) {
 		v.visit(this);
 	}
+	
+	@Override
+    public String toString()
+    {
+    	return "unit";
+    }
 }
 
 class Bool extends Exp {
