@@ -197,9 +197,31 @@ min_caml_float_of_int:
         bx	lr
         .size min_caml_float_of_int, .-min_caml_float_of_int
 
+min_caml_truncate:
+	stmfd	sp!, {lr}
+	bl	__aeabi_f2iz
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_truncate, .-min_caml_truncate
+
+min_caml_print_float:
+	stmfd	sp!, {lr}
+	bl	min_caml_truncate
+	bl	min_caml_print_int
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_print_float, .-min_caml_print_float
+
+min_caml_abs_float:
+	stmfd	sp!, {lr}
+	bic	r0, r0, #-2147483648
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_abs_float, .-min_caml_abs_float
+
 
 @min_caml_create_float_array
-@_min_caml_abs_float
-@_min_caml_truncate
+
+
 
 
