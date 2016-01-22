@@ -32,6 +32,10 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Float e) {
+		if(!data){
+			defVar += ".data\n";
+			data = true;
+		}
 		nbFloat++;
 		String strFloat="fl"+nbFloat;
 		String registre = e.registreDeRetour;
@@ -191,8 +195,10 @@ public class GenerationS implements ObjVisitor<String> {
 		String r1 = "";
 		String r2 = "";
 		String retour = "";
-
-		if (e.e1 instanceof Var){
+		if(e.e1 instanceof Float){
+			r1 = e.e1.registreDeRetour;
+			retour += String.format("%s\tmov\tr1,%s\n",e.e1.accept(this),r1);
+		} else if (e.e1 instanceof Var){
 			r1 = e.e1.accept(this);
 			retour += String.format("\tmov\tr1,%s\n",r1);
 		} else {
@@ -200,7 +206,10 @@ public class GenerationS implements ObjVisitor<String> {
 			System.exit(1);
 			return null;
 		}
-		if (e.e1 instanceof Var){
+		if(e.e2 instanceof Float){
+			r1 = e.e2.registreDeRetour;
+			retour += String.format("%s\tmov\tr0,%s\n",e.e2.accept(this),r1);
+		}else if (e.e2 instanceof Var){
 			r2 = e.e2.accept(this);
 			retour += String.format("\tmov\tr0,%s\n",r2);
 		} 
@@ -536,10 +545,6 @@ public class GenerationS implements ObjVisitor<String> {
 			e.e1.registreDeRetour = registre;
 			retour+=e.e1.accept(this);
 		} else if (e.e1 instanceof Float){
-			if(!data){
-				defVar += ".data\n";
-				data = true;
-			}
 			e.e1.registreDeRetour = registre;
 			retour+=e.e1.accept(this);			
 		} else if (e.e1 instanceof Not){
@@ -648,6 +653,12 @@ public class GenerationS implements ObjVisitor<String> {
 			if (nbParam >3) {
 				System.err.println("invalid argument number (>3) in function call");
 				System.exit(1);
+			}
+			if(param instanceof Float){
+				if(!data){
+					defVar += ".data\n";
+					data = true;
+				}
 			}
 			String strP = param.accept(this);
 			if(strP!=null){
