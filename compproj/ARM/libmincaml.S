@@ -177,7 +177,17 @@ min_caml_sin:	@sinus dans r0
 
 	ldmfd	sp!, {lr}
 	bx	lr
-      @  .size min_caml_sin, .-min_caml_sin
+       .size min_caml_sin, .-min_caml_sin
+
+        .align	2
+        .globl min_caml_print_int
+
+min_caml_div:
+	stmfd	sp!, {lr}
+	bl 	__aeabi_fdiv
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_div, .-min_caml_div
 
 
 @min_caml_create_float_array
