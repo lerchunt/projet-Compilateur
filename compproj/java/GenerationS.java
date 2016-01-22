@@ -681,7 +681,11 @@ public class GenerationS implements ObjVisitor<String> {
 							retour += String.format("\tstr\tfp,%s",strP);
 							retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  "fp");
 						} else {
-							retour +=String.format("\tmov\tr%d,%s\n", nbParam-1, strP);
+							if(param instanceof Float){
+								retour +=String.format("%s\n",strP);
+							}else{
+								retour +=String.format("\tmov\tr%d,%s\n", nbParam-1, strP);
+							}
 						}
 					} else if (e.e instanceof App){
 						nbParam++;
