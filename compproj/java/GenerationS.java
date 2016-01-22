@@ -34,9 +34,12 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(Float e) {
 		nbFloat++;
 		String strFloat="fl"+nbFloat;
-		
-		defVar += "\t" + strFloat+":\t.float "+e.f+"\n";
-		return strFloat;
+		String registre = e.registreDeRetour;
+		String retour = String.format("\tldr\t%s,addr_Float%d\n", registre,nbFloat);
+		retour += String.format("\tldr\t%s,[%s]\n", registre,registre);		
+		defFunc += String.format("addr_Float%d:\t.word %s\n", nbFloat,strFloat);
+		defVar += strFloat+":\t.float "+e.f+"\n";
+		return retour;
 	}
 
 	@Override
@@ -513,7 +516,6 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(Let e) {
 		boolean isSpill1 = false;
 		String retour ="";
-		String strf="adr";
 		String registre = RegistreAllocation.getRegistre(e.id);
 		if (registre == null) {
 			isSpill1 = true;
@@ -535,11 +537,8 @@ public class GenerationS implements ObjVisitor<String> {
 				defVar += ".data\n";
 				data = true;
 			}
-			strf=strf+cptf;
-			defFunc += String.format("%s:\t.word %s\n", strf,e.e1.accept(this));
-			retour += String.format("\tldr\t%s,%s\n", registre,strf);
-			retour += String.format("\tldr\t%s,[%s]\n", registre,registre);
-			
+			e.e1.registreDeRetour = registre;
+			retour+=e.e1.accept(this);			
 		} else if (e.e1 instanceof Not){
 			e.e1.registreDeRetour = registre;
 			retour += e.e1.accept(this);
@@ -772,6 +771,7 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Array e) {
+		LinkedList<Id> listeid = new LinkedList<Id>();
 		String retour="";
 		cmpTab++;
 		
@@ -780,13 +780,38 @@ public class GenerationS implements ObjVisitor<String> {
 			
 			Id idretour = Id.gen();
 			e.registreDeRetour= RegistreAllocation.getRegistre(idretour);
-			defVar+=String.format("array%d:\t.skip %d\n\n",cmpTab,tailleT *100);
-			defFunc+=String.format("addr:\t.word array%d\n\n",cmpTab);
-			
-			retour+=String.format("\tldr\t%s,addr\n\tmov\tr0,%s\n",e.registreDeRetour,e.registreDeRetour);
-			retour+=String.format("\tmov\tr1,%s\n",e.e2.accept(this));
-			retour+="\tbl\tmin_caml_create_array\n";
-			
+			defVar+=String.format("array%d:\t.skip %d\n",cmpTab,tailleT *100);
+			defFunc+=String.format("addr_tab%d:\t.word array%d\n",cmpTab,cmpTab);
+
+			retour+=String.format("\tldr\t%s,addr_tab%d\n\tmov\tr0,%s\n",e.registreDeRetour,cmpTab,e.registreDeRetour);
+			retour+=String.format("\tmov\tr1,#%d\t@lenght of the array\n", tailleT);
+			if (e.e2 instanceof Float){
+				idretour = Id.gen();
+				listeid.add(idretour);
+				e.e2.registreDeRetour= RegistreAllocation.getRegistre(idretour);
+				retour+=e.e2.accept(this);
+				retour+=String.format("\tmov\tr2,%s\n",e.e2.registreDeRetour);
+				retour+="\tbl\tmin_caml_create_float_array\n";
+			}else if(e.e2 instanceof Tuple){
+				idretour = Id.gen();
+				listeid.add(idretour);
+				String reg= RegistreAllocation.getRegistre(idretour);
+				int nbTuple = ((Tuple)(e.e2)).es.size();
+				retour+="\tmov\tr0,#0\n";
+				retour+=String.format("\tmov\tr1,#%d\n",nbTuple);
+				retour+=String.format("\tmov\tr2,%s",((Tuple)e.e2).es.get(0));
+				retour+="\tbl\tmin_caml_create_array\n";
+				for(int i=1;i<nbTuple;i++){
+					retour+=String.format("\tstr\t%s,[%s,%s,LSL #2]\n",((Tuple)e.e2).es.get(i),reg);
+				}
+				
+				
+				retour+="\tbl\tmin_caml_create_array\n";
+			}else{
+				retour+=String.format("\tmov\tr2,%s\n",e.e2.accept(this));
+				retour+="\tbl\tmin_caml_create_array\n";
+			}			
+
 		}else{
 			System.err.println("internal error - Array (GenerationS)");
 			System.exit(1);
