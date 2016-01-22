@@ -54,6 +54,10 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	public Exp visit(Sub e) {
 		OpBin newExp = (OpBin)CFolding(e);
 		if (newExp.e1 instanceof Int && newExp.e2 instanceof Int) {
+			int test = ((Int)newExp.e1).i - ((Int)newExp.e2).i;
+			if(test < 0){
+				return new Neg(new Int((-test)));
+			}
 			return new Int(((Int)newExp.e1).i - ((Int)newExp.e2).i);
 		}
 		return newExp;
@@ -78,6 +82,10 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	public Exp visit(FSub e) {
 		OpBin newExp = (OpBin)CFolding(e);
 		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
+			float test = ((Float)newExp.e1).f - ((Float)newExp.e2).f ;
+			if(test < 0) {
+				return new Neg(new Float(-test));
+			}
 			return new Float(((Float)newExp.e1).f - ((Float)newExp.e2).f);
 		}
 		return newExp;
@@ -179,7 +187,7 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 				}
 			}
 			e.e1 = e.e1.accept(this) ; 
-			if (e.e1 instanceof Int || e.e1 instanceof Float || e.e1 instanceof Bool || e.e1 instanceof Var) {
+			if (e.e1 instanceof Int || e.e1 instanceof Float || e.e1 instanceof Bool || e.e1 instanceof Var || e.e1 instanceof Unit) {
 				tabSym.put(e.id.toString(), e.e1);
 				tabVar.put(e.id.toString(), true);
 			}
@@ -225,7 +233,7 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 					args.set(cpt, tabSym.get(((Var)arg).id.toString()));
 				}
 			} else {
-				args.get(cpt).accept(this);
+				args.set(cpt,args.get(cpt).accept(this));
 			}
 
 			cpt++;
