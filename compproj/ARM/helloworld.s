@@ -1,3 +1,5 @@
+#include "math.h"
+#include "fdlibm.h"
 	.text
 	.global _start
 _start:

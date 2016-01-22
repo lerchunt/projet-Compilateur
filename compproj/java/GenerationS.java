@@ -32,6 +32,7 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(Float e) {
 		nbFloat++;
 		String strFloat="fl"+nbFloat;
+		
 		defVar += "\t" + strFloat+":\t.float "+e.f+"\n";
 		return strFloat;
 	}
@@ -438,8 +439,7 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e3 instanceof App){
 			ifFalse+=e.e3.accept(this);			
 		} else if (e.e3 instanceof Let){
-			e.e2.registreDeRetour = e.registreDeRetour;
-			ifFalse+=e.e3.accept(this);						
+			e.e2.registreDeRetour = e.registreDeRetour;		
 		} else if (e.e3 instanceof LetRec){
 			e.e2.registreDeRetour = e.registreDeRetour;
 			ifFalse+=e.e3.accept(this);		
@@ -741,17 +741,43 @@ public class GenerationS implements ObjVisitor<String> {
 		String retour ="";
 		String registre="";
 		int cpt=0;
+		LinkedList<Boolean> isSpill = new LinkedList<Boolean>();
 		for (Id id : e.ids) {
-				registre = RegistreAllocation.getRegistre(id);
-				//String res = e.e1.accept(this).substring(cpt,cpt+2);
-				if ( e.e1 instanceof Tuple) {
-					retour += String.format("\tmov\t%s,%s\n", registre, ((Tuple)e.e1).es.get(cpt).accept(this));	
-				} else {
-					retour += String.format("\tmov\t%s,%s\n", registre, e.e1.accept(this));	
-				}
-				cpt++;
+			isSpill.add(true);
+			registre = RegistreAllocation.getRegistre(id);
+			if (registre == null) {
+				isSpill.set(cpt, true);	
+				registre = RegistreAllocation.spillInit(id);
+				retour += RegistreAllocation.spillStart(registre);
+			}
+			if ( e.e1 instanceof Tuple) {
+				retour += String.format("\tmov\t%s,%s\n", registre, ((Tuple)e.e1).es.get(cpt).accept(this));	
+			} else {
+				retour += String.format("\tmov\t%s,%s\n", registre, e.e1.accept(this));	
+			}
+			cpt++;
 		}
-		retour += e.e2.accept(this);
+		if (e.e2 instanceof OpBin){
+			boolean isSpill1 = false;
+			Id idretour = Id.gen();
+			String regRetour = RegistreAllocation.getRegistre(idretour);
+			if (regRetour == null) {
+				isSpill1 = true;
+				regRetour = RegistreAllocation.spillInit(idretour);
+				retour += RegistreAllocation.spillStart(regRetour);
+			}
+			e.e2.registreDeRetour = regRetour;
+			retour += e.e2.accept(this);
+			retour += String.format("\tmov\t%s,%s\n",e.registreDeRetour,regRetour);
+			if (isSpill1) {
+				retour += RegistreAllocation.spillEnd(regRetour);
+			}
+		} else if (e.e2 instanceof Var) {
+			String regE1 = e.e2.accept(this);
+			retour += String.format("\tmov\t%s,%s\n",e.registreDeRetour,regE1);
+		} else {
+			retour += e.e2.accept(this);
+		}
 		return retour;
 	}
 
