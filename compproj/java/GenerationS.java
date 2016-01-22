@@ -187,63 +187,78 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(FAdd e) {
 		String r1 = "";
 		String r2 = "";
-		if (e.e1 instanceof Var) {
+		String retour = "";
+
+		if (e.e1 instanceof Var){
 			r1 = e.e1.accept(this);
+			retour += String.format("\tmov\tr1,%s\n",r1);
 		} else {
-			System.err.println("internal error -- GenerationS -- add");
+			System.err.println("internal error -- GenerationS -- fadd");
 			System.exit(1);
 			return null;
 		}
-		if (e.e2 instanceof Var) {
+		if (e.e1 instanceof Var){
 			r2 = e.e2.accept(this);
-		} else {
-			System.err.println("internal error -- GenerationS -- add");
+			retour += String.format("\tmov\tr0,%s\n",r2);
+		} 
+		else {
+			System.err.println("internal error -- GenerationS -- fadd");
 			System.exit(1);
 			return null;
 		}
-		return String.format("\tadd\t%s, %s, %s\n",e.registreDeRetour, r1, r2);
+		return retour + "\tbl\tmin_caml_fadd\n";
 	}
 
 	@Override
 	public String visit(FSub e) {
 		String r1 = "";
 		String r2 = "";
-		if (e.e1 instanceof Var) {
+		String retour = "";
+
+		if (e.e1 instanceof Var){
 			r1 = e.e1.accept(this);
+			retour += String.format("\tmov\tr1,%s\n",r1);
 		} else {
-			System.err.println("internal error -- GenerationS -- sub");
+			System.err.println("internal error -- GenerationS -- fsub");
 			System.exit(1);
 			return null;
 		}
-		if (e.e2 instanceof Var) {
+		if (e.e1 instanceof Var){
 			r2 = e.e2.accept(this);
-		} else {
-			System.err.println("internal error -- GenerationS -- sub");
+			retour += String.format("\tmov\tr0,%s\n",r2);
+		} 
+		else {
+			System.err.println("internal error -- GenerationS -- fsub");
 			System.exit(1);
 			return null;
 		}
-		return String.format("\tsub\t%s, %s, %s\n",e.registreDeRetour, r1, r2);
+		return retour + "\tbl\tmin_caml_fsub\n";
 	}
 
 	@Override
 	public String visit(FMul e) {
 		String r1 = "";
 		String r2 = "";
-		if (e.e1 instanceof Var) {
+		String retour = "";
+
+		if (e.e1 instanceof Var){
 			r1 = e.e1.accept(this);
+			retour += String.format("\tmov\tr1,%s\n",r1);
 		} else {
 			System.err.println("internal error -- GenerationS -- fmul");
 			System.exit(1);
 			return null;
 		}
-		if (e.e2 instanceof Var) {
+		if (e.e1 instanceof Var){
 			r2 = e.e2.accept(this);
-		} else {
+			retour += String.format("\tmov\tr0,%s\n",r2);
+		} 
+		else {
 			System.err.println("internal error -- GenerationS -- fmul");
 			System.exit(1);
 			return null;
 		}
-		return String.format("\tmul\t%s, %s, %s\n",e.registreDeRetour, r1, r2);
+		return retour + "\tbl\tmin_caml_fmul\n";
 	}
 
 	@Override
@@ -278,9 +293,28 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(FDiv e) {
-		e.e1.accept(this);
-		e.e2.accept(this);
-		return null;
+		String r1 = "";
+		String r2 = "";
+		String retour = "";
+
+		if (e.e1 instanceof Var){
+			r1 = e.e1.accept(this);
+			retour += String.format("\tmov\tr1,%s\n",r1);
+		} else {
+			System.err.println("internal error -- GenerationS -- fdiv");
+			System.exit(1);
+			return null;
+		}
+		if (e.e1 instanceof Var){
+			r2 = e.e2.accept(this);
+			retour += String.format("\tmov\tr0,%s\n",r2);
+		} 
+		else {
+			System.err.println("internal error -- GenerationS -- fdiv");
+			System.exit(1);
+			return null;
+		}
+		return retour + "\tbl\tmin_caml_fdiv\n";
 	}
 
 	@Override
@@ -626,9 +660,10 @@ public class GenerationS implements ObjVisitor<String> {
 						if (registre.contains("[sp,")) {
 							retour += String.format("\tstr\tfp,%s",registre);
 							retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  "fp");
-						} else {
+						} else if (!e.e.toString().equals("print_float")){
 							retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  registre);
 						}
+						
 					} else if (e.e instanceof App){
 						((App)e.e).closure.add(registre);
 					} else{
