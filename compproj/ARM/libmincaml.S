@@ -141,26 +141,6 @@ min_caml_print_int:
         bx	lr
         .size min_caml_print_int, .-min_caml_print_int
 
-        .align	2
-        .globl min_caml_print_float
-min_caml_print_float:
-	@ Function supports interworking.
-	@ args = 0, pretend = 0, frame = 0
-	@ frame_needed = 1, uses_anonymous_args = 0
-	stmfd	sp!, {fp, lr}
-	add	fp, sp, #4
-	ldr	r0, .L3
-	mov	r2, #0
-	ldr	r3, .L3+4
-	@bl	printf
-	bl	min_caml_print_string
-	mov	r3, #0
-	mov	r0, r3
-	sub	sp, fp, #4
-	@ sp needed
-	ldmfd	sp!, {fp, lr}
-	bx	lr
-        .size min_caml_print_float, .-min_caml_print_float
 
 	.globl min_caml_create_array
 min_caml_create_array: 

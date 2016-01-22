@@ -723,13 +723,6 @@ public class GenerationS implements ObjVisitor<String> {
 		} else {
 			retour += e.e2.accept(this);
 		}
-
-		for (Id id : e.ids){
-			if (isSpill.get(e.ids.indexOf(id))) {
-				retour += RegistreAllocation.spillEnd(RegistreAllocation.getRegistre(id));
-			}
-			RegistreAllocation.sup(id);
-		}
 		return retour;
 	}
 
