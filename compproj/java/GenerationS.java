@@ -532,7 +532,6 @@ public class GenerationS implements ObjVisitor<String> {
 			e.e1.registreDeRetour = registre;
 			retour+=e.e1.accept(this);
 		} else if (e.e1 instanceof Float){
-			cptf++;
 			if(!data){
 				defVar += ".data\n";
 				data = true;
@@ -562,7 +561,7 @@ public class GenerationS implements ObjVisitor<String> {
 			}
 			e.e1.registreDeRetour = registre;
 			retour+=String.format("%s", e.e1.accept(this));			
-		}else{		
+		}else{
 			retour += String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		}
 
@@ -621,11 +620,7 @@ public class GenerationS implements ObjVisitor<String> {
 				System.exit(1);
 			}
 		}
-
-		/*defFunc += String.format("\n\t@push: empiler registre\n%s\n",push(0));
-		defFunc += "\n\tsub\tr13,r13,#4 @place pour le résultat\n";
-		defFunc +=String.format("\n\t@pushFP:\n%s\n",pushFP());*/
-
+		
 		if (e.fd.e instanceof OpBin){
 			((OpBin)e.fd.e).registreDeRetour = "r0";
 		} else if (e.fd.e instanceof Var) {
@@ -686,7 +681,11 @@ public class GenerationS implements ObjVisitor<String> {
 							retour += String.format("\tstr\tfp,%s",strP);
 							retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  "fp");
 						} else {
-							retour +=String.format("\tmov\tr%d,%s\n", nbParam-1, strP);
+							if(param instanceof Float){
+								retour +=String.format("%s\n",strP);
+							}else{
+								retour +=String.format("\tmov\tr%d,%s\n", nbParam-1, strP);
+							}
 						}
 					} else if (e.e instanceof App){
 						nbParam++;
