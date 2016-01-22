@@ -97,6 +97,10 @@ public class GenerationS implements ObjVisitor<String> {
 		}
 		else if (e.e1 instanceof Var) {
 			r1 = e.e1.accept(this);
+			if (r1.contains("[sp,")) {
+				retour = String.format("\tstr\t%s,%s\n","r10",r1);
+				r1 = "r10";
+			} 
 		} else {
 			System.err.println("internal error -- GenerationS -- add");
 			System.exit(1);
@@ -112,17 +116,20 @@ public class GenerationS implements ObjVisitor<String> {
 		}
 		else if (e.e2 instanceof Var) {
 			r2 = e.e2.accept(this);
-		} 
-		else {
+			if (r2.contains("[sp,")) {
+				retour = String.format("\tstr\t%s,%s\n","r11",r2);
+				r2 = "r11";
+			} 
+		} else {
 			System.err.println("internal error -- GenerationS -- add");
 			System.exit(1);
 			return null;
 		}
 		if(e.e1 instanceof Int) {
-			return retour + String.format("\tadd\t%s,%s,%s\n",e.registreDeRetour, r2, r1);
+			return String.format("%s\tadd\t%s,%s,%s\n",retour,e.registreDeRetour, r2, r1);
 		}
 		else
-			return retour + String.format("\tadd\t%s,%s,%s\n",e.registreDeRetour, r1, r2);
+			return String.format("%s\tadd\t%s,%s,%s\n",retour,e.registreDeRetour, r1, r2);
 	}
 
 	@Override
