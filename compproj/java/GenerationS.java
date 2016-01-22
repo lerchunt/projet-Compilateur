@@ -27,7 +27,7 @@ public class GenerationS implements ObjVisitor<String> {
 		if (e.i <= 121){
 			return String.format("#%d",e.i);
 		}
-		return String.format("\tldr\t %s,#%d",e.registreDeRetour,e.i);
+		return String.format("\tldr\t %s,=%d",e.registreDeRetour,e.i);
 	}
 
 	@Override
@@ -53,7 +53,12 @@ public class GenerationS implements ObjVisitor<String> {
 			} 
 		}else if (e.e instanceof Var){
 			String reg = e.registreDeRetour;
-			return String.format("\trsc\t%s,%s\n\tmul\t%s,%s\n",reg,e.e.accept(this),reg,reg);
+			String retour = "";
+			if (reg.contains("[sp,")) {
+				retour = String.format("\tstr\tfp,%s\n",reg);
+				reg = "fp";
+			} 
+			return String.format("%s\trsc\t%s,%s\n\tmul\t%s,%s\n",retour,reg,e.e.accept(this),reg,reg);
 
 		} else {
 			System.err.println("internal error -- GenerationS not");
@@ -81,13 +86,13 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(Add e) {
 		String r1 = "";
 		String r2 = "";
-		String r3 = "";
+		String retour = "";
 		if(e.e1 instanceof Int){
 			if(((Int)e.e1).i <= 121){
 				r1 = e.e1.accept(this);
 			}
 			e.e1.registreDeRetour = e.registreDeRetour ; 
-			r3 = String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e1)).i);	
+			retour = String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e1)).i);	
 			r1 = e.registreDeRetour ;
 		}
 		else if (e.e1 instanceof Var) {
@@ -102,7 +107,7 @@ public class GenerationS implements ObjVisitor<String> {
 				r2 = e.e2.accept(this);
 			}
 			e.e2.registreDeRetour = e.registreDeRetour ; 
-			r3+= String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e2)).i);	
+			retour+= String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e2)).i);	
 			r2 = e.registreDeRetour ;
 		}
 		else if (e.e2 instanceof Var) {
@@ -114,10 +119,10 @@ public class GenerationS implements ObjVisitor<String> {
 			return null;
 		}
 		if(e.e1 instanceof Int) {
-			return r3 + String.format("\tadd\t%s,%s,%s\n",e.registreDeRetour, r2, r1);
+			return retour + String.format("\tadd\t%s,%s,%s\n",e.registreDeRetour, r2, r1);
 		}
 		else
-			return r3 + String.format("\tadd\t%s,%s,%s\n",e.registreDeRetour, r1, r2);
+			return retour + String.format("\tadd\t%s,%s,%s\n",e.registreDeRetour, r1, r2);
 	}
 
 	@Override
@@ -563,20 +568,8 @@ public class GenerationS implements ObjVisitor<String> {
 		}
 
 		if (e.e2 instanceof OpBin){
-			boolean isSpill = false;
-			Id idretour = Id.gen();
-			String regRetour = RegistreAllocation.getRegistre(idretour);
-			if (regRetour == null) {
-				isSpill = true;
-				regRetour = RegistreAllocation.spillInit(idretour);
-				retour += RegistreAllocation.spillStart(regRetour);
-			}
-			e.e2.registreDeRetour = regRetour;
+			e.e2.registreDeRetour = e.registreDeRetour;
 			retour += e.e2.accept(this);
-			retour += String.format("\tmov\t%s,%s\n",e.registreDeRetour,regRetour);
-			if (isSpill) {
-				retour += RegistreAllocation.spillEnd(regRetour);
-			}
 		} else if (e.e2 instanceof Var) {
 			String regE1 = e.e2.accept(this);
 			retour += String.format("\tmov\t%s,%s\n",e.registreDeRetour,regE1);
@@ -598,11 +591,8 @@ public class GenerationS implements ObjVisitor<String> {
 			if (reg != null) {
 				return reg; 
 			} else {
-				reg = "r11";
-				/*
 				System.err.println("register null for "+e.id.id);
-				System.exit(1);
-				*/
+				//System.exit(1);
 			}
 		}else{
 			return String.format("\tbl\tmin_caml_%s\n",e.id);
@@ -638,23 +628,7 @@ public class GenerationS implements ObjVisitor<String> {
 		defFunc +=String.format("\n\t@pushFP:\n%s\n",pushFP());*/
 
 		if (e.fd.e instanceof OpBin){
-			boolean isSpill = false;
-			Id idretour = Id.gen();
-			String regRetour = RegistreAllocation.getRegistre(idretour);
-			if (regRetour == null) {
-				isSpill = true;
-				regRetour = RegistreAllocation.spillInit(idretour);
-				retour += RegistreAllocation.spillStart(regRetour);
-			}
-			((OpBin)e.fd.e).registreDeRetour = regRetour;
-			retour += e.fd.e.accept(this);
-			retour += String.format("\tmov\tr0,%s",regRetour);
-			for (Id id : e.fd.args){
-				RegistreAllocation.sup(id);
-			}
-			if (isSpill) {
-				retour += RegistreAllocation.spillEnd(regRetour);
-			}
+			((OpBin)e.fd.e).registreDeRetour = "r0";
 		} else if (e.fd.e instanceof Var) {
 			retour += String.format("\tmov\tr0,%s",e.fd.e.accept(this));
 		} else {
@@ -669,13 +643,10 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(App e) {
-		LinkedList<Id> listeid = new LinkedList<Id>();
-		LinkedList<Boolean> isSpill = new LinkedList<Boolean>();
 		String retour="";
 		String registre="";
 		int nbParam = 0;
 		for(Exp param : e.es){
-			isSpill.add(true);
 			if (nbParam >3) {
 				System.err.println("invalid argument number (>3) in function call");
 				System.exit(1);
@@ -686,20 +657,15 @@ public class GenerationS implements ObjVisitor<String> {
 					nbParam ++;
 					registre = strP;
 					if (e.e instanceof Var) {
-						if (!e.e.toString().equals("print_float")){
+						if (registre.contains("[sp,")) {
+							retour += String.format("\tstr\tfp,%s",registre);
+							retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  "fp");
+						} else if (!e.e.toString().equals("print_float")){
 							retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  registre);
 						}
+						
 					} else if (e.e instanceof App){
-						Id idretour = Id.gen();
-						listeid.add(idretour);
-						String reg = RegistreAllocation.getRegistre(idretour);
-						if (reg == null) {
-							isSpill.set(e.es.indexOf(param), true);
-							reg = RegistreAllocation.spillInit(idretour);
-							retour += RegistreAllocation.spillStart(reg);
-						}
-						retour +=String.format("\tmov\t%s,%s\n",reg,  registre);
-						((App)e.e).closure.add(reg);
+						((App)e.e).closure.add(registre);
 					} else{
 						System.err.println("internal error - definition function (GenerationS)");
 						System.exit(1);
@@ -709,16 +675,7 @@ public class GenerationS implements ObjVisitor<String> {
 						nbParam ++;
 						retour += strP;
 					} else if (e.e instanceof App){
-						Id idretour = Id.gen();
-						listeid.add(idretour);
-						String reg = RegistreAllocation.getRegistre(idretour);
-						if (reg == null) {
-							isSpill.set(e.es.indexOf(param), true);
-							reg = RegistreAllocation.spillInit(idretour);
-							retour += RegistreAllocation.spillStart(reg);
-						}
-						retour +=String.format("\tmov\t%s,%s\n",reg,  registre);
-						((App)e.e).closure.add(reg);
+						((App)e.e).closure.add(registre);
 					}else{
 						System.err.println("internal error - definition function (GenerationS)");
 						System.exit(1);
@@ -726,19 +683,15 @@ public class GenerationS implements ObjVisitor<String> {
 				} else {
 					if (e.e instanceof Var){
 						nbParam++;
-						retour +=String.format("\tmov\tr%d,%s\n", nbParam-1, strP);
+						if (strP.contains("[sp,")) {
+							retour += String.format("\tstr\tfp,%s",strP);
+							retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  "fp");
+						} else {
+							retour +=String.format("\tmov\tr%d,%s\n", nbParam-1, strP);
+						}
 					} else if (e.e instanceof App){
 						nbParam++;
-						Id idretour = Id.gen();
-						listeid.add(idretour);
-						String reg = RegistreAllocation.getRegistre(idretour);
-						if (reg == null) {
-							isSpill.set(e.es.indexOf(param), true);
-							reg = RegistreAllocation.spillInit(idretour);
-							retour += RegistreAllocation.spillStart(reg);
-						}
-						retour +=String.format("\tmov\t%s,%s\n",reg,  strP);
-						((App)e.e).closure.add(reg);
+						((App)e.e).closure.add(registre);
 					}else{
 						System.err.println("internal error - definition function (GenerationS)");
 						System.exit(1);
@@ -757,13 +710,6 @@ public class GenerationS implements ObjVisitor<String> {
 		}else{
 			System.err.println("internal error - definition function (GenerationS)");
 			System.exit(1);
-		}
-
-		for (Id id : listeid){
-			if (isSpill.get(listeid.indexOf(id))) {
-				retour += RegistreAllocation.spillEnd(RegistreAllocation.getRegistre(id));
-			}
-			RegistreAllocation.sup(id);
 		}
 
 		return retour;
@@ -826,7 +772,6 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Array e) {
-		LinkedList<Id> listeid = new LinkedList<Id>();
 		String retour="";
 		cmpTab++;
 		
@@ -839,16 +784,12 @@ public class GenerationS implements ObjVisitor<String> {
 			defFunc+=String.format("addr:\t.word array%d\n\n",cmpTab);
 			
 			retour+=String.format("\tldr\t%s,addr\n\tmov\tr0,%s\n",e.registreDeRetour,e.registreDeRetour);
-			retour+=String.format("\tmov\tr1,#%d\t@lenght of the array\n", tailleT);
-			retour+=String.format("\tmov\tr2,%s\n",e.e2.accept(this));
+			retour+=String.format("\tmov\tr1,%s\n",e.e2.accept(this));
 			retour+="\tbl\tmin_caml_create_array\n";
 			
 		}else{
 			System.err.println("internal error - Array (GenerationS)");
 			System.exit(1);
-		}		
-		for (Id id : listeid){
-			RegistreAllocation.sup(id);
 		}		
 		return retour;
 	}
@@ -870,10 +811,7 @@ public class GenerationS implements ObjVisitor<String> {
 				System.err.println("internal error - Get (GenerationS)");
 				System.exit(1);
 			}
-		}		
-		for (Id id : listeid){
-			RegistreAllocation.sup(id);
-		}
+		}	
 		return retour;
 	}
 
@@ -894,10 +832,7 @@ public class GenerationS implements ObjVisitor<String> {
 				System.err.println("internal error - Put (GenerationS)");
 				System.exit(1);
 			}
-		}
-		for (Id id : listeid){
-			RegistreAllocation.sup(id);
-		}		
+		}	
 		return retour;
 	}
 

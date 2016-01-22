@@ -150,13 +150,13 @@ public class Main {
 						System.out.println();
 					}
 					
-					//expression = expression.accept(new ConstantFolding());
+					expression = expression.accept(new ConstantFolding());
 					if (verbose) {
 						System.out.println("------ AST ConstantFolding ------");
 						expression.accept(new PrintVisitor());
 						System.out.println();
 					}
-					//expression = expression.accept(new UnDefinition());
+					expression = expression.accept(new UnDefinition());
 					if (verbose) {
 						System.out.println("------ AST UnecessaryDefinition ------");
 						expression.accept(new PrintVisitor());
@@ -204,7 +204,7 @@ public class Main {
 					writer.close();
 
 					// supprimer le fichier asml créé.
-					new File(pathAsml).delete();
+					//new File(pathAsml).delete();
 				}
 
 				if (verbose) {

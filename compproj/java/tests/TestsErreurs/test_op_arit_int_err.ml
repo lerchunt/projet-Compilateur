@@ -1,2 +1,2 @@
-(*type error : int != unit*)
+(*add > type error : int != unit*)
 1+1 

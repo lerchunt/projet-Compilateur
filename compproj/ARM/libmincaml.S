@@ -249,6 +249,7 @@ min_caml_abs_float:
 
 min_caml_create_float_array:
 @r0: début tab  r1: taille du tableau  r2:contenu
+@r0: début tab  r1: taille du tableau
 	stmfd	sp!, {lr}
 	mov	r6,#0
 loop_array_float:

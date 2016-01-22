@@ -325,12 +325,12 @@ public class GenerationASML implements ObjVisitor<String> {
             	GenerationASML.asml += "let ";
             	GenerationASML.asml += e.id;
                 GenerationASML.asml += " = ";
-                if(e.e1.isVIFB()){
+                if(e.e1.isVIFB() || e.e1 instanceof If){
                 	GenerationASML.asml += "\n\t";
                 }
                 e.e1.accept(this);
                 GenerationASML.asml += " in ";
-                if(!e.e2.isVIFB())
+                if(!e.e2.isVIFB() && !(e.e2 instanceof App))
                 {
                 	e.e2.accept(this);
                     GenerationASML.asml += " \n\t";
@@ -455,27 +455,67 @@ public class GenerationASML implements ObjVisitor<String> {
     }
 
     public String visit(Tuple e){
-		return GenerationASML.asml;
-
+    	if(!def){
+	    	GenerationASML.asml += " (" +printInfix(e.es, ", ") + ")";
+	    	return  GenerationASML.asml ;
+    	} else {
+    		return " (" +printInfix(e.es, ", ") + ")";
+    	}
     }
 
     public String visit(LetTuple e){
-		return GenerationASML.asml;
+    	String retour = e.e1.accept(this);
+    	retour += e.e2.accept(this);
+		return retour;
 
     }
 
     public String visit(Array e){
-		return GenerationASML.asml;
-
+    	if(!def){
+    		GenerationASML.asml += "call _min_caml_create_array ";
+    		e.e1.accept(this);
+    		e.e2.accept(this) ;
+    		return GenerationASML.asml;
+    	} else {
+    		String txt = "call _min_caml_create_array_ ";
+            txt += e.e1.accept(this) + " ";
+            txt += e.e2.accept(this) + " ";
+    		return txt;
+    	}
     }
 
     public String visit(Get e){
-		return GenerationASML.asml;
-
+    	if(!def){
+    		GenerationASML.asml += "mem( ";
+    		e.e1.accept(this);
+    		e.e2.accept(this) ;
+    		GenerationASML.asml += ")";
+    		return GenerationASML.asml;
+    	} else {
+    		String txt = "call _min_caml_create_array_ ";
+            txt += e.e1.accept(this) + " ";
+            txt += e.e2.accept(this) + " ";
+    		return txt;
+    	}
     }
 
     public String visit(Put e){
-		return GenerationASML.asml;
-
+    	if(!def){
+	    	GenerationASML.asml += "mem(";
+			e.e1.accept(this);
+			GenerationASML.asml += " + " ;
+			e.e2.accept(this) ;
+			GenerationASML.asml += ") <- " ;
+			e.e3.accept(this);
+			return GenerationASML.asml;
+		} else {
+			String txt = "mem(";
+			txt += e.e1.accept(this) + " ";
+			txt += " + " ;
+	        txt += e.e2.accept(this) + " ";
+			txt += ") <- " ;
+	        txt += e.e3.accept(this) + " ";
+			return txt;
+		}
     }
 }
