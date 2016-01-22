@@ -165,9 +165,6 @@ end_array:
 	.globl min_caml_sin
 min_caml_sin:	@sinus dans r0
 	stmfd	sp!, {lr}
-		
-@loop_sin:
-	
 
 	ldmfd	sp!, {lr}
 	bx	lr

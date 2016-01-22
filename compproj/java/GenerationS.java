@@ -29,6 +29,7 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(Float e) {
 		nbFloat++;
 		String strFloat="fl"+nbFloat;
+		
 		defVar += "\t" + strFloat+":\t.float "+e.f+"\n";
 		return strFloat;
 	}
