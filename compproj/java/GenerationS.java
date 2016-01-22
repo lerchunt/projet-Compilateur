@@ -503,11 +503,8 @@ public class GenerationS implements ObjVisitor<String> {
 			if (reg != null) {
 				return reg; 
 			} else {
-				reg = "r11";
-				/*
 				System.err.println("register null for "+e.id.id);
-				System.exit(1);
-				*/
+				//System.exit(1);
 			}
 		}else{
 			return String.format("\tbl\tmin_caml_%s\n",e.id);
@@ -716,8 +713,7 @@ public class GenerationS implements ObjVisitor<String> {
 			defFunc+=String.format("addr:\t.word array%d\n\n",cmpTab);
 			
 			retour+=String.format("\tldr\t%s,addr\n\tmov\tr0,%s\n",e.registreDeRetour,e.registreDeRetour);
-			retour+=String.format("\tmov\tr1,#%d\t@lenght of the array\n", tailleT);
-			retour+=String.format("\tmov\tr2,%s\n",e.e2.accept(this));
+			retour+=String.format("\tmov\tr1,%s\n",e.e2.accept(this));
 			retour+="\tbl\tmin_caml_create_array\n";
 			
 		}else{
