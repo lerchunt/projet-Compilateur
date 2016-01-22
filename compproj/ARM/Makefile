@@ -1,5 +1,4 @@
 export PATH := /opt/gnu/arm/bin:$(PATH)
-
 AS=arm-none-eabi-as
 LD=arm-none-eabi-ld
 ASM=$(wildcard *.s)
@@ -14,9 +13,8 @@ echo:
 %.o : %.s libmincaml.S
 	${AS} -o $@ $^
 
-%.arm : %.o 
-	${LD} -o  $@ $^
-
+%.arm : %.o
+	${LD} -o $@ $^ -lm -L/usr/lib/gcc/arm-none-eabi/4.8.2/fpu -lgcc -lc
 test: ${PRG}
 	@for p in ${PRG} ; do \
 	  echo "*** Launching $$p"; \
