@@ -659,7 +659,7 @@ public class GenerationS implements ObjVisitor<String> {
 						if (registre.contains("[sp,")) {
 							retour += String.format("\tstr\tfp,%s",registre);
 							retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  "fp");
-						} else if (!e.e.toString().equals("print_float")){
+						} else {
 							retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  registre);
 						}
 						
