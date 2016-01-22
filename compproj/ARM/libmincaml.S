@@ -141,6 +141,13 @@ min_caml_print_int:
         bx	lr
         .size min_caml_print_int, .-min_caml_print_int
 
+min_caml_cos:
+	stmfd	sp!, {lr}
+	bl	cos
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_cos, .-min_caml_cos
+
 	.globl min_caml_create_array
 min_caml_create_array: 
 @r0: début tab  r1: taille du tableau
@@ -180,7 +187,5 @@ min_caml_sin:	@sinus dans r0
 @_min_caml_int_of_float
 @_min_caml_float_of_int
 @_min_caml_truncate
-
-
 
 
