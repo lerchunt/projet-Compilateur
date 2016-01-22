@@ -28,6 +28,8 @@ abstract class Exp implements Cloneable {
 		 */
 		this.env.add(new Environnement(new Id("print_int"), tP1));
 		
+		
+		
 		TFun tP2 = new TFun();
 		tP2.typeRetour = new TInt();
 		tP2.typeArgs = new LinkedList<Type>();
@@ -41,6 +43,27 @@ abstract class Exp implements Cloneable {
 		tP3.typeArgs.add(new TUnit());
 
 		this.env.add(new Environnement(new Id("print_newline"), tP3));
+		
+		TFun tP4 = new TFun();
+		tP4.typeRetour = new TUnit();
+		tP4.typeArgs = new LinkedList<Type>();
+		tP4.typeArgs.add(new TFloat());
+
+		this.env.add(new Environnement(new Id("print_float"), tP4));
+		
+		TFun tP5 = new TFun();
+		tP5.typeRetour = new TInt();
+		tP5.typeArgs = new LinkedList<Type>();
+		tP5.typeArgs.add(new TFloat());
+
+		this.env.add(new Environnement(new Id("int_of_float"), tP5));
+		
+		TFun tP6 = new TFun();
+		tP6.typeRetour = new TFloat();
+		tP6.typeArgs = new LinkedList<Type>();
+		tP6.typeArgs.add(new TInt());
+
+		this.env.add(new Environnement(new Id("float_of_int"), tP6));
 	}
 	// ***********************************************************
 
