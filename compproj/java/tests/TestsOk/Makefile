@@ -15,7 +15,7 @@ echo:
 	${AS} -o $@ $^
 
 %.arm : %.o
-	${LD} -o $@ $^ -lm -L/opt/gnu/arm/lib/gcc/arm-eabi/4.5.3/fpu -lgcc -lc
+	${LD} -o $@ $^ -lm -L/usr/lib/gcc/arm-eabi/4.5.3/fpu -lgcc -lc
 
 test: ${PRG}
 	@for p in ${PRG} ; do \
