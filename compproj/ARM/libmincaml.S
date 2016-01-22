@@ -1,6 +1,6 @@
+	
 	.text
         .globl min_caml_exit
-	.extern sin
 
 /* exit syscall */
 min_caml_exit:
@@ -141,6 +141,7 @@ min_caml_print_int:
         bx	lr
         .size min_caml_print_int, .-min_caml_print_int
 
+
 	.globl min_caml_create_array
 min_caml_create_array: 
 @r0: début tab  r1: taille du tableau
@@ -150,7 +151,7 @@ loop_array:
 	cmp	r6,r1
 	beq	end_array
 	add	r7,r0,r6,LSL #2
-	mov	r8,r1
+	mov	r8,r2
 	str	r8,[r7]
 	add	r6,r6,#1
 	b	loop_array
@@ -159,10 +160,16 @@ end_array:
 	bx	lr
       @  .size min_caml_create_array, .-min_caml_create_array
 
+
+
+
 	.globl min_caml_sin
 min_caml_sin:	@sinus dans r0
 	stmfd	sp!, {lr}
-	bl	sin
+		
+@loop_sin:
+	
+
 	ldmfd	sp!, {lr}
 	bx	lr
       @  .size min_caml_sin, .-min_caml_sin
@@ -177,7 +184,5 @@ min_caml_sin:	@sinus dans r0
 @_min_caml_int_of_float
 @_min_caml_float_of_int
 @_min_caml_truncate
-
-
 
 

@@ -7,14 +7,14 @@ PRG=$(subst .s,.arm,${ASM})
 all: ${PRG}
 
 echo:
-	echo ${A SM}
+	echo ${ASM}
 	echo ${PRG}
 
 %.o : %.s libmincaml.S
-	${AS} -o $@ $^
+	${AS} -o $@ $^ 
 
 %.arm : %.o
-	${LD} -o $@ $^
+	${LD} -o $@ $^ -lm 
 
 test: ${PRG}
 	@for p in ${PRG} ; do \
