@@ -13,6 +13,8 @@ public class GenerationS implements ObjVisitor<String> {
 	private static int cmpIf = 0;
 	private static int cmpTab =0;
 	
+	private static int cptf=0;
+	
 	@Override
 	public String visit(Bool e) {
 		if (e.b){
@@ -472,6 +474,7 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(Let e) {
 		boolean isSpill1 = false;
 		String retour ="";
+		String strf="adr";
 		String registre = RegistreAllocation.getRegistre(e.id);
 		if (registre == null) {
 			isSpill1 = true;
@@ -488,12 +491,16 @@ public class GenerationS implements ObjVisitor<String> {
 			e.e1.registreDeRetour = registre;
 			retour+=e.e1.accept(this);
 		} else if (e.e1 instanceof Float){
-
+			cptf++;
 			if(!data){
 				defVar += ".data\n";
 				data = true;
 			}
-			retour += String.format("\tldr\t%s,=%s\n", registre,e.e1.accept(this));
+			strf=strf+cptf;
+			defFunc += String.format("%s:\t.word %s\n", strf,e.e1.accept(this));
+			retour += String.format("\tldr\t%s,%s\n", registre,strf);
+			retour += String.format("\tldr\t%s,[%s]\n", registre,registre);
+			
 		} else if (e.e1 instanceof Not){
 			e.e1.registreDeRetour = registre;
 			retour += e.e1.accept(this);
