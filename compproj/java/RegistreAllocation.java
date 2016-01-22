@@ -18,7 +18,7 @@ public class RegistreAllocation implements Visitor {
 		Noeud noeud = null;
 		for (Noeud n : tabVar) {
 			if (n.var.id.equals(v)) {
-				if (n.regCour != null && !n.regCour.isEmpty() && n.regCour.contains("[sp + ")) {
+				if (n.regCour != null && !n.regCour.isEmpty() && n.regCour.contains("[sp,")) {
 					n.var.dec();
 					return n.regCour;
 				}
@@ -77,10 +77,16 @@ public class RegistreAllocation implements Visitor {
 		for (Noeud n : tabVar) {
 			if (id.equals(n.var.id)) {
 				for (Registre reg : tabReg) {
-					if ( reg.var.isEmpty() || !n.arc.contains(reg.var.getLast().id)) {
+					Var last = reg.var.getLast();
+					if ( reg.var.isEmpty() || !n.arc.contains(last.id)) {
 						reg.var.addLast(n.var);
 						SpillTabVar();
 						n.regCour = reg.nom;
+						for (Noeud no : tabVar) {
+							if (last.id.equals(no.var.id)) {
+								no.regCour = "[sp, #0]";
+							}
+						}
 						return reg.nom;
 					}
 					int cmpt = 0;
@@ -96,7 +102,7 @@ public class RegistreAllocation implements Visitor {
 				if (!r.var.isEmpty()) {
 					for (Noeud no : tabVar) {
 						if (no.var.id.equals(r.var.getLast().id)) {
-							no.regCour = "[sp + 0]";
+							no.regCour = "[sp, #0]";
 						}
 					}
 				}
@@ -146,15 +152,15 @@ public class RegistreAllocation implements Visitor {
 		return retour;
 	}
 
-	static void add(Id v, String reg) {
+	/*static void add(Id v, String reg) {
 		Var var = new Var(v);
 		tabVar.add(new Noeud(var));
 		Registre r = new Registre(reg);
 		r.var.addLast(var);
 		tabReg.add(r);
-	}
+	}*/
 	
-	static void sup(Id v) {
+	/*static void sup(Id v) {
 		for (Registre r : tabReg) {
 			if (!r.var.isEmpty()) {
 				if (r.var.getLast().id.equals(v)) {
@@ -167,7 +173,7 @@ public class RegistreAllocation implements Visitor {
 				tabVar.remove(var);
 			}
 		}
-	}
+	}*/
 	
 	static void finaliseArc() {
 		for (Noeud n : tabVar) {
@@ -368,16 +374,16 @@ public class RegistreAllocation implements Visitor {
 		}
 		
 		public void unSpillReg() {
-			if (regCour != null && !regCour.isEmpty() && regCour.contains("[sp + ")){
+			if (regCour != null && !regCour.isEmpty() && regCour.contains("[sp,")){
 				cmpPile -= 4;
-				regCour = String.format("[sp + %d]",cmpPile);
+				regCour = String.format("[sp, #%d]",cmpPile);
 			}
 		}
 
 		public void spillReg() {
-			if (regCour != null && !regCour.isEmpty() && regCour.contains("[sp + ")){
+			if (regCour != null && !regCour.isEmpty() && regCour.contains("[sp,")){
 				cmpPile += 4;
-				regCour = String.format("[sp + %d]",cmpPile);
+				regCour = String.format("[sp, #%d]",cmpPile);
 			}
 		}
 	}
