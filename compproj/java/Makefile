@@ -12,7 +12,7 @@ Parser.java: Parser.cup
 	java -jar java-cup-11b.jar -nonterms -expect 150 -interface -parser Parser Parser.cup
 
 clean:
-	rm -rf *.class rm sym.java Lexer.java Parser.java *~ tests/TestsOk/*.s tests/TestsOk/*.o tests/TestsOk/*.arm tests/TestsOk/*~ tests/TestsErreurs/*.s tests/TestsErreurs/*.o tests/TestsErreurs/*.arm tests/TestsErreurs/*~
+	rm -rf *.class rm sym.java Lexer.java Parser.java *~ tests/TestsOk/*.s tests/TestsOk/*.asml tests/TestsOk/*.o tests/TestsOk/*.arm tests/TestsOk/*~ tests/TestsErreurs/*.s tests/TestsErreurs/*.o tests/TestsErreurs/*.arm tests/TestsErreurs/*.asml tests/TestsErreurs/*~
 
 test:
 	./test.sh ${ARGS}
