@@ -141,6 +141,12 @@ min_caml_print_int:
         bx	lr
         .size min_caml_print_int, .-min_caml_print_int
 
+min_caml_cos:
+	stmfd	sp!, {lr}
+	bl	cos
+	ldmfd	sp!, {lr}
+        bx	lr
+        .size min_caml_cos, .-min_caml_cos
 
 	.globl min_caml_create_array
 min_caml_create_array: 
