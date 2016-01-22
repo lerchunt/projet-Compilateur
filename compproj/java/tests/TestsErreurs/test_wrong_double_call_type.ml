@@ -1,4 +1,4 @@
-(*type error : int != float*)
+(*3 > type error : int != float*)
 let rec plus x y =
 	x+y in
 let rec moins x y =

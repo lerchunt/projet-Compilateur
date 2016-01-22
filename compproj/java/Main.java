@@ -198,13 +198,13 @@ public class Main {
 					main += "\tbl\tmin_caml_print_newline\n\tbl\tmin_caml_exit\n";
 					String retour = GenerationS.defVar+init;
 					retour += GenerationS.defFunc;
-					retour += "_start:\n"+main;
+					retour += "\n_start:\n"+main;
 					PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(Main.Path+Main.OutName+".s")));
 					writer.print(retour);
 					writer.close();
 
 					// supprimer le fichier asml créé.
-					new File(pathAsml).delete();
+					//new File(pathAsml).delete();
 				}
 
 				if (verbose) {

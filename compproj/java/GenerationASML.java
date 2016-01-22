@@ -18,9 +18,7 @@ public class GenerationASML implements ObjVisitor<String> {
     		GenerationASML.asml += e.b ;
     		return GenerationASML.asml ;
     	} else {
-    		String txt = "" ;
-        	txt += e.b ;
-    		return txt;
+    		return String.format("%s",e.b);
     	}
     }
 
@@ -29,9 +27,7 @@ public class GenerationASML implements ObjVisitor<String> {
     		GenerationASML.asml += e.i ;
     		return GenerationASML.asml ;
     	} else {
-    		String txt = "" ;
-        	txt += e.i ;
-    		return txt;
+    		return String.format("%s",e.i);
     	}	
     }
 
@@ -48,9 +44,7 @@ public class GenerationASML implements ObjVisitor<String> {
             e.e.accept(this);
     		return GenerationASML.asml;
     	} else {
-    		String txt = "not " ; 
-    		txt += e.e.accept(this);
-    		return txt ;
+    		return String.format("not %s",e.e.accept(this));
     	}
     }
 
@@ -60,9 +54,7 @@ public class GenerationASML implements ObjVisitor<String> {
             e.e.accept(this);
     		return GenerationASML.asml;
     	} else {
-    		String txt = "-";
-            txt += e.e.accept(this);
-    		return txt;
+    		return String.format("- %s",e.e.accept(this));
     	}
     }
 
@@ -75,10 +67,7 @@ public class GenerationASML implements ObjVisitor<String> {
     		e.e2.accept(this);
     		return GenerationASML.asml;
     	} else {
-    		String txt = " add ";
-    		txt += e.e1.accept(this) + " ";
-    		txt += e.e2.accept(this) ;//+ "\n";
-    		return txt;
+    		return String.format("add %s %s",e.e1.accept(this),e.e2.accept(this));
     	} 	
     }
 
@@ -91,10 +80,7 @@ public class GenerationASML implements ObjVisitor<String> {
     		e.e2.accept(this);
     		return GenerationASML.asml;
     	} else {
-    		String txt = " sub ";
-    		txt += e.e1.accept(this) + " ";
-    		txt += e.e2.accept(this);
-    		return txt;
+    		return String.format("sub %s %s",e.e1.accept(this),e.e2.accept(this));
     	}
 
     }
@@ -113,10 +99,7 @@ public class GenerationASML implements ObjVisitor<String> {
     		e.e2.accept(this);
     		return GenerationASML.asml;
     	} else {
-    		String txt = " fadd ";
-    		txt += e.e1.accept(this) + " ";
-    		txt += e.e2.accept(this);
-    		return txt;
+    		return String.format("fadd %s %s",e.e1.accept(this),e.e2.accept(this));
     	}
     }
 
@@ -129,12 +112,8 @@ public class GenerationASML implements ObjVisitor<String> {
     		e.e2.accept(this);
     		return GenerationASML.asml;
     	} else {
-    		String txt = " fsub ";
-    		txt += e.e1.accept(this) + " ";
-    		txt += e.e2.accept(this);
-    		return txt;
+    		return String.format("fsub %s %s",e.e1.accept(this),e.e2.accept(this));
     	}
-
     }
 
     public String visit(FMul e) {
@@ -146,10 +125,7 @@ public class GenerationASML implements ObjVisitor<String> {
     		e.e2.accept(this);
     		return GenerationASML.asml;
     	} else {
-    		String txt = " fmul ";
-    		txt += e.e1.accept(this) + " ";
-    		txt += e.e2.accept(this);
-    		return txt;
+    		return String.format("fmul %s %s",e.e1.accept(this),e.e2.accept(this));
     	}
 
     }
@@ -163,10 +139,7 @@ public class GenerationASML implements ObjVisitor<String> {
     		e.e2.accept(this);
     		return GenerationASML.asml;
     	} else {
-    		String txt = " mul ";
-    		txt += e.e1.accept(this) + " ";
-    		txt += e.e2.accept(this);
-    		return txt;
+    		return String.format("mul %s %s",e.e1.accept(this),e.e2.accept(this));
     	}
     }
 
@@ -179,10 +152,7 @@ public class GenerationASML implements ObjVisitor<String> {
     		e.e2.accept(this);
     		return GenerationASML.asml;
     	} else {
-    		String txt = " fdiv ";
-    		txt += e.e1.accept(this) + " ";
-    		txt += e.e2.accept(this);
-    		return txt;
+    		return String.format("fdiv %s %s",e.e1.accept(this),e.e2.accept(this));
     	}
     }
 
@@ -200,10 +170,7 @@ public class GenerationASML implements ObjVisitor<String> {
 	        e.e2.accept(this);
     		return GenerationASML.asml;
     	} else {
-    		String txt = " ";
-    		txt += e.e1.accept(this) + " = ";
-    		txt += e.e2.accept(this);
-    		return txt;
+    		return String.format("%s = %s",e.e1.accept(this),e.e2.accept(this));
     	}
 
     }
@@ -223,10 +190,8 @@ public class GenerationASML implements ObjVisitor<String> {
     		}
     		return GenerationASML.asml;
     	} else {
-    		String txt = " ";
-    		txt += e.e1.accept(this) + " <= ";
-    		txt += e.e2.accept(this);
-    		return txt;
+    		return String.format("%s <= %s",e.e1.accept(this),e.e2.accept(this));
+
     	}
     }
 
@@ -281,20 +246,18 @@ public class GenerationASML implements ObjVisitor<String> {
                 txt += ") else (\n\t\t _z" + cp++ +" \n\t) ";
         		return txt ;
     		}else {
-	    		String txt = "if ";
-	    		txt += e.e1.accept(this) + " then ( \n\t";
-	    		txt += e.e2.accept(this) ;
-	    		if(!e.e2.isVIFB()){
-	                txt += " \n\t";
+    			
+        		String retour = String.format("\n\tif %s then ( \n\t%s ",e.e1.accept(this),e.e2.accept(this));
+;	    		if(!e.e2.isVIFB()){
+	                retour += " \n\t";
 	            }
-	    		txt += " ) else (\n\t ";
-	    		txt += e.e3.accept(this) ;
+				retour += String.format(") else (\n\t%s ",e.e3.accept(this));
 	    		if(!e.e3.isVIFB()){
-	                txt += " \n\t)";
+	                retour += " \n\t)";
 	            } else {
-	            	txt += ") ";
+	            	retour += ") ";
 	            }
-	    		return txt;
+	    		return retour;
     		}
     	}
     	
@@ -325,12 +288,12 @@ public class GenerationASML implements ObjVisitor<String> {
             	GenerationASML.asml += "let ";
             	GenerationASML.asml += e.id;
                 GenerationASML.asml += " = ";
-                if(e.e1.isVIFB()){
+                if(e.e1.isVIFB() || e.e1 instanceof If){
                 	GenerationASML.asml += "\n\t";
                 }
                 e.e1.accept(this);
                 GenerationASML.asml += " in ";
-                if(!e.e2.isVIFB())
+                if(!e.e2.isVIFB() && !(e.e2 instanceof App))
                 {
                 	e.e2.accept(this);
                     GenerationASML.asml += " \n\t";
@@ -360,17 +323,14 @@ public class GenerationASML implements ObjVisitor<String> {
                 	e.e2.accept(this);
                 }
             } else {
-            	txt += "let " + e.id +" = ";
-                txt += e.e1.accept(this);
-                txt += " in " ;
+            	String retour = String.format("let %s = %s in", e.id.id,e.e1.accept(this));
                 if(!e.e2.isVIFB())
                 {
-                	txt += e.e2.accept(this);
-                    txt += " \n";
+                	retour += e.e2.accept(this)+ " \n";
                 } else {
-                    txt += " \n";
-                	txt += e.e2.accept(this);
+                    retour += " \n" + e.e2.accept(this);
                 }
+                return retour;
             } 
     		return txt;
         }
@@ -383,9 +343,7 @@ public class GenerationASML implements ObjVisitor<String> {
     		GenerationASML.asml += e.id;
     		return GenerationASML.asml;
     	} else {
-    		String txt = "" ;
-    		txt += e.id;
-    		return txt;
+    		return e.id.id;
     	}
     }
 
@@ -447,35 +405,63 @@ public class GenerationASML implements ObjVisitor<String> {
             printInfix2(e.es, " ");
     		return GenerationASML.asml;
     	} else {
-    		String txt = "call _min_caml_";
-            txt += e.e.accept(this) + " ";
-            txt += printInfix(e.es, " ");
-    		return txt;
+        	String retour = String.format("call _min_caml_ %s", e.e.accept(this));
+            retour += printInfix(e.es, " ");
+    		return retour;
     	}
     }
 
     public String visit(Tuple e){
-		return GenerationASML.asml;
-
+    	if(!def){
+	    	GenerationASML.asml += " (" +printInfix(e.es, ", ") + ")";
+	    	return  GenerationASML.asml ;
+    	} else {
+    		return " (" +printInfix(e.es, ", ") + ")";
+    	}
     }
 
     public String visit(LetTuple e){
-		return GenerationASML.asml;
+    	String retour = e.e1.accept(this);
+    	retour += e.e2.accept(this);
+		return retour;
 
     }
 
     public String visit(Array e){
-		return GenerationASML.asml;
-
+    	if(!def){
+    		GenerationASML.asml += "call _min_caml_create_array ";
+    		e.e1.accept(this);
+    		e.e2.accept(this) ;
+    		return GenerationASML.asml;
+    	} else {
+    		return String.format("call _min_caml_create_array %s %s", e.e1.accept(this), e.e2.accept(this));
+    	}
     }
 
     public String visit(Get e){
-		return GenerationASML.asml;
-
+    	if(!def){
+	    	GenerationASML.asml += "mem(";
+			e.e1.accept(this);
+			GenerationASML.asml += " + " ;
+			e.e2.accept(this) ;
+			return GenerationASML.asml;
+		} else {
+    		return String.format("mem(%s + %s)", e.e1.accept(this), e.e2.accept(this));
+		}
     }
 
     public String visit(Put e){
-		return GenerationASML.asml;
+    	if(!def){
+	    	GenerationASML.asml += "mem(";
+			e.e1.accept(this);
+			GenerationASML.asml += " + " ;
+			e.e2.accept(this) ;
+			GenerationASML.asml += ") <- " ;
+			e.e3.accept(this);
+			return GenerationASML.asml;
+		} else {
+    		return String.format("mem(%s + %s) <- %s", e.e1.accept(this), e.e2.accept(this),e.e3.accept(this));
 
+		}
     }
 }

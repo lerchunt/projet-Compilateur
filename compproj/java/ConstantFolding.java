@@ -94,24 +94,20 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(FMul e) {
-		if (e.e1 instanceof Var) {
-			tabVar.remove(((Var)e.e1).id.id);
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
+			return new Float(((Float)newExp.e1).f * ((Float)newExp.e2).f);
 		}
-		if (e.e2 instanceof Var) {
-			tabVar.remove(((Var)e.e2).id.id);
-		}
-		return e;
+		return newExp;
 	}
 
 	@Override
 	public Exp visit(Mul e) {
-		if (e.e1 instanceof Var) {
-			tabVar.remove(((Var)e.e1).id.id);
+		OpBin newExp = (OpBin)CFolding(e);
+		if (newExp.e1 instanceof Int && newExp.e2 instanceof Int) {
+			return new Int(((Int)newExp.e1).i * ((Int)newExp.e2).i);
 		}
-		if (e.e2 instanceof Var) {
-			tabVar.remove(((Var)e.e2).id.id);
-		}
-		return e;
+		return newExp;
 	}
 
 	@Override

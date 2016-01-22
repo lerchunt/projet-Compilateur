@@ -4,7 +4,8 @@ AS=arm-none-eabi-as
 LD=arm-none-eabi-ld
 ASM=$(wildcard *.s)
 PRG=$(subst .s,.arm,${ASM})
-
+# /opt/gnu/arm/lib/gcc/arm-eabi/4.5.3/fpu
+# /usr/lib/gcc/arm-none-eabi/4.8.2/fpu
 all: ${PRG}
 
 echo:
