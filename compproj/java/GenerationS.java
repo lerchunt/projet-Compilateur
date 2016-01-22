@@ -25,7 +25,7 @@ public class GenerationS implements ObjVisitor<String> {
 		if (e.i <= 121){
 			return String.format("#%d",e.i);
 		}
-		return String.format("\tldr\t %s,#%d",e.registreDeRetour,e.i);
+		return String.format("\tldr\t %s,=%d",e.registreDeRetour,e.i);
 	}
 
 	@Override

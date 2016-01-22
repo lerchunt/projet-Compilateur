@@ -384,6 +384,11 @@ class FSub extends OpBin {
 	void accept(Visitor v) {
 		v.visit(this);
 	}
+	
+	@Override
+	public String toString(){
+		return "fsub" ;
+	}
 }
 
 class FMul extends OpBin {
@@ -415,6 +420,11 @@ class Mul extends OpBin {
 	}
 	void accept(Visitor v) {
 		v.visit(this);
+	}
+	
+	@Override
+	public String toString(){
+		return "mul" ;
 	}
 }
 
@@ -730,6 +740,11 @@ class LetTuple extends Exp {
 		this.ts = ts;
 		this.e1 = e1;
 		this.e2 = e2;
+	}
+	
+	@Override
+	public String toString(){
+		return "let tuple" ;
 	}
 
 	<E> E accept(ObjVisitor<E> v) {
