@@ -303,9 +303,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 				System.exit(1);
 			} else {
 				if (tFun instanceof TVar) {
-					//System.err.println("error "+((Var)e.e).id.id+" expected as function and found as var");
-				} else {
-					System.err.println("error "+((Var)e.e).id.id+" expected as function and found as "+ tFun.toString());
+					System.err.println("error "+((Var)e.e).id.id+" expected as function and found as var");
 				}
 				System.exit(1);
 			}
@@ -489,7 +487,9 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		} else if (e.e1 instanceof Var){
 			Type ts = ((Var)e.e1).rechercheEnv();
 			if(ts instanceof TVar){
-				((TVar)ts).typeParamArray = Type.gen();
+				if(((TVar)ts).typeParamArray == null) {
+					((TVar)ts).typeParamArray = Type.gen();
+				}
 				Equations eq = new Equations(e.typeAttendu, ((TVar)ts).typeParamArray,e.toString());
 				retour.add(eq);
 				eq = new Equations(new TInt(), e.e2.typeAttendu,e.toString());
