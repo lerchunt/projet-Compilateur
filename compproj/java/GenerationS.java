@@ -83,7 +83,7 @@ public class GenerationS implements ObjVisitor<String> {
 			e.e.registreDeRetour = e.registreDeRetour ; 
 			return String.format("\tldr\t%s,=-%d\n",e.registreDeRetour,((Int)(e.e)).i);
 		} else {
-			System.err.println("internal error -- GenerationS -- Not");
+			System.err.println("internal error -- GenerationS -- Neg");
 			System.exit(1);
 			return null;
 		}
@@ -200,7 +200,7 @@ public class GenerationS implements ObjVisitor<String> {
 			e.e.registreDeRetour = e.registreDeRetour ; 
 			return String.format("\tldr\t%s,=-%d\n",e.registreDeRetour,((Int)(e.e)).i);
 		} else {
-			System.err.println("internal error -- GenerationS -- Not");
+			System.err.println("internal error -- GenerationS -- FNeg");
 			System.exit(1);
 			return null;
 		}
@@ -533,11 +533,9 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e2 instanceof If) {
 			e.e2.registreDeRetour = e.registreDeRetour;
 			ifTrue += e.e2.accept(this);
-		} else if(e.e2 instanceof Int){
-			if(((Int)(e.e2)).i > 121){
-				e.e2.registreDeRetour = e.registreDeRetour ; 
-				ifTrue +=String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e2)).i);
-			} 
+		} else if(e.e2 instanceof Int && ((Int)(e.e2)).i > 121){
+			e.e2.registreDeRetour = e.registreDeRetour ; 
+			ifTrue +=String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e2)).i);
 			ifTrue+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e2.accept(this));	
 			
 		} else { // entier +float +bool
@@ -565,11 +563,9 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e3 instanceof If) {
 			e.e3.registreDeRetour = e.registreDeRetour;
 			ifFalse += e.e3.accept(this);
-		} else if(e.e3 instanceof Int){
-			if(((Int)(e.e3)).i > 121){
+		} else if(e.e3 instanceof Int && ((Int)(e.e3)).i > 121){
 			e.e3.registreDeRetour = e.registreDeRetour ; 
 			ifFalse += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e3)).i);
-			}
 			ifFalse+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e3.accept(this));	
 		} else {  //entier +float +bool
 			ifFalse+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e3.accept(this));
@@ -634,7 +630,10 @@ public class GenerationS implements ObjVisitor<String> {
 			}
 			e.e1.registreDeRetour = registre;
 			retour+=String.format("%s", e.e1.accept(this));			
-		}else{
+		} else if (e.e1 instanceof Int && ((Int)(e.e1)).i > 121){
+			e.e1.registreDeRetour = e.registreDeRetour ; 
+			retour += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e1)).i);
+		} else{
 			retour += String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		}
 
@@ -648,6 +647,10 @@ public class GenerationS implements ObjVisitor<String> {
 				regE1 = "r10";
 			} 
 			retour += String.format("\tmov\t%s,%s\n",e.registreDeRetour,regE1);
+		}  else if (e.e2 instanceof Int && ((Int)(e.e2)).i > 121){
+			e.e1.registreDeRetour = e.registreDeRetour ; 
+			//String reg = "r10";
+			retour += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e2)).i);
 		} else {
 			retour += e.e2.accept(this);
 		}
@@ -766,10 +769,13 @@ public class GenerationS implements ObjVisitor<String> {
 					} else if (e.e instanceof App){
 						 retour += strP;
 						((App)e.e).closure.add(param.registreDeRetour);
-					}else{
+					} else{
 						System.err.println("internal error - definition function (GenerationS)");
 						System.exit(1);
 					}
+				} else if (param instanceof Int && ((Int)(param)).i > 121){
+					param.registreDeRetour = e.registreDeRetour ; 
+					retour += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(param)).i);
 				} else {
 					if (e.e instanceof Var){
 						nbParam++;

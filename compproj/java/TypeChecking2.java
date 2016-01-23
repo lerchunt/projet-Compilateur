@@ -265,6 +265,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		
 		e.e.typeAttendu = e.typeAttendu;
 		e.e.env.addAll(e.env);
+		e.e.env.addAll(e.fd.e.env);
 		e.e.addEnv(e.fd.id, e.fd.type);
 		retour.addAll(e.e.accept(this));
 		e.e.env.removeFirst();
@@ -415,6 +416,8 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 				cpt++;
 			}
 		}
+		e.e2.env.addAll(e.env);
+		e.e1.env = e.env;
 		retour.addAll(e.e1.accept(this));
 		retour.addAll(e.e2.accept(this));
 		e.e2.env.removeFirst();
