@@ -98,8 +98,7 @@ public class GenerationS implements ObjVisitor<String> {
 			if(((Int)e.e1).i <= 121){
 				r1 = e.e1.accept(this);
 			} else {
-				e.e1.registreDeRetour = e.registreDeRetour ; 
-				retour = String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e1)).i);	
+				retour = String.format("\tldr\t%s,=%d\n","r9",((Int)(e.e1)).i);	
 				r1 = "r9" ;
 			}
 		}
@@ -118,8 +117,7 @@ public class GenerationS implements ObjVisitor<String> {
 			if(((Int)e.e2).i <= 121){
 				r2 = e.e2.accept(this);
 			} else {
-				e.e2.registreDeRetour = e.registreDeRetour ; 
-				retour+= String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e2)).i);	
+				retour+= String.format("\tldr\t%s,=%d\n","r10",((Int)(e.e2)).i);	
 				r2 = "r10" ;
 			}	
 		}
@@ -149,10 +147,10 @@ public class GenerationS implements ObjVisitor<String> {
 		if(e.e1 instanceof Int){
 			if(((Int)e.e1).i <= 121){
 				r1 = e.e1.accept(this);
+			} else {
+			retour += String.format("\tldr\t%s,=%d\n","r9",((Int)(e.e1)).i);	
+			r1 = "r9" ;
 			}
-			e.e1.registreDeRetour = e.registreDeRetour ; 
-			retour += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e1)).i);	
-			r1 = e.registreDeRetour ;
 		}
 		else if (e.e1 instanceof Var) {
 			r1 = e.e1.accept(this);
@@ -168,10 +166,10 @@ public class GenerationS implements ObjVisitor<String> {
 		if(e.e2 instanceof Int){
 			if(((Int)e.e2).i <= 121){
 				r2 = e.e2.accept(this);
+			} else {
+			retour+= String.format("\tldr\t%s,=%d\n","r10",((Int)(e.e2)).i);	
+			r2 = "r10" ;
 			}
-			e.e2.registreDeRetour = e.registreDeRetour ; 
-			retour+= String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e2)).i);	
-			r2 = e.registreDeRetour ;
 		}
 		else if (e.e2 instanceof Var) {
 			r2 = e.e2.accept(this);
@@ -193,12 +191,13 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(FNeg e) {
+		/*Jamais utilisé*/
 		if(e.e instanceof Int){
 			if(((Int)(e.e)).i < 121){
 				return String.format("\tmov\t%s,#-%d\n",e.registreDeRetour,((Int)(e.e)).i);
 			} 
 			e.e.registreDeRetour = e.registreDeRetour ; 
-			return String.format("\tldr\t%s,=-%d\n",e.registreDeRetour,((Int)(e.e)).i);
+			return e.e.accept(this);
 		} else {
 			System.err.println("internal error -- GenerationS -- FNeg");
 			System.exit(1);
@@ -402,9 +401,8 @@ public class GenerationS implements ObjVisitor<String> {
 			retour += s1;
 			s1 = "r9";
 		} else if (e.e1 instanceof Int && ((Int)(e.e1)).i > 121 ) {
-			e.e1.registreDeRetour = e.registreDeRetour ; 
 			s1 = "r9" ;
-			retour = String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e1)).i);
+			retour = String.format("\tldr\t%s,=%d\n","r9",((Int)(e.e1)).i);
 		} else if (e.e1 instanceof Var) {
 			s1 = e.e1.accept(this);
 			if (s1.contains("[sp,")) {
@@ -420,10 +418,8 @@ public class GenerationS implements ObjVisitor<String> {
 			retour += s2;
 			s2 = "r10";
 		} else if (e.e1 instanceof Int && ((Int)(e.e1)).i > 121 ) {
-			Id idretour = Id.gen();
 			s2 = "r10";
-			e.e1.registreDeRetour = e.registreDeRetour ; 
-			retour += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e2)).i);
+			retour += String.format("\tldr\t%s,=%d\n","r10",((Int)(e.e2)).i);
 		} else if (e.e2 instanceof Var) {
 			s2 = e.e2.accept(this);
 			if (s2.contains("[sp,")) {
@@ -449,9 +445,8 @@ public class GenerationS implements ObjVisitor<String> {
 			retour += s1;
 			s1 = "r9";
 		} else if (e.e1 instanceof Int && ((Int)(e.e1)).i > 121 ) {
-			e.e1.registreDeRetour = e.registreDeRetour ; 
-			s1 = e.registreDeRetour ;
-			retour += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e1)).i);
+			s1 = "r9";
+			retour += String.format("\tldr\t%s,=%d\n","r9",((Int)(e.e1)).i);
 		} else if (e.e1 instanceof Var) {
 			s1 = e.e1.accept(this);
 			if (s1.contains("[sp,")) {
@@ -467,10 +462,8 @@ public class GenerationS implements ObjVisitor<String> {
 			retour += s2;
 			s2 = "r10";
 		} else if (e.e1 instanceof Int && ((Int)(e.e1)).i > 121 ) {
-			Id idretour = Id.gen();
-			s2 = RegistreAllocation.getRegistre(idretour);
-			e.e1.registreDeRetour = e.registreDeRetour ; 
-			retour += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e2)).i);
+			s2 = "r10";
+			retour += String.format("\tldr\t%s,=%d\n","r10",((Int)(e.e2)).i);
 		} else if (e.e2 instanceof Var) {
 			s2 = e.e2.accept(this);
 			if (s2.contains("[sp,")) {
@@ -541,8 +534,7 @@ public class GenerationS implements ObjVisitor<String> {
 			ifTrue += e.e2.accept(this);
 		} else if(e.e2 instanceof Int && ((Int)(e.e2)).i > 121){
 			e.e2.registreDeRetour = e.registreDeRetour ; 
-			ifTrue +=String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e2)).i);
-			ifTrue+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e2.accept(this));	
+			ifTrue +=e.e2.accept(this);	
 
 		} else { // entier +float +bool
 			ifTrue+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e2.accept(this));	
@@ -572,8 +564,7 @@ public class GenerationS implements ObjVisitor<String> {
 			ifFalse += e.e3.accept(this);
 		} else if(e.e3 instanceof Int && ((Int)(e.e3)).i > 121){
 			e.e3.registreDeRetour = e.registreDeRetour ; 
-			ifFalse += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e3)).i);
-			ifFalse+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e3.accept(this));	
+			ifFalse += e.e3.accept(this);	
 		} else {  //entier +float +bool
 			ifFalse+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e3.accept(this));
 		}		
