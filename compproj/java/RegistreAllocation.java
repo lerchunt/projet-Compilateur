@@ -128,14 +128,12 @@ public class RegistreAllocation implements Visitor {
 	}
 
 	static public String spillStart(String id_registre) {
-		String retour = "\tSUB\tsp, sp, #4\n";
-		retour = String.format("%s\tSTR\t%s, [sp,#0]\n",retour, id_registre);
+		String retour = String.format("\tSTMBD\t%s, [sp,#0]\n", id_registre);
 		return retour;
 	}
 	
 	static public String spillEnd(String id_registre) {
-		String retour = "\tADD\tsp, sp, #4\n";
-		retour += String.format("\tLDR\t%s, [sp,#0]\n", id_registre);
+		String retour = String.format("\tLDMIA\t%s, [sp,#0]\n", id_registre);
 		for (Registre reg : tabReg) {
 			if (reg.nom.equals(id_registre)) {
 				reg.var.removeLast();
@@ -391,14 +389,14 @@ public class RegistreAllocation implements Visitor {
 
 		public void startDefFunc() {
 			if (regCour != null && !regCour.isEmpty() && regCour.contains("[sp,")){
-				cmpPile += 32;
+				cmpPile += 52;
 				regCour = String.format("[sp, #%d]",cmpPile);
 			}
 		}
 
 		public void endDefFunc() {
 			if (regCour != null && !regCour.isEmpty() && regCour.contains("[sp,")){
-				cmpPile -= 32;
+				cmpPile -= 52;
 				regCour = String.format("[sp, #%d]",cmpPile);
 			}
 		}
