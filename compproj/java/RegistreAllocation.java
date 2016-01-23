@@ -128,12 +128,12 @@ public class RegistreAllocation implements Visitor {
 	}
 
 	static public String spillStart(String id_registre) {
-		String retour = String.format("\tSTMBD\t%s, [sp,#0]\n", id_registre);
+		String retour = String.format("\tSTMDB\tsp!, {%s}\n", id_registre);
 		return retour;
 	}
 	
 	static public String spillEnd(String id_registre) {
-		String retour = String.format("\tLDMIA\t%s, [sp,#0]\n", id_registre);
+		String retour = String.format("\tLDMIA\tsp!, {%s}\n", id_registre);
 		for (Registre reg : tabReg) {
 			if (reg.nom.equals(id_registre)) {
 				reg.var.removeLast();
