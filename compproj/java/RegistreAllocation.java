@@ -5,7 +5,7 @@ import java.util.LinkedList;
 public class RegistreAllocation implements Visitor {
 	
 	public RegistreAllocation() {
-		for (int i=3; i<10; i++) {
+		for (int i=4; i<9; i++) {
 			String nom = String.format("r%d", i);
 			tabReg.add(new Registre(nom));
 		}
@@ -128,14 +128,12 @@ public class RegistreAllocation implements Visitor {
 	}
 
 	static public String spillStart(String id_registre) {
-		String retour = "\tSUB\tsp, sp, #4\n";
-		retour = String.format("%s\tSTR\t%s, [sp,#0]\n",retour, id_registre);
+		String retour = String.format("\tSTMBD\t%s, [sp,#0]\n", id_registre);
 		return retour;
 	}
 	
 	static public String spillEnd(String id_registre) {
-		String retour = "\tADD\tsp, sp, #4\n";
-		retour += String.format("\tLDR\t%s, [sp,#0]\n", id_registre);
+		String retour = String.format("\tLDMIA\t%s, [sp,#0]\n", id_registre);
 		for (Registre reg : tabReg) {
 			if (reg.nom.equals(id_registre)) {
 				reg.var.removeLast();
@@ -272,6 +270,8 @@ public class RegistreAllocation implements Visitor {
 
 	@Override
 	public void visit(LE e) {
+		e.e1.accept(this);
+		e.e2.accept(this);
 	}
 
 	@Override
@@ -386,6 +386,20 @@ public class RegistreAllocation implements Visitor {
 				regCour = String.format("[sp, #%d]",cmpPile);
 			}
 		}
+
+		public void startDefFunc() {
+			if (regCour != null && !regCour.isEmpty() && regCour.contains("[sp,")){
+				cmpPile += 52;
+				regCour = String.format("[sp, #%d]",cmpPile);
+			}
+		}
+
+		public void endDefFunc() {
+			if (regCour != null && !regCour.isEmpty() && regCour.contains("[sp,")){
+				cmpPile -= 52;
+				regCour = String.format("[sp, #%d]",cmpPile);
+			}
+		}
 	}
 
 
@@ -417,6 +431,18 @@ public class RegistreAllocation implements Visitor {
 					n.arc.removeFirst();
 				}
 			}
+		}
+	}
+
+	public static void startDefFunc() {
+		for (Noeud n : tabVar) {
+			n.startDefFunc();
+		}
+	}
+
+	public static void endDefFunc() {
+		for (Noeud n : tabVar) {
+			n.endDefFunc();
 		}
 	}
 
