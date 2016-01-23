@@ -132,7 +132,17 @@ public class ReductionOfNestedLet implements ObjVisitor<Exp> {
 	public Exp visit(App e) {
 		Exp newExp = e;
 		e.e = e.e.accept(this);
+		/*List<Exp> newEs = new LinkedList<Exp>();
+		for (Exp es : e.es) {
+			newEs.add(es.accept(this));
+		}
+
+		if (!newEs.isEmpty()) {
+			e.es = newEs;
+		}
 		
+		return e;
+		*/
 		List<Exp> newEs = new LinkedList<Exp>();
 		for (Exp exp : e.es) {
 			Exp argOpt = exp.accept(this);
