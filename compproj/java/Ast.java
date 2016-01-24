@@ -64,13 +64,7 @@ abstract class Exp implements Cloneable {
 		tP6.typeArgs.add(new TInt());
 
 		this.env.add(new Environnement(new Id("float_of_int"), tP6));
-		
-		TFun tP7 = new TFun();
-		tP7.typeRetour = new TInt();
-		tP7.typeArgs = new LinkedList<Type>();
-		tP7.typeArgs.add(new TFloat());
 
-		this.env.add(new Environnement(new Id("truncate"), tP7));
 		
 	}
 	// ***********************************************************

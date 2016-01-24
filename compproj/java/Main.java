@@ -174,11 +174,12 @@ public class Main {
 						System.out.println();
 
 					}
-						expression.accept(new GenerationASML());
+					String asml =  expression.accept(new GenerationASML());
+					asml = GenerationASML.haut + GenerationASML.inter + asml ;
 					String pathAsml = Path+InName+".asml";
 
 					PrintWriter w = new PrintWriter( new BufferedWriter( new FileWriter(pathAsml)));
-					w.print(GenerationASML.asml);
+					w.print(asml);
 					w.close();
 
 					// option -asml
