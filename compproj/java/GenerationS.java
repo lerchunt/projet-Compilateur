@@ -236,7 +236,7 @@ public class GenerationS implements ObjVisitor<String> {
 			} 
 			retour += String.format("\tmov\tr0,%s\n",r2);
 		} else {
-			System.err.println("internal error -- GenerationS -- add");
+			System.err.println("internal error -- GenerationS -- fadd");
 			System.exit(1);
 			return null;
 		}
@@ -261,7 +261,7 @@ public class GenerationS implements ObjVisitor<String> {
 			} 
 			retour += String.format("\tmov\tr1,%s\n",r1);
 		} else {
-			System.err.println("internal error -- GenerationS -- fadd");
+			System.err.println("internal error -- GenerationS -- fsub");
 			System.exit(1);
 			return null;
 		}
@@ -276,7 +276,7 @@ public class GenerationS implements ObjVisitor<String> {
 			} 
 			retour += String.format("\tmov\tr0,%s\n",r2);
 		} else {
-			System.err.println("internal error -- GenerationS -- add");
+			System.err.println("internal error -- GenerationS -- fsub");
 			System.exit(1);
 			return null;
 		}
