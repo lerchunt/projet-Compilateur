@@ -903,12 +903,13 @@ public class GenerationS implements ObjVisitor<String> {
 
 			Id idretour = Id.gen();
 			e.e1.registreDeRetour= RegistreAllocation.getRegistre(idretour);
-			defVar+=String.format("array%d:\t.skip %d\n",cmpTab,tailleT *100);
-			defFunc+=String.format("addr_tab%d:\t.word array%d\n",cmpTab,cmpTab);	
+				
 			defTab+=String.format("\tldr\t%s,addr_tab%d\n\tmov\tr0,%s\n",e.e1.registreDeRetour,cmpTab,e.e1.registreDeRetour);
 			defTab+=String.format("\tmov\tr1,#%d\t@lenght of the array\n", tailleT);
 
 			if (e.e2 instanceof Float){
+				defVar+=String.format("array%d:\t.skip %d\n",cmpTab,tailleT *100);
+				defFunc+=String.format("addr_tab%d:\t.word array%d\n",cmpTab,cmpTab);
 				idretour = Id.gen();
 				listeid.add(idretour);
 				e.e2.registreDeRetour= RegistreAllocation.getRegistre(idretour);
@@ -917,6 +918,8 @@ public class GenerationS implements ObjVisitor<String> {
 				retour+="\tbl\tmin_caml_create_float_array\n";
 
 			}else if(e.e2 instanceof Tuple){	
+				defVar+=String.format("array%d:\t.skip %d\n",cmpTab,tailleT *100);
+				defFunc+=String.format("addr_tab%d:\t.word array%d\n",cmpTab,cmpTab);
 				cmpTuple++;
 
 				idretour = Id.gen();
@@ -958,20 +961,27 @@ public class GenerationS implements ObjVisitor<String> {
 				retour+=String.format("\tmov\tr2,%s\n", reg);
 				retour+=defTab;
 			}else if(e.e2 instanceof Array){
-				cmpTab++;
-				int tailleTab = ((Int)(((Array)(e.e2)).e1)).i;
-				idretour = Id.gen();
-				e.e2.registreDeRetour= RegistreAllocation.getRegistre(idretour);
-				
-				defVar+=String.format("array%d:\t.skip %d\n",cmpTab,tailleTab *100);
+				defVar+=String.format("array%d:\t.skip %d\n",cmpTab,tailleT *100);
 				defFunc+=String.format("addr_tab%d:\t.word array%d\n",cmpTab,cmpTab);
 				
-				retour+=String.format("\tldr\t%s,addr_tab%d\n\tmov\tr0,%s\n",e.e2.registreDeRetour,cmpTab,e.e2.registreDeRetour);
-				retour+=String.format("\tmov\tr1,#%d\t@lenght of the array\n", tailleT);
-				
-				retour+=e.e2.accept(this)+defTab;
-				retour+=String.format("\tmov\tr2,%s\n",e.e2.registreDeRetour);
-				retour+="\tbl\tmin_caml_create_array\n";
+				if (((Array)(e.e2)).e2 instanceof Array){
+					retour+=e.e2.accept(this) + defTab;
+					retour+=String.format("\tmov\tr2,%s\n",((Array)(e.e2)).e1.registreDeRetour);
+					retour+="\tbl\tmin_caml_create_array\n";
+				}else{
+					cmpTab++;
+					int tailleTab = ((Int)(((Array)(e.e2)).e1)).i;
+					idretour = Id.gen();
+					e.e2.registreDeRetour= RegistreAllocation.getRegistre(idretour);					
+					defVar+=String.format("array%d:\t.skip %d\n",cmpTab,tailleTab *100);
+					defFunc+=String.format("addr_tab%d:\t.word array%d\n",cmpTab,cmpTab);
+					
+					retour+=String.format("\tldr\t%s,addr_tab%d\n\tmov\tr0,%s\n",e.e2.registreDeRetour,cmpTab,e.e2.registreDeRetour);
+					retour+=String.format("\tmov\tr1,#%d\t@lenght of the array\n", tailleT);					
+					retour+=e.e2.accept(this)+defTab;
+					retour+=String.format("\tmov\tr2,%s\n",e.e2.registreDeRetour);
+					retour+="\tbl\tmin_caml_create_array\n";
+				}
 			}else{
 				retour+=String.format("\tmov\tr2,%s\n",e.e2.accept(this));
 				retour+="\tbl\tmin_caml_create_array\n";
