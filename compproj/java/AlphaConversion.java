@@ -226,9 +226,12 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(Tuple e) {
+		List<Exp> newExp = new LinkedList<Exp>();
 		for (Exp exp : e.es) {
-			exp = exp.accept(this);
+			newExp.add(exp.accept(this));
+			
 		}
+		e.es=newExp;
 		return e;
 	}
 

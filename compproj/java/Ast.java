@@ -690,7 +690,7 @@ class App extends Exp {
 	}
 
 	LinkedList<String> closure = new LinkedList<String>();
-
+	
 	<E> E accept(ObjVisitor<E> v) {
 		return v.visit(this);
 	}
@@ -702,6 +702,7 @@ class App extends Exp {
 	public String toString(){
 		return "app" ;
 	}
+	
     @Override
     public Object clone() {
     	Object o = null;
