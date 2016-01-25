@@ -659,7 +659,10 @@ public class GenerationS implements ObjVisitor<String> {
 				data = true;
 			}
 			e.e1.registreDeRetour = registre;
-			retour+=String.format("%s", e.e1.accept(this));			
+			retour+=String.format("%s", e.e1.accept(this));		
+		}else if (e.e1 instanceof Tuple){
+			e.e1.registreDeRetour = registre;
+			retour += String.format("%s", e.e1.accept(this));
 		} else if (e.e1 instanceof Int && ((Int)(e.e1)).i > 121){
 			e.e1.registreDeRetour = e.registreDeRetour ; 
 			retour += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e1)).i);
@@ -933,7 +936,7 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(LetTuple e) { 
-		boolean isSpill1 = false;
+		boolean isSpill = false;
 		String retour ="";
 		String registre="";
 		int cpt=0;
@@ -958,8 +961,22 @@ public class GenerationS implements ObjVisitor<String> {
 		}*/
 		if ( e.e1 instanceof Tuple) {
 			retour += e.e1.accept(this);
-		}else 
-			retour += String.format("\tmov\t%s,%s\n", registre, e.e1.accept(this));	
+			
+		}else if (e.e1 instanceof Var){
+			String regVar = RegistreAllocation.getRegistre(((Var)(e.e1)).id); 
+			if (regVar == null) {
+				isSpill = true;
+				regVar = RegistreAllocation.spillInit(((Var)(e.e1)).id);
+				retour += RegistreAllocation.spillStart(regVar);
+			}
+			retour+=e.e2.accept(this);
+			retour+=String.format("\tmov\t%s,%s\n",regVar,e.e2.registreDeRetour);
+			
+			if (isSpill){
+				RegistreAllocation.spillEnd(regVar);
+			}			
+		}
+	
 		
 		if (e.e2 instanceof OpBin){
 			e.e2.registreDeRetour = e.registreDeRetour;
@@ -1002,37 +1019,8 @@ public class GenerationS implements ObjVisitor<String> {
 				retour+="\tbl\tmin_caml_create_float_array\n";
 
 			}else if(e.e2 instanceof Tuple){	
-				cmpTuple++;				
-				String reg = ((Tuple)(e.e2)).registreDeRetour;
-							
-				//Create array composed to the element of Tuple : 
-				int nbTuple = ((Tuple)(e.e2)).es.size();
-				defVar+=String.format("arrayTuple%d:\t.skip %d\n",cmpTuple,nbTuple *100);
-				defFunc+=String.format("addr_tabTuple%d:\t.word arrayTuple%d\n",cmpTuple,cmpTuple);
-				
-				retour+=String.format("\tldr\t%s,addr_tabTuple%d\n\tmov\tr0,%s\n",reg,cmpTuple,reg);
-				retour+=String.format("\tmov\tr1,#%d\t\n", nbTuple);
-				retour+=String.format("\tmov\tr2,#0\n");
-				retour+="\tbl\tmin_caml_create_array\n";
-
-				for(int i=0;i<nbTuple;i++){
-					if (((Tuple)e.e2).es.get(i) instanceof Float){
-						((Tuple)e.e2).es.get(i).registreDeRetour = "r11";
-						retour+=String.format("%s",((Tuple)e.e2).es.get(i).accept(this));
-						retour+=String.format("\tmov\tr10,#%d\n",i);
-						retour+=String.format("\tstr\tr11,[%s,r10,LSL #2]\n",reg);
-					} else if (((Tuple)e.e2).es.get(i) instanceof Array){
-						retour+=String.format("%s\n",((Tuple)e.e2).es.get(i).accept(this));
-						retour+=String.format("\tmov\tr11,%s\n", ((Array)((Tuple)e.e2).es.get(i)).e2.registreDeRetour);
-						retour+=String.format("\tmov\tr10,#%d\n",i);
-						retour+=String.format("\tstr\tr11,[%s,r10,LSL #2]\n",reg);					
-					}else{
-						retour+=String.format("\tmov\tr11,%s\n",((Tuple)e.e2).es.get(i).accept(this));
-						retour+=String.format("\tmov\tr10,#%d\n",i);
-						retour+=String.format("\tstr\tr11,[%s,r10,LSL #2]\n",reg);
-					}
-				}				
-				retour+=String.format("\tmov\tr2,%s\n", reg);
+				retour+=e.e2.accept(this);	
+				retour+=String.format("\tmov\t%s,%s\n", e.registreDeRetour,e.e2.registreDeRetour);
 
 			}else if(e.e2 instanceof Array){
 				retour+=e.e2.accept(this);
