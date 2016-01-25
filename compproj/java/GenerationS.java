@@ -271,14 +271,14 @@ public class GenerationS implements ObjVisitor<String> {
 		String retour = "";
 		if(e.e1 instanceof Float){
 			e.e1.registreDeRetour = "r10";
-			retour += String.format("%s\tmov\tr1,%s\n",e.e1.accept(this),"r10");
+			retour += String.format("%s\tmov\tr0,%s\n",e.e1.accept(this),"r10");
 		} else if (e.e1 instanceof Var){
 			r1 = e.e1.accept(this);
 			if (r1.contains("[sp,")) {
 				retour += String.format("\tldr\t%s,%s\n","r10",r1);
 				r1 = "r10";
 			} 
-			retour += String.format("\tmov\tr1,%s\n",r1);
+			retour += String.format("\tmov\tr0,%s\n",r1);
 		} else {
 			System.err.println("internal error -- GenerationS -- fsub");
 			System.exit(1);
@@ -287,7 +287,7 @@ public class GenerationS implements ObjVisitor<String> {
 		if(e.e2 instanceof Float){
 			e.e2.registreDeRetour= "r11";
 			if(!r2.equals("r0"))
-				retour += String.format("%s\tmov\tr0,%s\n",e.e2.accept(this),"r11");
+				retour += String.format("%s\tmov\tr1,%s\n",e.e2.accept(this),"r11");
 			else
 				retour += e.e2.accept(this);
 		}else if (e.e2 instanceof Var){
@@ -296,7 +296,7 @@ public class GenerationS implements ObjVisitor<String> {
 				retour += String.format("\tldr\t%s,%s\n","r11",r2);
 				r2 = "r11";
 			} 
-			retour += String.format("\tmov\tr0,%s\n",r2);
+			retour += String.format("\tmov\tr1,%s\n",r2);
 		} else {
 			System.err.println("internal error -- GenerationS -- fsub");
 			System.exit(1);
