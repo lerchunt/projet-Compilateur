@@ -199,7 +199,15 @@ public class ClosureConversion implements ObjVisitor<Exp> {
 			Exp E2Prec = (Exp)newLetRec.e.clone();
 			newLetRec.e = (LetRec)e.clone();
 			((LetRec)newLetRec.e).fd.e = e.fd.e;
-			e.fd.e = E2Prec;
+			if (E2Prec instanceof Var) {
+				List<Exp> newArgs = new LinkedList<Exp>();
+				for (Id id : e.fd.args) {
+					newArgs.add(new Var(id));
+				}
+				e.fd.e = new App(E2Prec,newArgs);
+			} else {
+				e.fd.e = E2Prec;
+			}
 			newLetRec.env = e.env;
 			newLetRec.fd.e.env = e.env;
 			newLetRec.fd.e = newLetRec.fd.e.accept(this);
@@ -219,7 +227,6 @@ public class ClosureConversion implements ObjVisitor<Exp> {
 		e.e.env.addAll(e.env);
 		e.e = e.e.accept(this);
 		e.env.removeFirst();
-
 		return e;
 	}
 
