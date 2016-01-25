@@ -216,8 +216,8 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e1 instanceof Var){
 			r1 = e.e1.accept(this);
 			if (r1.contains("[sp,")) {
-				retour += String.format("\tldr\t%s,%s\n","r11",r1);
-				r1 = "r11";
+				retour += String.format("\tldr\t%s,%s\n","r10",r1);
+				r1 = "r10";
 			} 
 			retour += String.format("\tmov\tr1,%s\n",r1);
 		} else {
@@ -262,8 +262,8 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e1 instanceof Var){
 			r1 = e.e1.accept(this);
 			if (r1.contains("[sp,")) {
-				retour += String.format("\tldr\t%s,%s\n","r11",r1);
-				r1 = "r11";
+				retour += String.format("\tldr\t%s,%s\n","r10",r1);
+				r1 = "r10";
 			} 
 			retour += String.format("\tmov\tr1,%s\n",r1);
 		} else {
@@ -308,8 +308,8 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e1 instanceof Var){
 			r1 = e.e1.accept(this);
 			if (r1.contains("[sp,")) {
-				retour += String.format("\tldr\t%s,%s\n","r9",r1);
-				r1 = "r9";
+				retour += String.format("\tldr\t%s,%s\n","r10",r1);
+				r1 = "r10";
 			} 
 			retour += String.format("\tmov\tr1,%s\n",r1);
 		} else {
@@ -386,8 +386,8 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e1 instanceof Var){
 			r1 = e.e1.accept(this);
 			if (r1.contains("[sp,")) {
-				retour += String.format("\tldr\t%s,%s\n","r9",r1);
-				r1 = "r9";
+				retour += String.format("\tldr\t%s,%s\n","r10",r1);
+				r1 = "r10";
 			} 
 			retour += String.format("\tmov\tr1,%s\n",r1);
 		} else {
@@ -891,28 +891,26 @@ public class GenerationS implements ObjVisitor<String> {
 		String retour ="";
 		String registre="";
 		int cpt=0;
-		LinkedList<Boolean> isSpill = new LinkedList<Boolean>();
+		/*LinkedList<Boolean> isSpill = new LinkedList<Boolean>();
 		for (Id id : e.ids) {
-			//for(int i=0;i<nbTuple;i++){
-			if ( e.e1 instanceof Tuple) {
-				isSpill.add(true);
+			isSpill.add(true);
 				registre = RegistreAllocation.getRegistre(id);
 				if (registre == null) {
 					isSpill.set(cpt, true);	
 					registre = RegistreAllocation.spillInit(id);
 					retour += RegistreAllocation.spillStart(registre);
 				}
-				if (((Tuple)e.e1).es.get(cpt) instanceof Float){
-					((Tuple)e.e1).es.get(cpt).registreDeRetour= registre;
-					retour+=String.format("%s\n",((Tuple)e.e1).es.get(cpt).accept(this));
-				}
-				else
-					retour += String.format("\tmov\t%s,%s\n", registre, ((Tuple)e.e1).es.get(cpt).accept(this));	
-			} else {
+			if ( e.e1 instanceof Tuple) {
+					if (((Tuple)e.e1).es.get(cpt) instanceof Float){
+						((Tuple)e.e1).es.get(cpt).registreDeRetour= registre;
+						retour+=String.format("%s\n",((Tuple)e.e1).es.get(cpt).accept(this));
+					} else
+						retour += String.format("\tmov\t%s,%s\n", registre, ((Tuple)e.e1).es.get(cpt).accept(this));
+			} else 
 				retour += String.format("\tmov\t%s,%s\n", registre, e.e1.accept(this));	
-			}
 			cpt++;
-		}
+		}*/
+		
 		if (e.e2 instanceof OpBin){
 			e.e2.registreDeRetour = e.registreDeRetour;
 			retour += e.e2.accept(this);
