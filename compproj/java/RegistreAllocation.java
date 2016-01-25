@@ -5,7 +5,7 @@ import java.util.LinkedList;
 public class RegistreAllocation implements Visitor {
 	
 	public RegistreAllocation() {
-		for (int i=4; i<9; i++) {
+		for (int i=4; i<10; i++) {
 			String nom = String.format("r%d", i);
 			tabReg.add(new Registre(nom));
 		}
