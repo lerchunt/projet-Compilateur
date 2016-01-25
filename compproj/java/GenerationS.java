@@ -940,6 +940,7 @@ public class GenerationS implements ObjVisitor<String> {
 		String retour="";
 		cmpTab++;
 		String defTab ="";
+		boolean isSpill = false;
 
 		if (e.e1 instanceof Int){
 			int tailleT = ((Int)(e.e1)).i;
@@ -987,11 +988,28 @@ public class GenerationS implements ObjVisitor<String> {
 					}
 				}				
 				retour+=String.format("\tmov\tr2,%s\n", reg);
-				//retour+=defTab;
+				
+
 			}else if(e.e2 instanceof Array){
 				retour+=e.e2.accept(this);
 				retour+=String.format("\tmov\tr2,%s\n%s",((Array)(e.e2)).e2.registreDeRetour,defTab);
 				retour+="\tbl\tmin_caml_create_array\n";
+			}else if (e.e2 instanceof Var){
+				String regVar = RegistreAllocation.getRegistre(((Var)(e.e2)).id); 
+				if (regVar == null) {
+					isSpill = true;
+					regVar = RegistreAllocation.spillInit(((Var)(e.e2)).id);
+					retour += RegistreAllocation.spillStart(regVar);
+				}
+				retour+=defTab;
+				retour+=String.format("\tmov\tr2,%s\n",regVar);							
+				retour+="\tbl\tmin_caml_create_array\n";
+				
+				if (isSpill){
+					RegistreAllocation.spillEnd(regVar);
+				}
+				
+				
 			}else{
 				retour+=defTab;	
 				retour+=String.format("\tmov\tr2,%s\n",e.e2.accept(this));							
@@ -1038,6 +1056,9 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(Put e) {
 		String retour = "";
 		boolean isSpill = false;
+		boolean isSpill2 = false;
+		
+		
 		
 		if (e.e2 instanceof Int){
 			retour+=String.format("\tmov\tr10,%s\n",e.e2.accept(this));
@@ -1048,7 +1069,25 @@ public class GenerationS implements ObjVisitor<String> {
 					regVar = RegistreAllocation.spillInit(((Var)(e.e1)).id);
 					retour += RegistreAllocation.spillStart(regVar);
 				}
-				retour+=String.format("\tstr\t%s,[%s,r10,LSL #2]\n",e.registreDeRetour,regVar);
+				if (e.e3 instanceof Var){
+					String regVar3 = RegistreAllocation.getRegistre(((Var)(e.e3)).id);
+					if (regVar3 == null) {
+						isSpill2 = true;
+						regVar3 = RegistreAllocation.spillInit(((Var)(e.e1)).id);
+						retour += RegistreAllocation.spillStart(regVar3);
+					}
+					retour+=String.format("\tstr\t%s,[%s,r10,LSL #2]\n",regVar3,regVar);					
+					if (isSpill2){
+						RegistreAllocation.spillEnd(regVar3);
+					}
+				} else if (e.e3 instanceof Array){
+					e.e3.registreDeRetour = "r11";
+					retour+=e.e3.accept(this);
+					retour+=String.format("\tstr\tr11,[%s,r10,LSL #2]\n",regVar);
+				}else{
+					retour+=String.format("\tmov\tr11,%s\n",e.e3.accept(this));
+					retour+=String.format("\tstr\tr11,[%s,r10,LSL #2]\n",e.e1.registreDeRetour);
+				}
 				if (isSpill){
 					RegistreAllocation.spillEnd(regVar);
 				}
