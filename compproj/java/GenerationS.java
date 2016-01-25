@@ -579,7 +579,10 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if(e.e2 instanceof Int && ((Int)(e.e2)).i > 121){
 			e.e2.registreDeRetour = e.registreDeRetour ; 
 			ifTrue +=e.e2.accept(this);	
-		} else { // entier +float +bool
+		}else if (e.e2 instanceof Float){
+			e.e2.registreDeRetour = e.registreDeRetour;
+			ifTrue += e.e2.accept(this);
+		} else { // entier  +bool
 			ifTrue+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e2.accept(this));	
 		}
 
