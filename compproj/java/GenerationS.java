@@ -971,8 +971,8 @@ public class GenerationS implements ObjVisitor<String> {
 
 				for(int i=0;i<nbTuple;i++){
 					if (((Tuple)e.e2).es.get(i) instanceof Float){
-						retour+=String.format("%s\n",((Tuple)e.e2).es.get(i).accept(this));
-						retour+=String.format("\tmov\tr11,%s\n", ((Tuple)e.e2).es.get(i).registreDeRetour);
+						((Tuple)e.e2).es.get(i).registreDeRetour = "r11";
+						retour+=String.format("%s",((Tuple)e.e2).es.get(i).accept(this));
 						retour+=String.format("\tmov\tr10,#%d\n",i);
 						retour+=String.format("\tstr\tr11,[%s,r10,LSL #2]\n",reg);
 					} else if (((Tuple)e.e2).es.get(i) instanceof Array){
@@ -989,12 +989,12 @@ public class GenerationS implements ObjVisitor<String> {
 				retour+=String.format("\tmov\tr2,%s\n", reg);
 				//retour+=defTab;
 			}else if(e.e2 instanceof Array){
-				retour+=e.e2.accept(this)+defTab;
-				retour+=String.format("\tmov\tr2,%s\n",((Array)(e.e2)).e2.registreDeRetour);
+				retour+=e.e2.accept(this);
+				retour+=String.format("\tmov\tr2,%s\n%s",((Array)(e.e2)).e2.registreDeRetour,defTab);
 				retour+="\tbl\tmin_caml_create_array\n";
 			}else{
-				retour+=defTab;
-				retour+=String.format("\tmov\tr2,%s\n",e.e2.accept(this));
+				retour+=defTab;	
+				retour+=String.format("\tmov\tr2,%s\n",e.e2.accept(this));							
 				retour+="\tbl\tmin_caml_create_array\n";
 			}	
 		}else{
@@ -1036,21 +1036,29 @@ public class GenerationS implements ObjVisitor<String> {
 
 	@Override
 	public String visit(Put e) {
-		LinkedList<Id> listeid = new LinkedList<Id>();
 		String retour = "";
-		if (e.e1 instanceof Array){
-			retour += e.e1.accept(this);
-			String reg0 = e.e1.registreDeRetour;
-			if (e.e2 instanceof Int){
-				Id idretour = Id.gen();
-				listeid.add(idretour);
-				String reg1 = RegistreAllocation.getRegistre(idretour);	
-				retour+=String.format("\tmov\t%s,%s\n",reg1,e.e2.accept(this));
-				retour+=String.format("\tstr\t%s,[%s,%s,LSL #2]\n",e.registreDeRetour,reg0,reg1);				
-			}else{
-				System.err.println("internal error - Put (GenerationS)");
-				System.exit(1);
-			}
+		boolean isSpill = false;
+		
+		if (e.e2 instanceof Int){
+			retour+=String.format("\tmov\tr10,%s\n",e.e2.accept(this));
+			if (e.e1 instanceof Var){
+				String regVar = RegistreAllocation.getRegistre(((Var)(e.e1)).id); 
+				if (regVar == null) {
+					isSpill = true;
+					regVar = RegistreAllocation.spillInit(((Var)(e.e1)).id);
+					retour += RegistreAllocation.spillStart(regVar);
+				}
+				retour+=String.format("\tstr\t%s,[%s,r10,LSL #2]\n",e.registreDeRetour,regVar);
+				if (isSpill){
+					RegistreAllocation.spillEnd(regVar);
+				}
+			} else if (e.e1 instanceof Put){
+				retour += e.e1.accept(this);
+				retour+=String.format("\tstr\t%s,[%s,r10,LSL #2]\n",e.registreDeRetour,e.e1.registreDeRetour);
+			}	
+		}else{
+			System.err.println("internal error - Put (GenerationS)");
+			System.exit(1);
 		}	
 		return retour;
 	}
