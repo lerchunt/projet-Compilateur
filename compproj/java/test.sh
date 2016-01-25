@@ -41,7 +41,8 @@ cd ../../
 		echo -n "(*" > tmp.txt
 
 		# Set du time out
-		( echo -n `qemu-arm ./${i%%.*}.arm` >> tmp.txt ) & sleep 0.1 ; if [ $? -eq 0 ]; then kill $! 2> /dev/null; fi
+		#( echo -n `qemu-arm ./${i%%.*}.arm` >> tmp.txt ) & sleep 0.1 ; if [ $? -eq 0 ]; then kill $! 2> /dev/null; fi
+		echo -n `qemu-arm ./${i%%.*}.arm` >> tmp.txt
 
 		echo "*)" >> tmp.txt
 		sed -n 1p $i > tmp2.txt
