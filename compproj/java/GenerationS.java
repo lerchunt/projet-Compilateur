@@ -984,6 +984,7 @@ public class GenerationS implements ObjVisitor<String> {
 		LinkedList<Id> listeid = new LinkedList<Id>();
 		String retour = "";
 		String reg1 = "";
+		boolean isSpill = false;
 		if (e.e2 instanceof Int){
 			Id idretour = Id.gen();
 			listeid.add(idretour);
@@ -994,11 +995,19 @@ public class GenerationS implements ObjVisitor<String> {
 			
 			if (e.e1 instanceof Var){
 				String regVar = RegistreAllocation.getRegistre(((Var)(e.e1)).id); 
+				if (regVar == null) {
+					isSpill = true;
+					regVar = RegistreAllocation.spillInit(((Var)(e.e1)).id);
+					retour += RegistreAllocation.spillStart(regVar);
+				}
 				retour+=String.format("\tldr\t%s,[%s,%s,LSL #2]\n",e.registreDeRetour,regVar,reg1);
+				if (isSpill){
+					RegistreAllocation.spillEnd(regVar);
+				}
 			} else if (e.e1 instanceof Get){
 				retour += e.e1.accept(this);
 				retour+=String.format("\tldr\t%s,[%s,%s,LSL #2]\n",e.registreDeRetour,e.e1.registreDeRetour,reg1);
-				System.out.println("ici");
+				
 			}	
 		}else{
 			System.err.println("internal error - Get (GenerationS)");
