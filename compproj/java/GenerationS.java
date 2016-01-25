@@ -937,8 +937,8 @@ public class GenerationS implements ObjVisitor<String> {
 		String retour ="";
 		String registre="";
 		int cpt=0;
-		LinkedList<Boolean> isSpill = new LinkedList<Boolean>();
-		/*for (Id id : e.ids) {
+		/*LinkedList<Boolean> isSpill = new LinkedList<Boolean>();
+		for (Id id : e.ids) {
 			isSpill.add(true);
 				registre = RegistreAllocation.getRegistre(id);
 				if (registre == null) {
@@ -958,7 +958,8 @@ public class GenerationS implements ObjVisitor<String> {
 		}*/
 		if ( e.e1 instanceof Tuple) {
 			retour += e.e1.accept(this);
-		}
+		}else 
+			retour += String.format("\tmov\t%s,%s\n", registre, e.e1.accept(this));	
 		
 		if (e.e2 instanceof OpBin){
 			e.e2.registreDeRetour = e.registreDeRetour;
@@ -974,11 +975,6 @@ public class GenerationS implements ObjVisitor<String> {
 			e.e2.registreDeRetour = e.registreDeRetour ; 
 			retour += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e2)).i);
 		} else if (e.e2 instanceof App){
-				/*retour+=String.format("\tmov\tr10,%s\n",e.e2.accept(this));
-				if (e.e1 instanceof Var){
-					String regVar = RegistreAllocation.getRegistre(((Var)(e.e1)).id); 
-					retour+=String.format("\tldr\t%s,[%s,r10,LSL #2]\n",e.registreDeRetour,regVar);
-				}*/
 			retour += e.e2.accept(this);
 		}
 		return retour;
