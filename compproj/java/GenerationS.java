@@ -1008,37 +1008,8 @@ public class GenerationS implements ObjVisitor<String> {
 				retour+="\tbl\tmin_caml_create_float_array\n";
 
 			}else if(e.e2 instanceof Tuple){	
-				cmpTuple++;				
-				String reg = ((Tuple)(e.e2)).registreDeRetour;
-							
-				//Create array composed to the element of Tuple : 
-				int nbTuple = ((Tuple)(e.e2)).es.size();
-				defVar+=String.format("arrayTuple%d:\t.skip %d\n",cmpTuple,nbTuple *100);
-				defFunc+=String.format("addr_tabTuple%d:\t.word arrayTuple%d\n",cmpTuple,cmpTuple);
-				
-				retour+=String.format("\tldr\t%s,addr_tabTuple%d\n\tmov\tr0,%s\n",reg,cmpTuple,reg);
-				retour+=String.format("\tmov\tr1,#%d\t\n", nbTuple);
-				retour+=String.format("\tmov\tr2,#0\n");
-				retour+="\tbl\tmin_caml_create_array\n";
-
-				for(int i=0;i<nbTuple;i++){
-					if (((Tuple)e.e2).es.get(i) instanceof Float){
-						((Tuple)e.e2).es.get(i).registreDeRetour = "r11";
-						retour+=String.format("%s",((Tuple)e.e2).es.get(i).accept(this));
-						retour+=String.format("\tmov\tr10,#%d\n",i);
-						retour+=String.format("\tstr\tr11,[%s,r10,LSL #2]\n",reg);
-					} else if (((Tuple)e.e2).es.get(i) instanceof Array){
-						retour+=String.format("%s\n",((Tuple)e.e2).es.get(i).accept(this));
-						retour+=String.format("\tmov\tr11,%s\n", ((Array)((Tuple)e.e2).es.get(i)).e2.registreDeRetour);
-						retour+=String.format("\tmov\tr10,#%d\n",i);
-						retour+=String.format("\tstr\tr11,[%s,r10,LSL #2]\n",reg);					
-					}else{
-						retour+=String.format("\tmov\tr11,%s\n",((Tuple)e.e2).es.get(i).accept(this));
-						retour+=String.format("\tmov\tr10,#%d\n",i);
-						retour+=String.format("\tstr\tr11,[%s,r10,LSL #2]\n",reg);
-					}
-				}				
-				retour+=String.format("\tmov\tr2,%s\n", reg);
+				retour+=e.e2.accept(this);	
+				retour+=String.format("\tmov\tr2,%s\n", e.e2.registreDeRetour);
 
 			}else if(e.e2 instanceof Array){
 				retour+=e.e2.accept(this);
