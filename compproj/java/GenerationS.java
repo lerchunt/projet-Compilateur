@@ -887,7 +887,15 @@ public class GenerationS implements ObjVisitor<String> {
 								retour +=String.format("%s\n",strP);
 							}else if (param instanceof Int && ((Int)param).i > 121) {
 								retour += strP;
-							} else {
+							}else if(param instanceof Array){
+								retour+=strP;
+							}else if(param instanceof Tuple){
+								retour+=strP;
+							}else if(param instanceof Get){
+								retour+=strP;
+							}else if(param instanceof Put){
+								retour+=strP;
+							}else {
 								retour +=String.format("\tmov\tr%d,%s\n", nbParam, strP);
 							}
 						}
