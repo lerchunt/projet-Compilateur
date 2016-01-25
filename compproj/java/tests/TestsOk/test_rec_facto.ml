@@ -1,5 +1,6 @@
-(*15*)
-let rec facto x p=
-	if x=1 then p
-	else  facto (x-1 x*p) in 
-print_int (facto 10 1)
+(*3628800*)
+let rec facto x =
+if x <=1 then 1 
+else 
+let y = x-1 in  x * (facto y) in 
+print_int (facto 10)
