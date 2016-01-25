@@ -216,8 +216,8 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e1 instanceof Var){
 			r1 = e.e1.accept(this);
 			if (r1.contains("[sp,")) {
-				retour += String.format("\tldr\t%s,%s\n","r11",r1);
-				r1 = "r11";
+				retour += String.format("\tldr\t%s,%s\n","r10",r1);
+				r1 = "r10";
 			} 
 			retour += String.format("\tmov\tr1,%s\n",r1);
 		} else {
@@ -262,8 +262,8 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e1 instanceof Var){
 			r1 = e.e1.accept(this);
 			if (r1.contains("[sp,")) {
-				retour += String.format("\tldr\t%s,%s\n","r11",r1);
-				r1 = "r11";
+				retour += String.format("\tldr\t%s,%s\n","r10",r1);
+				r1 = "r10";
 			} 
 			retour += String.format("\tmov\tr1,%s\n",r1);
 		} else {
@@ -308,8 +308,8 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e1 instanceof Var){
 			r1 = e.e1.accept(this);
 			if (r1.contains("[sp,")) {
-				retour += String.format("\tldr\t%s,%s\n","r9",r1);
-				r1 = "r9";
+				retour += String.format("\tldr\t%s,%s\n","r10",r1);
+				r1 = "r10";
 			} 
 			retour += String.format("\tmov\tr1,%s\n",r1);
 		} else {
@@ -386,8 +386,8 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e1 instanceof Var){
 			r1 = e.e1.accept(this);
 			if (r1.contains("[sp,")) {
-				retour += String.format("\tldr\t%s,%s\n","r9",r1);
-				r1 = "r9";
+				retour += String.format("\tldr\t%s,%s\n","r10",r1);
+				r1 = "r10";
 			} 
 			retour += String.format("\tmov\tr1,%s\n",r1);
 		} else {
@@ -785,10 +785,9 @@ public class GenerationS implements ObjVisitor<String> {
 						if (registre.contains("[sp,")) {
 							retour += String.format("\tldr\tr10,%s",registre);
 							retour +=String.format("\tmov\tr%d,%s\n",nbParam,  "r10");
-						} else {
+						}else {
 							retour +=String.format("\tmov\tr%d,%s\n",nbParam,  registre);
 						}
-
 					} else if (e.e instanceof App){
 						((App)e.e).closure.add(registre);
 						retour += e.e.accept(this);
@@ -886,33 +885,83 @@ public class GenerationS implements ObjVisitor<String> {
 	}
 
 	@Override
-	public String visit(LetTuple e) {
+	public String visit(LetTuple e) { 
 		boolean isSpill1 = false;
 		String retour ="";
 		String registre="";
 		int cpt=0;
 		LinkedList<Boolean> isSpill = new LinkedList<Boolean>();
-		for (Id id : e.ids) {
-			//for(int i=0;i<nbTuple;i++){
-			if ( e.e1 instanceof Tuple) {
-				isSpill.add(true);
+		/*for (Id id : e.ids) {
+			isSpill.add(true);
 				registre = RegistreAllocation.getRegistre(id);
 				if (registre == null) {
 					isSpill.set(cpt, true);	
 					registre = RegistreAllocation.spillInit(id);
 					retour += RegistreAllocation.spillStart(registre);
 				}
-				if (((Tuple)e.e1).es.get(cpt) instanceof Float){
-					((Tuple)e.e1).es.get(cpt).registreDeRetour= registre;
-					retour+=String.format("%s\n",((Tuple)e.e1).es.get(cpt).accept(this));
-				}
-				else
-					retour += String.format("\tmov\t%s,%s\n", registre, ((Tuple)e.e1).es.get(cpt).accept(this));	
-			} else {
+			if ( e.e1 instanceof Tuple) {
+					if (((Tuple)e.e1).es.get(cpt) instanceof Float){
+						((Tuple)e.e1).es.get(cpt).registreDeRetour= registre;
+						retour+=String.format("%s\n",((Tuple)e.e1).es.get(cpt).accept(this));
+					} else
+						retour += String.format("\tmov\t%s,%s\n", registre, ((Tuple)e.e1).es.get(cpt).accept(this));
+			} else 
 				retour += String.format("\tmov\t%s,%s\n", registre, e.e1.accept(this));	
-			}
 			cpt++;
+		}*/
+		if ( e.e1 instanceof Tuple) {
+			cmpTuple++;	
+			//boolean isSpill1 = false;
+			String reg = ((Tuple)(e.e1)).registreDeRetour;
+						
+			//Create array composed to the element of Tuple : 
+			int nbTuple = ((Tuple)(e.e1)).es.size();
+			if(!data){
+				defVar += ".data\n";
+				data = true;
+			}
+			defVar+=String.format("arrayTuple%d:\t.skip %d\n",cmpTuple,nbTuple *100);
+			defFunc+=String.format("addr_tabTuple%d:\t.word arrayTuple%d\n",cmpTuple,cmpTuple);
+			
+			retour+=String.format("\tldr\t%s,addr_tabTuple%d\n\tmov\tr0,%s\n",reg,cmpTuple,reg);
+			retour+=String.format("\tmov\tr1,#%d\t\n", nbTuple);
+			retour+=String.format("\tmov\tr2,#0\n");
+			retour+="\tbl\tmin_caml_create_array\n";
+	
+			for(int i=0;i<nbTuple;i++){
+				if (((Tuple)e.e1).es.get(i) instanceof Float){
+					((Tuple)e.e1).es.get(i).registreDeRetour = "r11";
+					retour+=String.format("%s",((Tuple)e.e1).es.get(i).accept(this));
+					retour+=String.format("\tmov\tr10,#%d\n",i);
+					retour+=String.format("\tstr\tr11,[%s,r10,LSL #2]\n",reg);
+				} else if (((Tuple)e.e1).es.get(i) instanceof Array){
+					retour+=String.format("%s\n",((Tuple)e.e1).es.get(i).accept(this));
+					retour+=String.format("\tmov\tr11,%s\n", ((Array)((Tuple)e.e1).es.get(i)).e1.registreDeRetour);
+					retour+=String.format("\tmov\tr10,#%d\n",i);
+					retour+=String.format("\tstr\tr11,[%s,r10,LSL #2]\n",reg);					
+				}else if (((Tuple)e.e1).es.get(i) instanceof Var){
+					String regVar = RegistreAllocation.getRegistre(((Var)(((Tuple)e.e1).es.get(i))).id); 
+					if (regVar == null) {
+						isSpill1 = true;
+						regVar = RegistreAllocation.spillInit(((Var)(((Tuple)e.e1).es.get(i))).id);
+						retour += RegistreAllocation.spillStart(regVar);
+					}
+					((Tuple)e.e1).es.get(i).registreDeRetour = regVar;
+					retour+=String.format("\tmov\tr11,%s\n",((Tuple)e.e1).es.get(i).accept(this));
+					retour+=String.format("\tmov\tr10,#%d\n",i);
+					retour+=String.format("\tstr\tr11,[%s,r10,LSL #2]\n",reg);
+					if (isSpill1){
+						RegistreAllocation.spillEnd(regVar);
+						isSpill1 = false;
+					}	
+				}else{
+					retour+=String.format("\tmov\tr11,%s\n",((Tuple)e.e1).es.get(i).accept(this));
+					retour+=String.format("\tmov\tr10,#%d\n",i);
+					retour+=String.format("\tstr\tr11,[%s,r10,LSL #2]\n",reg);
+				}
+			}				
 		}
+		
 		if (e.e2 instanceof OpBin){
 			e.e2.registreDeRetour = e.registreDeRetour;
 			retour += e.e2.accept(this);
@@ -926,11 +975,13 @@ public class GenerationS implements ObjVisitor<String> {
 		}  else if (e.e2 instanceof Int && ((Int)(e.e2)).i > 121){
 			e.e2.registreDeRetour = e.registreDeRetour ; 
 			retour += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e2)).i);
-		} else {
+		} else if (e.e2 instanceof App){
+				/*retour+=String.format("\tmov\tr10,%s\n",e.e2.accept(this));
+				if (e.e1 instanceof Var){
+					String regVar = RegistreAllocation.getRegistre(((Var)(e.e1)).id); 
+					retour+=String.format("\tldr\t%s,[%s,r10,LSL #2]\n",e.registreDeRetour,regVar);
+				}*/
 			retour += e.e2.accept(this);
-		}
-		if (isSpill1) {
-			retour += RegistreAllocation.spillEnd(registre);
 		}
 		return retour;
 	}
@@ -988,7 +1039,6 @@ public class GenerationS implements ObjVisitor<String> {
 					}
 				}				
 				retour+=String.format("\tmov\tr2,%s\n", reg);
-				
 
 			}else if(e.e2 instanceof Array){
 				retour+=e.e2.accept(this);
