@@ -115,13 +115,13 @@ public class RegistreAllocation implements Visitor {
 		return null;
 	}
 
-	private static void SpillTabVar() {
+	public static void SpillTabVar() {
 		for (Noeud n : tabVar) {
 			n.spillReg();
 		}
 	}
 	
-	private static void UnSpillTabVar() {
+	public static void UnSpillTabVar() {
 		for (Noeud n : tabVar) {
 			n.unSpillReg();
 		}
@@ -444,6 +444,22 @@ public class RegistreAllocation implements Visitor {
 		for (Noeud n : tabVar) {
 			n.endDefFunc();
 		}
+	}
+
+	public static void addVar(String s) {
+		tabVar.addLast(new Noeud(new Var(new Id(s))));
+	}
+
+	public static String loadClosure(Var e) {
+		String retour = "";
+		int cmp = 0;
+		for (Noeud n : tabVar) {
+			if (n.var.id.id.equals(String.format("closure%sr%d",e.id.id,cmp))) {
+				retour += String.format("\tldr\tr%d,%s",cmp,n.regCour);
+				cmp++;
+			}
+		}
+		return retour;
 	}
 
 }

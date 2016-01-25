@@ -64,13 +64,7 @@ abstract class Exp implements Cloneable {
 		tP6.typeArgs.add(new TInt());
 
 		this.env.add(new Environnement(new Id("float_of_int"), tP6));
-		
-		TFun tP7 = new TFun();
-		tP7.typeRetour = new TInt();
-		tP7.typeArgs = new LinkedList<Type>();
-		tP7.typeArgs.add(new TFloat());
 
-		this.env.add(new Environnement(new Id("truncate"), tP7));
 		
 	}
 	// ***********************************************************
@@ -696,7 +690,7 @@ class App extends Exp {
 	}
 
 	LinkedList<String> closure = new LinkedList<String>();
-
+	
 	<E> E accept(ObjVisitor<E> v) {
 		return v.visit(this);
 	}
@@ -708,6 +702,7 @@ class App extends Exp {
 	public String toString(){
 		return "app" ;
 	}
+	
     @Override
     public Object clone() {
     	Object o = null;
