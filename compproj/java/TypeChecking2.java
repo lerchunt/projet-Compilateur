@@ -677,6 +677,8 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 				}
 			}
 		} 
+		Equations eq = new Equations(new TUnit(), e.typeAttendu,e.toString());
+		retour.add(eq);
 		e.e2.env.removeFirst();
 		return retour;
 	}
