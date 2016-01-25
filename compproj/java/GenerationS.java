@@ -15,6 +15,18 @@ public class GenerationS implements ObjVisitor<String> {
 	private static int cmpTuple =0;
 	private static int cptf=0;
 
+	private LinkedList<Closure> envFunc = new LinkedList<Closure>();
+	private class Closure {
+		public Closure(Id i, List<Id> args) {
+			this.id = i;
+			for (Id exp : args) {
+				this.args.add(exp);
+			}
+		}
+		Id id;
+		List<Id> args = new LinkedList<Id>();
+	}
+
 	@Override
 	public String visit(Bool e) {
 		if (e.b){
@@ -148,8 +160,8 @@ public class GenerationS implements ObjVisitor<String> {
 			if(((Int)e.e1).i <= 121){
 				r1 = e.e1.accept(this);
 			} else {
-			retour += String.format("\tldr\t%s,=%d\n","r11",((Int)(e.e1)).i);	
-			r1 = "r11" ;
+				retour += String.format("\tldr\t%s,=%d\n","r11",((Int)(e.e1)).i);	
+				r1 = "r11" ;
 			}
 		}
 		else if (e.e1 instanceof Var) {
@@ -167,8 +179,8 @@ public class GenerationS implements ObjVisitor<String> {
 			if(((Int)e.e2).i <= 121){
 				r2 = e.e2.accept(this);
 			} else {
-			retour+= String.format("\tldr\t%s,=%d\n","r10",((Int)(e.e2)).i);	
-			r2 = "r10" ;
+				retour+= String.format("\tldr\t%s,=%d\n","r10",((Int)(e.e2)).i);	
+				r2 = "r10" ;
 			}
 		}
 		else if (e.e2 instanceof Var) {
@@ -183,7 +195,8 @@ public class GenerationS implements ObjVisitor<String> {
 			return null;
 		}
 		if(e.e1 instanceof Int) {
-			return String.format("%s\tsub\t%s,%s,%s\n",retour,e.registreDeRetour, r2, r1);
+			retour += String.format("\tmov\tr11, %s\n", r1);
+			return String.format("%s\tsub\t%s,%s,%s\n",retour,e.registreDeRetour, "r11", r2);
 		}
 		else
 			return String.format("%s\tsub\t%s,%s,%s\n",retour,e.registreDeRetour, r1, r2);
@@ -548,10 +561,10 @@ public class GenerationS implements ObjVisitor<String> {
 			e.e3.registreDeRetour = e.registreDeRetour;
 			ifFalse+=e.e3.accept(this);			
 		} else if (e.e3 instanceof Let){
-			e.e2.registreDeRetour = e.registreDeRetour;		
+			e.e3.registreDeRetour = e.registreDeRetour;		
 			ifFalse+=e.e3.accept(this);		
 		} else if (e.e3 instanceof LetRec){
-			e.e2.registreDeRetour = e.registreDeRetour;
+			e.e3.registreDeRetour = e.registreDeRetour;
 			ifFalse+=e.e3.accept(this);		
 		} else if (e.e3 instanceof OpBin || e.e3 instanceof OpUn){ 
 			e.e3.registreDeRetour = e.registreDeRetour;
@@ -619,7 +632,7 @@ public class GenerationS implements ObjVisitor<String> {
 			}
 			e.e1.registreDeRetour = registre;
 			retour += String.format("%s\tmov\t%s,%s\n", e.e1.accept(this),e.e1.registreDeRetour,(((Array)(e.e1)).e2.registreDeRetour));
-			
+
 		}else if (e.e1 instanceof Get){
 			if(!data){
 				defVar += ".data\n";
@@ -651,6 +664,7 @@ public class GenerationS implements ObjVisitor<String> {
 			e.e2.registreDeRetour = e.registreDeRetour ; 
 			retour += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e2)).i);	
 		}else {
+			e.e2.registreDeRetour = e.registreDeRetour ; 
 			retour += e.e2.accept(this);
 		}
 		if (isSpill1) {
@@ -672,7 +686,7 @@ public class GenerationS implements ObjVisitor<String> {
 				//System.exit(1);
 			}
 		}else{
-			return String.format("\tbl\tmin_caml_%s\n",e.id);
+			return String.format("\tbl\tmin_caml_%s\n",e.id.id);
 		}
 		return null;
 	}
@@ -682,6 +696,7 @@ public class GenerationS implements ObjVisitor<String> {
 		String reg="";
 		String retour = "";
 		int nbreg = 0;
+		envFunc.add(new Closure(e.fd.id,e.fd.args));
 		RegistreAllocation.startDefFunc();
 		defFunc +=String.format("\nmin_caml_%s:\n",e.fd.id);
 		defFunc += String.format("\t@prologue\n%s\n",prologue(0));
@@ -713,8 +728,35 @@ public class GenerationS implements ObjVisitor<String> {
 			if (RegistreAllocation.isInTabVar(((Var)e.fd.e).id)) {
 				retour += String.format("\tmov\tr0,%s",s1);
 			} else {
+				for (Closure c : envFunc) {
+					if (c.id.equals(((Var)e.fd.e).id)) {
+						int cmp = 0;
+						for (int i = c.args.size()-1; i>= 0; i--) {
+							RegistreAllocation.addVar(String.format("closure%sr%d",((Var)e.fd.e).id.id,cmp));
+							retour += String.format("\tldr\tr%d, [r13, #%d]\n",i,28+cmp*4);
+							cmp++;
+						}
+					}
+				}
 				retour += s1;
 			}
+		} else if (e.fd.e instanceof App) {
+			for (Closure c : envFunc) {
+				if (((App)e.fd.e).e instanceof Var && c.id.equals(((Var)((App)e.fd.e).e).id)) {
+					int cmp = 0;
+					for (Id id : c.args) {
+						if (e.fd.args.contains(id)) {
+							retour += String.format("\tmov\tr%d, %s\n",cmp, RegistreAllocation.getRegistre(id));
+						} else {
+							RegistreAllocation.addVar(String.format("closure%sr%d",(((Var)((App)e.fd.e).e).id).id,cmp));
+							retour += String.format("\tldr\tr%d, [r13, #%d]\n",cmp,28+cmp*4);
+						}
+						cmp++;
+					}
+					retour = String.format("%s\tbl\tmin_caml_%s\n",retour,(((Var)((App)e.fd.e).e).id.id));
+				}
+			}
+			//retour += e.fd.e.accept(this);
 		} else {
 			retour += e.fd.e.accept(this);
 		}
@@ -723,6 +765,7 @@ public class GenerationS implements ObjVisitor<String> {
 		defFunc += "\n\tbx\tlr\n";
 		RegistreAllocation.endDefFunc();
 
+		e.e.registreDeRetour = e.registreDeRetour;
 		return e.e.accept(this);	
 	}
 
@@ -750,15 +793,14 @@ public class GenerationS implements ObjVisitor<String> {
 					registre = strP;
 					if (e.e instanceof Var) {
 						if (registre.contains("[sp,")) {
-							retour += String.format("\tldr\tr10,%s",registre);
+							retour += String.format("\tldr\tr10,%s\n",registre);
 							retour +=String.format("\tmov\tr%d,%s\n",nbParam,  "r10");
 						} else {
 							retour +=String.format("\tmov\tr%d,%s\n",nbParam,  registre);
 						}
 
 					} else if (e.e instanceof App){
-						((App)e.e).closure.add(registre);
-						retour += e.e.accept(this);
+						((App)e.e).closure.add(param.registreDeRetour);
 					} else{
 						System.err.println("internal error - definition function (GenerationS)");
 						System.exit(1);
@@ -797,6 +839,9 @@ public class GenerationS implements ObjVisitor<String> {
 					nbParam++;
 				} else if (param instanceof Int && ((Int)(param)).i > 121){
 					retour += String.format("\tldr\t%s,=%d\n",param.registreDeRetour,((Int)(param)).i);
+					if (e.e instanceof App){
+						((App)e.e).closure.add(param.registreDeRetour);
+					}
 					nbParam++;
 				} else {
 					if (e.e instanceof Var){
@@ -814,7 +859,9 @@ public class GenerationS implements ObjVisitor<String> {
 						}
 						nbParam++;
 					} else if (e.e instanceof App){
-						((App)e.e).closure.add(strP);
+						retour +=String.format("\tmov\tr%d,%s\n", nbParam, strP);
+						((App)e.e).closure.add(param.registreDeRetour);
+						nbParam++;
 					}else{
 						System.err.println("internal error - definition function (GenerationS)");
 						System.exit(1);
@@ -824,10 +871,14 @@ public class GenerationS implements ObjVisitor<String> {
 		}
 		if (e.e instanceof Var) {
 			for (String s : e.closure) {
-				nbParam++;
-				retour +=String.format("\tmov\tr%d,%s\n",nbParam-1,  s);
+				RegistreAllocation.SpillTabVar();
+				retour = String.format("\tSTMFD\tsp!, {%s}\n",s) + retour;
 			}
 			retour = String.format("%s\tbl\tmin_caml_%s\n",retour,((Var)e.e).id.id);
+			for (String s : e.closure) {
+				retour += String.format("\tLDMFD\tsp!, {%s}\n","r1");
+				RegistreAllocation.UnSpillTabVar();
+			}
 		} else if (e.e instanceof App){
 			retour+=e.e.accept(this);
 		}else{
@@ -908,10 +959,10 @@ public class GenerationS implements ObjVisitor<String> {
 			int tailleT = ((Int)(e.e1)).i;
 			Id idretour = Id.gen();
 			e.e2.registreDeRetour= RegistreAllocation.getRegistre(idretour);
-				
+
 			defTab+=String.format("\tldr\t%s,addr_tab%d\n\tmov\tr0,%s\n",e.e2.registreDeRetour,cmpTab,e.e2.registreDeRetour);
 			defTab+=String.format("\tmov\tr1,#%d\t@lenght of the array\n", tailleT);
-			
+
 			defVar+=String.format("array%d:\t.skip %d\n",cmpTab,tailleT *100);
 			defFunc+=String.format("addr_tab%d:\t.word array%d\n",cmpTab,cmpTab);
 
@@ -933,12 +984,12 @@ public class GenerationS implements ObjVisitor<String> {
 				idretour = Id.gen();
 				listeid.add(idretour);
 				String reg1= RegistreAllocation.getRegistre(idretour);
-				
+
 				//Create array composed to the element of Tuple : 
 				int nbTuple = ((Tuple)(e.e2)).es.size();
 				defVar+=String.format("arrayTuple%d:\t.skip %d\n",cmpTuple,nbTuple *100);
 				defFunc+=String.format("addr_tabTuple%d:\t.word arrayTuple%d\n",cmpTuple,cmpTuple);
-				
+
 				retour+=String.format("\tldr\t%s,addr_tabTuple%d\n\tmov\tr0,%s\n",reg,cmpTuple,reg);
 				retour+=String.format("\tmov\tr1,#%d\t\n", nbTuple);
 				retour+=String.format("\tmov\tr2,#0\n");
@@ -991,8 +1042,8 @@ public class GenerationS implements ObjVisitor<String> {
 			reg1 = RegistreAllocation.getRegistre(idretour);	
 			e.registreDeRetour = reg1;
 			retour+=String.format("\tmov\t%s,%s\n",reg1,e.e2.accept(this));
-			
-			
+
+
 			if (e.e1 instanceof Var){
 				String regVar = RegistreAllocation.getRegistre(((Var)(e.e1)).id); 
 				if (regVar == null) {
@@ -1007,13 +1058,13 @@ public class GenerationS implements ObjVisitor<String> {
 			} else if (e.e1 instanceof Get){
 				retour += e.e1.accept(this);
 				retour+=String.format("\tldr\t%s,[%s,%s,LSL #2]\n",e.registreDeRetour,e.e1.registreDeRetour,reg1);
-				
+
 			}	
 		}else{
 			System.err.println("internal error - Get (GenerationS)");
 			System.exit(1);
 		}
-		
+
 		return retour;
 	}
 
@@ -1045,11 +1096,11 @@ public class GenerationS implements ObjVisitor<String> {
 
 	private String epilogue() {
 		//return "\tadd\tr13,r10,#0\n\tldr\tr10,[r13]\n\tadd\tr13,r13,#4";
-		return "\tnop\n\tldmfd\tsp!, {r4-r8, lr}\n";
+		return "\tnop\n\tldmfd\tsp!, {r4-r9, pc}\n";
 	}
 
 	private String prologue(int nbVL) {
 		//return String.format("\tadd\tr13,r13,#-4\n\tstr\tr10,[r13]\n\tadd\tr10,r13,#0\n\tadd\tr13,r13,#-%d @taille des variables locales\n", 4*nbVL);
-		return "\tstmfd\tsp!, {r4-r8, lr}\n";
+		return "\tstmfd\tsp!, {r4-r9, lr}\n";
 	}
 }
