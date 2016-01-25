@@ -7,6 +7,7 @@ public class GenerationASML implements ObjVisitor<String> {
 	static int cp ; 
 	private static int var = 0 ;
 	private static boolean def = false ; 
+	private static boolean not = false ; 
 	private static boolean iff = false ;
 	private static boolean app = false ;
 	public GenerationASML()
@@ -40,7 +41,7 @@ public class GenerationASML implements ObjVisitor<String> {
     }
 
     public String visit(Not e) {
-    	return String.format("not %s",e.e.accept(this));
+    	return String.format("%s",e.e.accept(this));
     }
 
     public String visit(Neg e) {
@@ -160,7 +161,8 @@ public class GenerationASML implements ObjVisitor<String> {
     			if(e.e2 instanceof Var){
     				retour += String.format("fadd %s %s",e.e1.accept(this), e.e2.accept(this));
     			} else {
-    				GenerationASML.haut += String.format("\nlet _%s = %s",variable(var),e.e2.accept(this));
+    				String v = variable(var++);
+    				GenerationASML.haut += String.format("\nlet _%s = %s",v,e.e2.accept(this));
     				retour += String.format("fadd _%s %s", variable(var),e.e1.accept(this));
     				var++;
     			}
@@ -329,17 +331,48 @@ public class GenerationASML implements ObjVisitor<String> {
     			String v = variable(var) ;
     			var++;
 				GenerationASML.inter += String.format("\n\tlet %s = %s in \n\t let %s = %s in ",v,e.e1.accept(this),variable(var),e.e2.accept(this));
-        		retour += String.format("%s = %s", v,variable(var));
+        		if(not){
+            		retour += String.format("%s != %s", v,variable(var));
+            		not = false ;
+        		} else {
+            		retour += String.format("%s = %s", v,variable(var));
+        		}
         		var++;
     		} else {
-    			retour += String.format("%s = %s", e.e1.accept(this),e.e2.accept(this));
+    			if(not){
+        			retour += String.format("%s != %s", e.e1.accept(this),e.e2.accept(this));
+            		not = false ;
+        		} else {
+        			retour += String.format("%s = %s", e.e1.accept(this),e.e2.accept(this));
+        		}
     		}
-    		return retour;
     	} else {
-    		return String.format("%s = %s",e.e1.accept(this),e.e2.accept(this));
+    		if(e.e1.isFloat()){
+    			GenerationASML.haut = String.format("\nlet _z%s = %s \nlet _z%s = %s",cp++,e.e1.accept(this),cp++,e.e2.accept(this));
+    			retour += String.format("_z%s = _z%s", cp--,cp++);
+    		} else if(e.e1 instanceof Bool || e.e1 instanceof Int) {
+    			String v = variable(var) ;
+    			var++;
+				GenerationASML.haut += String.format("\n\tlet %s = %s in \n\t let %s = %s in ",v,e.e1.accept(this),variable(var),e.e2.accept(this));
+        		if(not){
+            		retour += String.format("%s != %s", v,variable(var));
+            		not = false ;
+        		} else {
+            		retour += String.format("%s = %s", v,variable(var));
+        		}
+        		var++;
+    		} else {
+    			if(not){
+        			retour += String.format("%s != %s", e.e1.accept(this),e.e2.accept(this));
+            		not = false ;
+        		} else {
+        			retour += String.format("%s = %s", e.e1.accept(this),e.e2.accept(this));
+        		}
+    		}
     	}
-
-    }
+			
+    	return retour ;
+	}
 
     public String visit(LE e){
     	String retour ="";
@@ -352,21 +385,55 @@ public class GenerationASML implements ObjVisitor<String> {
     			String v = variable(var) ;
     			var++;
 				GenerationASML.inter += String.format("\n\tlet %s = %s in \n\t let %s = %s in ",v,e.e1.accept(this),variable(var),e.e2.accept(this));
-        		retour += String.format("%s <= %s", v,variable(var));
+				if(not){
+            		retour += String.format("%s >= %s", v,variable(var));
+            		not = false ;
+    			} else {
+            		retour += String.format("%s <= %s", v,variable(var));
+    			}
         		var++;
-    		} else {
+    		} if(not){
+    			retour += String.format("%s >= %s", e.e1.accept(this),e.e2.accept(this));
+        		not = false ;
+			} else {
     			retour += String.format("%s <= %s", e.e1.accept(this),e.e2.accept(this));
-    		}
+
+			}
     		return retour;
     	} else {
-    		return String.format("%s <= %s",e.e1.accept(this),e.e2.accept(this));
-    	}
+    		if(e.e1.isFloat()){
+    			GenerationASML.haut = String.format("\nlet _z%s = %s \nlet _z%s = %s",cp++,e.e1.accept(this),cp++,e.e2.accept(this));
+    			retour += String.format("_z%s <= _z%s", cp--,cp++);
+    		} else if(e.e1 instanceof Bool || e.e1 instanceof Int) {
+    			String v = variable(var) ;
+    			var++;
+				GenerationASML.haut += String.format("\n\tlet %s = %s in \n\t let %s = %s in ",v,e.e1.accept(this),variable(var),e.e2.accept(this));
+        		if(not){
+            		retour += String.format("%s >= %s", v,variable(var));
+            		not = false ;
+    			} else {
+            		retour += String.format("%s <= %s", v,variable(var));
+    			}
+        		var++;
+    		} else {
+    			if(not){
+        			retour += String.format("%s >= %s", e.e1.accept(this),e.e2.accept(this));
+            		not = false ;
+    			} else {
+        			retour += String.format("%s <= %s", e.e1.accept(this),e.e2.accept(this));
+
+    			}
+    		}
+    		return retour;}
 
     }
 
     public String visit(If e){
     	String retour ="";
     	String haut ="";
+    	if(e.e1 instanceof Not){
+			not = true;
+    	}
     	if(!def)
     	{
     		if (e.e2.isFloat()){
@@ -437,12 +504,12 @@ public class GenerationASML implements ObjVisitor<String> {
         if(!def){
         	if((e.e1).isFloat())
             {
-        		GenerationASML.haut += String.format("let _%s = %s \n",e.id,e.e1.accept(this));
-        		retour = String.format("\n\tlet %s = _%s in",e.id,e.id);
+        		GenerationASML.haut += String.format("\nlet _%s = %s",e.id,e.e1.accept(this));
+        		retour = String.format("\n\tlet %s = _%s in ",e.id,e.id);
+				
                 if(e.e1.isVIFB() || e.e1 instanceof If){
                 	retour += "\n\t";
                 }
-                retour += String.format("%s in ",e.e1.accept(this));
                 if(!e.e2.isVIFB() && !(e.e2 instanceof App)){
                 	retour += String.format("%s \n\t ",e.e2.accept(this));
                 } else {
@@ -515,7 +582,7 @@ public class GenerationASML implements ObjVisitor<String> {
     			if(e instanceof Var){
             		t += e + " ";  
     			} else {
-    				if (!e.isVIFB()) {
+    				if (e instanceof App) {
         				if(app) {
                 			app = false ;
                     		txt = e.accept(this);
@@ -539,7 +606,12 @@ public class GenerationASML implements ObjVisitor<String> {
     		} else {
     			if(e instanceof Var){
             		t += e + " ";  
-    			} else if (!e.isVIFB()) {
+    			} else if (e instanceof Float) {
+    				String v = variable(var++) ;
+    				GenerationASML.haut += String.format("\nlet _%s = %s",v,((Float)e).f);
+    				GenerationASML.inter += String.format("\n\tlet %s = _%s in \n\t",v,v);
+    				t += v ;
+    			} else if (e instanceof App) {
     				if(app) {
             			app = false ;
                 		txt = e.accept(this);
@@ -551,7 +623,7 @@ public class GenerationASML implements ObjVisitor<String> {
         				txt += String.format("in call _min_caml_%s %s ",id,t) ;
                         t = String.format("\n\tlet %s = %s ",variable(var),txt);
         			} else {
-                        t += String.format("\n\tlet %s = %s ",variable(var),txt);
+                        GenerationASML.inter += String.format("\n\tlet %s = %s in ",variable(var),txt);
         			}
     				t += variable(var) + " ";
             		var++;
@@ -579,20 +651,30 @@ public class GenerationASML implements ObjVisitor<String> {
     	String retour ="";
     		if(e.e instanceof Var && (((Var)e.e).id.id.equals("print_int") || ((Var)e.e).id.id.equals("print_float") || ((Var)e.e).id.id.equals("truncate") || ((Var)e.e).id.id.equals("print_newline") || ((Var)e.e).id.id.equals("int_of_float") || ((Var)e.e).id.id.equals("float_of_int"))){
     			for(Exp r : e.es){
-    	    		if (!(r instanceof Var)){
+    	    		if (r.isVIFB()){
     	    			app = true ;
     	    			retour += printInfix2(e.es, " ",e.e.accept(this));
     	    		}
-    	    	} if(!app)
+    	    	} 
+    			if(((Var)e.e).id.id.equals("print_float") ){
+    				String v = variable(var++) ;
+    	    		retour += String.format("let %s = mem(%s + 0) in\n\tlet %s = call _min_caml_int_of_float %s in ",v,printInfix2(e.es, " ",e.e.accept(this)),variable(var),v);
+    	    		retour += String.format("call _min_caml_print_int %s ",variable(var++));
+    			} else if(!app)
     	    		retour += String.format("call _min_caml_%s %s ",e.e.accept(this),printInfix2(e.es, " ",e.e.accept(this)));
     		} else {
     			for(Exp r : e.es){
-    	    		if (!(r instanceof Var)){
+    	    		if (!(r instanceof Var) && !(r instanceof Int)){
     	    			app = true ;
     	    			retour += printInfix2(e.es, " ",e.e.accept(this));
+    	    			//app = false ;
     	    		}
-    	    	} if(!app)
-    			retour += String.format("call _%s %s ",e.e.accept(this),printInfix2(e.es, " ",e.e.accept(this)));
+    			}
+    			if(!app) {
+        			retour += String.format("call _%s %s ",e.e.accept(this),printInfix2(e.es, " ",e.e.accept(this)));
+
+    	    		}
+    			app = false;
     		}
     		return retour ;
     }
@@ -609,35 +691,26 @@ public class GenerationASML implements ObjVisitor<String> {
     	String retour ="";
     	String v1 = "";
     	String v2 = "";
+    	if(e.e1 instanceof Int){
+			v2 = variable(var++);
+			GenerationASML.inter += String.format("\n\tlet %s = %s in",v2,e.e1.accept(this));
+    	} else if (e.e1 instanceof Var){
+			v2 = e.e1.accept(this);
+    	} 
     	if(e.e2 instanceof Int){
-    		if(!(e.e2 instanceof Var)){
-    			v1 = variable(var++);
-    			GenerationASML.inter += String.format("\n\tlet %s = %s in",v1,e.e2.accept(this));
-    		} else {
-    			v1 = e.e2.accept(this);
-    		}
-    		if(!(e.e1 instanceof Var)){
-    			v2 = variable(var++);
-    			GenerationASML.inter += String.format("\n\tlet %s = %s in",v2,e.e1.accept(this));
-    		} else {
-    			v2 = e.e1.accept(this);
-    		}
-            retour += String.format("call _min_caml_create_array %s %s", v2, v1);
-    	} else if (e.e2 instanceof Float){
-    		if(!(e.e2 instanceof Var)){
-    			v1 = variable(var++);
-    			GenerationASML.haut += String.format("let %s = %s in",v1,e.e2.accept(this));
-    		} else {
-    			v1 = e.e2.accept(this);
-    		}
-    		if(!(e.e1 instanceof Var)){
-    			v2 = variable(var++);
-    			GenerationASML.haut += String.format("let %s = %s in",v2,e.e1.accept(this));
-    		} else {
-    			v2 = e.e1.accept(this);
-    		}
+			v1 = variable(var++);
+			GenerationASML.inter += String.format("\n\tlet %s = %s in",v1,e.e2.accept(this));
         	retour = String.format("call _min_caml_create_float_array %s %s",v2,v1);
-    	}
+    	} else if (e.e2 instanceof Var){
+			v1 = e.e2.accept(this);
+        	retour = String.format("call _min_caml_create_float_array %s %s",v2,v1);
+    	} else if (e.e2 instanceof Float){
+			v1 = variable(var++);
+			String v3 = variable(var++);
+			GenerationASML.inter += String.format("\n\tlet %s = _%s in\n\tlet %s = mem(%s + 0) in",v1,v1,v3,v1);
+			GenerationASML.haut += String.format("\nlet _%s = %s",v1,e.e2.accept(this));
+        	retour = String.format("call _min_caml_create_float_array %s %s",v2,v3);
+    	} 
     	return retour;
     }
 

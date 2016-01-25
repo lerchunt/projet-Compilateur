@@ -622,50 +622,28 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 					
 				} else if(e.e3 instanceof Var){
 					Type t = ((Var)e.e3).rechercheEnv();
-					if (t instanceof TVar && ((TVar)t).typeArgs != null){
-						if(((TVar)t).typeArgs.size() == ((TVar)ts).typeArgs.size()){
-							int cpt =0 ;
-							while(cpt < ((TVar)ts).typeArgs.size()){
-								Type r = ((TVar)ts).typeArgs.get(cpt);
-								Type s = ((TVar)t).typeArgs.get(cpt);
-								Equations eq = new Equations(s, r,e.toString());
-								retour.add(eq);
-								cpt++;
-							}
-						} else {
-							System.err.println("expected similar size of tuple");
-							System.exit(1);
-						}
+					if (t instanceof TVar && ((TVar)t) != null){
+						Type r = ((TVar)ts).typeParamArray;
+						Type s = ((TVar)t);
+						Equations eq = new Equations(s, r,e.toString());
+						retour.add(eq);
 					}
+				} else {
+					System.err.println("expected similar size of tuple");
+					System.exit(1);
 				}
 			}
 		}
-		if((e.e3 instanceof Tuple || e.e3 instanceof Var )&& e.e1 instanceof Array && ((Array)e.e1).e2 instanceof Tuple){
-			if(e.e3 instanceof Var){
-				Type ra = ((Var)e.e3).rechercheEnv();
-				if( ra == null ){
-					System.err.println("error "+((Var)e.e3).id+" is not defined");
-					System.exit(1);
-				} else if ( ra instanceof TVar && ((TVar)ra).typeArgs != null){
-					if(((TVar)ra).typeArgs.size() == ((Tuple)((Array)e.e1).e2).es.size()){
-						int cpt =0 ;
-						while(cpt < ((TVar)ra).typeArgs.size()){
-							Type r = ((TVar)ra).typeArgs.get(cpt);
-							Type s = (((Tuple)((Array)e.e1).e2).es.get(cpt)).typeAttendu ;
-							Equations eq = new Equations(s, r,e.toString());
-							retour.add(eq);
-							cpt++;
-						}
-					} else {
-						System.err.println("expected similar size of tuple");
-						System.exit(1);
-					}
-				}
-			} else if(e.e3 instanceof Tuple) {
-				if(((Tuple)e.e3).es.size() == ((Tuple)((Array)e.e1).e2).es.size() ){
+		if(e.e3 instanceof Var && e.e1 instanceof Array && ((Array)e.e1).e2 instanceof Tuple){
+			Type ra = ((Var)e.e3).rechercheEnv();
+			if( ra == null ){
+				System.err.println("error "+((Var)e.e3).id+" is not defined");
+				System.exit(1);
+			} else if ( ra instanceof TVar && ((TVar)ra).typeArgs != null){
+				if(((TVar)ra).typeArgs.size() == ((Tuple)((Array)e.e1).e2).es.size()){
 					int cpt =0 ;
-					while(cpt < ((Tuple)e.e3).es.size()){
-						Type r = (((Tuple)e.e3).es.get(cpt)).typeAttendu ;
+					while(cpt < ((TVar)ra).typeArgs.size()){
+						Type r = ((TVar)ra).typeArgs.get(cpt);
 						Type s = (((Tuple)((Array)e.e1).e2).es.get(cpt)).typeAttendu ;
 						Equations eq = new Equations(s, r,e.toString());
 						retour.add(eq);
@@ -676,7 +654,21 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 					System.exit(1);
 				}
 			}
-		} 
+		} else if(e.e3 instanceof Tuple && e.e1 instanceof Array && ((Array)e.e1).e2 instanceof Tuple) {
+			if(((Tuple)e.e3).es.size() == ((Tuple)((Array)e.e1).e2).es.size() ){
+				int cpt =0 ;
+				while(cpt < ((Tuple)e.e3).es.size()){
+					Type r = (((Tuple)e.e3).es.get(cpt)).typeAttendu ;
+					Type s = (((Tuple)((Array)e.e1).e2).es.get(cpt)).typeAttendu ;
+					Equations eq = new Equations(s, r,e.toString());
+					retour.add(eq);
+					cpt++;
+				}
+			} else {
+				System.err.println("expected similar size of tuple");
+				System.exit(1);
+			}
+		}
 		Equations eq = new Equations(new TUnit(), e.typeAttendu,e.toString());
 		retour.add(eq);
 		e.e2.env.removeFirst();
