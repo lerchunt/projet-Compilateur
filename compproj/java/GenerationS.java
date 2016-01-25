@@ -666,7 +666,7 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e1 instanceof Int && ((Int)(e.e1)).i > 121){
 			e.e1.registreDeRetour = e.registreDeRetour ; 
 			retour += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e1)).i);
-		} else if (e.e1 instanceof Get || e.e1 instanceof Put){
+		} else if (e.e1 instanceof Put){
 			e.e1.registreDeRetour = registre;
 			retour +=e.e1.accept(this);
 		}else{
