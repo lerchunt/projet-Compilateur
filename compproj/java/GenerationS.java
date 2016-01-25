@@ -959,8 +959,7 @@ public class GenerationS implements ObjVisitor<String> {
 						retour+=String.format("\tmov\t%s,#%d\n",regCmp,i);
 						retour+=String.format("\tstr\t%s,[%s,%s,LSL #2]\n",reg1,reg,regCmp);
 					}
-				}
-				
+				}				
 				retour+=String.format("\tmov\tr2,%s\n", reg);
 				//retour+=defTab;
 			}else if(e.e2 instanceof Array){
