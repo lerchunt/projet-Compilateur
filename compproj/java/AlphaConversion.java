@@ -181,9 +181,9 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 			}
 			newProc.id = "_proc" + newProc;
 		}
-		e.fd.id = newProc;
 		varSeen.add(newProc);
 		envProcedures.addLast(new BindVar(e.fd.id, newProc));
+		e.fd.id = newProc;
 
 		// renommage des params
 		List<Id> newArgs = new LinkedList<Id>() ;
