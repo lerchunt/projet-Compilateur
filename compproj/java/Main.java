@@ -175,7 +175,7 @@ public class Main {
 
 					}
 					String asml =  expression.accept(new GenerationASML());
-					asml = GenerationASML.haut + GenerationASML.inter + asml ;
+					asml = GenerationASML.hautf + GenerationASML.haut + GenerationASML.inter + asml ;
 					String pathAsml = Path+InName+".asml";
 
 					PrintWriter w = new PrintWriter( new BufferedWriter( new FileWriter(pathAsml)));

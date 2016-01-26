@@ -3,6 +3,7 @@ import java.util.*;
 public class GenerationASML implements ObjVisitor<String> {
 	static String asml;
 	static String haut ="";
+	static String hautf ="";
 	static String inter ="\nlet _ = \n\t";
 	static int cp ; 
 	private static int var = 0 ;
@@ -147,7 +148,7 @@ public class GenerationASML implements ObjVisitor<String> {
         	retour += String.format("fneg %s",e.e.accept(this));
     	} else {
     		String v1 = variable(var++);
-    		GenerationASML.haut += String.format("\nlet _%s = %s ",v1,e.e.accept(this));
+    		GenerationASML.hautf += String.format("\nlet _%s = %s ",v1,e.e.accept(this));
         	GenerationASML.inter += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s +0) in",v1,v1,variable(var),v1);
     		retour += String.format("fneg %s",variable(var));
 			var++;
@@ -165,27 +166,54 @@ public class GenerationASML implements ObjVisitor<String> {
     				retour += String.format("fadd %s %s",e.e1.accept(this), e.e2.accept(this));
     			} else {
     				String v = variable(var++);
-    				GenerationASML.haut += String.format("\nlet _%s = %s",v,e.e2.accept(this));
+    				GenerationASML.hautf += String.format("\nlet _%s = %s",v,e.e2.accept(this));
     				retour += String.format("fadd _%s %s", variable(var),e.e1.accept(this));
     				var++;
     			}
     		} else {
     			if(e.e2 instanceof Var){
-    				GenerationASML.haut += String.format("\nlet _%s = %s",variable(var),e.e1.accept(this));
+    				GenerationASML.hautf += String.format("\nlet _%s = %s",variable(var),e.e1.accept(this));
     				retour += String.format("fadd _%s %s", variable(var),e.e2.accept(this));
     				var++;
     			} else {
     				String v1=variable(var);
         			var++;
-    				GenerationASML.haut += String.format("\nlet _%s = %s \n\tlet _%s = %s",v1,e.e2.accept(this), variable(var),e.e1.accept(this));
+    				GenerationASML.hautf += String.format("\nlet _%s = %s \nlet _%s = %s",v1,e.e2.accept(this), variable(var),e.e1.accept(this));
     				retour += String.format("fadd _%s _%s",v1,variable(var));
     				var++;
     			}
     		}
     		return retour ;
     	} else {
-    		return String.format("fadd %s %s",e.e1.accept(this),e.e2.accept(this));
-    	}
+    		if(e.e1 instanceof Var){
+				if(e.e2 instanceof Var){
+					retour += String.format("fadd %s %s",e.e1.accept(this), e.e2.accept(this));
+				} else {
+					String v = variable(var++);
+					GenerationASML.hautf += String.format("\nlet _%s = %s",v,e.e2.accept(this));
+					GenerationASML.haut += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in",v,v, variable(var),v);
+    				retour += String.format("fadd %s %s",variable(var),e.e1.accept(this));
+					var++;
+				}
+			} else {
+				if(e.e2 instanceof Var){
+					String v = variable(var++);
+					GenerationASML.hautf += String.format("\nlet _%s = %s",v,e.e1.accept(this));
+					GenerationASML.haut += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in",v,v, variable(var),v);
+    				retour += String.format("fadd %s %s",variable(var),e.e2.accept(this));
+					var++;
+			} else {
+    				String v1=variable(var++);
+        			var++;
+        			String v2 = variable(var);
+    				GenerationASML.hautf += String.format("\nlet _%s = %s \nlet _%s = %s",v1,e.e2.accept(this), v2,e.e1.accept(this));
+					GenerationASML.haut += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in \n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in",v1,v1, variable(var),v1,v2,v2,variable(var++),v2);
+    				retour += String.format("fadd %s %s",variable(var),variable(var--));
+					var++;
+			}
+    			
+		}
+		return retour ;}
     }
 
     public String visit(FSub e){
@@ -196,66 +224,112 @@ public class GenerationASML implements ObjVisitor<String> {
     			if(e.e2 instanceof Var){
     				retour += String.format("fsub %s %s",e.e1.accept(this), e.e2.accept(this));
     			} else {
-    				GenerationASML.haut += String.format("\nlet _%s = %s",variable(var),e.e2.accept(this));
+    				GenerationASML.hautf += String.format("\nlet _%s = %s",variable(var),e.e2.accept(this));
     				retour += String.format("fsub _%s %s", variable(var),e.e1.accept(this));
     				var++;
     			}
     		} else {
     			if(e.e2 instanceof Var){
-    				GenerationASML.haut += String.format("\nlet _%s = %s",variable(var),e.e1.accept(this));
+    				GenerationASML.hautf += String.format("\nlet _%s = %s",variable(var),e.e1.accept(this));
     				retour += String.format("fsub _%s %s", variable(var),e.e2.accept(this));
     				var++;
     			} else {
     				String v1=variable(var);
         			var++;
-    				GenerationASML.haut += String.format("\nlet _%s = %s \n\tlet _%s = %s",v1,e.e2.accept(this), variable(var),e.e1.accept(this));
+    				GenerationASML.hautf += String.format("\nlet _%s = %s \nlet _%s = %s",v1,e.e2.accept(this), variable(var),e.e1.accept(this));
     				retour += String.format("fsub _%s _%s",v1,variable(var));
     				var++;
     			}
     		}
     		return retour ;
-    	} else {
-    		return String.format("fsub %s %s",e.e1.accept(this),e.e2.accept(this));
-    	}
+    	}  else {
+    		if(e.e1 instanceof Var){
+				if(e.e2 instanceof Var){
+					retour += String.format("fsub %s %s",e.e1.accept(this), e.e2.accept(this));
+				} else {
+					String v = variable(var++);
+					GenerationASML.hautf += String.format("\nlet _%s = %s",v,e.e2.accept(this));
+					GenerationASML.haut += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in",v,v, variable(var),v);
+    				retour += String.format("fsub %s %s",variable(var),e.e1.accept(this));
+					var++;
+				}
+			} else {
+				if(e.e2 instanceof Var){
+					String v = variable(var++);
+					GenerationASML.hautf += String.format("\nlet _%s = %s",v,e.e1.accept(this));
+					GenerationASML.haut += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in",v,v, variable(var),v);
+    				retour += String.format("fsub %s %s",variable(var),e.e2.accept(this));
+					var++;
+			} else {
+    				String v1=variable(var++);
+        			var++;
+        			String v2 = variable(var);
+    				GenerationASML.hautf += String.format("\nlet _%s = %s \nlet _%s = %s",v1,e.e2.accept(this), v2,e.e1.accept(this));
+					GenerationASML.haut += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in \n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in",v1,v1, variable(var),v1,v2,v2,variable(var++),v2);
+    				retour += String.format("fsub %s %s",variable(var),variable(var--));
+					var++;
+			}
+    			
+		}
+		return retour ;}
     }
 
     public String visit(FMul e) {
     	String retour ="";
-		if(e.e1 instanceof Var){
-			if(e.e2 instanceof Var){
-				retour += String.format("fmul %s %s",e.e1.accept(this), e.e2.accept(this));
-			} else {
-				String v1 = variable(var++); 
-				GenerationASML.haut += String.format("\nlet _%s = %s",v1,e.e2.accept(this));
-				if(!def){
-    				GenerationASML.inter += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in", v1,v1,variable(var),v1);
+    	if(!def)
+    	{
+    		if(e.e1 instanceof Var){
+    			if(e.e2 instanceof Var){
+    				retour += String.format("fmul %s %s",e.e1.accept(this), e.e2.accept(this));
+    			} else {
+    				GenerationASML.hautf += String.format("\nlet _%s = %s",variable(var),e.e2.accept(this));
+    				retour += String.format("fmul _%s %s", variable(var),e.e1.accept(this));
+    				var++;
+    			}
+    		} else {
+    			if(e.e2 instanceof Var){
+    				GenerationASML.hautf += String.format("\nlet _%s = %s",variable(var),e.e1.accept(this));
+    				retour += String.format("fmul _%s %s", variable(var),e.e2.accept(this));
+    				var++;
+    			} else {
+    				String v1=variable(var);
+        			var++;
+    				GenerationASML.hautf += String.format("\nlet _%s = %s \nlet _%s = %s",v1,e.e2.accept(this), variable(var),e.e1.accept(this));
+    				retour += String.format("fmul _%s _%s",v1,variable(var));
+    				var++;
+    			}
+    		}
+    		return retour ;
+    	}  else {
+    		if(e.e1 instanceof Var){
+				if(e.e2 instanceof Var){
+					retour += String.format("fmul %s %s",e.e1.accept(this), e.e2.accept(this));
 				} else {
-    				GenerationASML.haut += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in", v1,v1,variable(var),v1);
+					String v = variable(var++);
+					GenerationASML.hautf += String.format("\nlet _%s = %s",v,e.e2.accept(this));
+					GenerationASML.haut += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in",v,v, variable(var),v);
+    				retour += String.format("fmul %s %s",variable(var),e.e1.accept(this));
+					var++;
 				}
-				retour += String.format("fmul %s %s",variable(var++),e.e1.accept(this));
-				var++;
-			}
-		} else {
-			if(e.e2 instanceof Var){
-				String v1 = variable(var++);
-				GenerationASML.haut += String.format("\nlet _%s = %s",v1,e.e1.accept(this));	
-				if(!def){
-    				GenerationASML.inter += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in", v1,v1,variable(var),v1);
-				} else {
-    				GenerationASML.haut += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in", v1,v1,variable(var),v1);
-				}
-				retour += String.format("fmul %s %s",variable(var++),e.e2.accept(this));
-				var++;
 			} else {
-				String v1=variable(var);
-    			var++;
-				GenerationASML.haut += String.format("\nlet _%s = %s \n\tlet _%s = %s",variable(var),e.e2.accept(this), v1,e.e1.accept(this));
-				retour += String.format("fmul _%s _%s",v1,variable(var));
-				var++;
+				if(e.e2 instanceof Var){
+					String v = variable(var++);
+					GenerationASML.hautf += String.format("\nlet _%s = %s",v,e.e1.accept(this));
+					GenerationASML.haut += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in",v,v, variable(var),v);
+    				retour += String.format("fmul %s %s",variable(var),e.e2.accept(this));
+					var++;
+			} else {
+    				String v1=variable(var++);
+        			var++;
+        			String v2 = variable(var);
+    				GenerationASML.hautf += String.format("\nlet _%s = %s \nlet _%s = %s",v1,e.e2.accept(this), v2,e.e1.accept(this));
+					GenerationASML.haut += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in \n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in",v1,v1, variable(var),v1,v2,v2,variable(var++),v2);
+    				retour += String.format("fmul %s %s",variable(var),variable(var--));
+					var++;
 			}
+    			
 		}
-		return retour ;
-    
+		return retour ;}
     }
     
     public String visit(Mul e) {
@@ -302,40 +376,60 @@ public class GenerationASML implements ObjVisitor<String> {
 
     public String visit(FDiv e){
     	String retour ="";
-		if(e.e1 instanceof Var){
-			if(e.e2 instanceof Var){
-				retour += String.format("fdiv %s %s",e.e1.accept(this), e.e2.accept(this));
-			} else {
-				String v1 = variable(var++);
-				GenerationASML.haut += String.format("\nlet _%s = %s",variable(var),e.e2.accept(this));
-				if(!def){
-    				GenerationASML.inter += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in", v1,v1,variable(var),v1);
+    	if(!def)
+    	{
+    		if(e.e1 instanceof Var){
+    			if(e.e2 instanceof Var){
+    				retour += String.format("fdiv %s %s",e.e1.accept(this), e.e2.accept(this));
+    			} else {
+    				GenerationASML.hautf += String.format("\nlet _%s = %s",variable(var),e.e2.accept(this));
+    				retour += String.format("fdiv _%s %s", variable(var),e.e1.accept(this));
+    				var++;
+    			}
+    		} else {
+    			if(e.e2 instanceof Var){
+    				GenerationASML.hautf += String.format("\nlet _%s = %s",variable(var),e.e1.accept(this));
+    				retour += String.format("fdiv _%s %s", variable(var),e.e2.accept(this));
+    				var++;
+    			} else {
+    				String v1=variable(var);
+        			var++;
+    				GenerationASML.hautf += String.format("\nlet _%s = %s \nlet _%s = %s",v1,e.e2.accept(this), variable(var),e.e1.accept(this));
+    				retour += String.format("fdiv _%s _%s",v1,variable(var));
+    				var++;
+    			}
+    		}
+    		return retour ;
+    	}  else {
+    		if(e.e1 instanceof Var){
+				if(e.e2 instanceof Var){
+					retour += String.format("fdiv %s %s",e.e1.accept(this), e.e2.accept(this));
 				} else {
-    				GenerationASML.haut += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in", v1,v1,variable(var),v1);
+					String v = variable(var++);
+					GenerationASML.hautf += String.format("\nlet _%s = %s",v,e.e2.accept(this));
+					GenerationASML.haut += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in",v,v, variable(var),v);
+    				retour += String.format("fdiv %s %s",variable(var),e.e1.accept(this));
+					var++;
 				}
-				retour += String.format("fdiv _%s %s", variable(var),e.e1.accept(this));
-				var++;
-			}
-		} else {
-			if(e.e2 instanceof Var){
-				String v1 = variable(var++);
-				GenerationASML.haut += String.format("\nlet _%s = %s",variable(var),e.e1.accept(this));
-				if(!def){
-    				GenerationASML.inter += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in", v1,v1,variable(var),v1);
-				} else {
-    				GenerationASML.haut += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in", v1,v1,variable(var),v1);
-				}
-				retour += String.format("fdiv _%s %s", variable(var),e.e2.accept(this));
-				var++;
 			} else {
-				String v1=variable(var);
-    			var++;
-				GenerationASML.haut += String.format("\nlet _%s = %s \n\tlet _%s = %s",v1,e.e2.accept(this), variable(var),e.e1.accept(this));
-				retour += String.format("fdiv _%s _%s",v1,variable(var));
-				var++;
+				if(e.e2 instanceof Var){
+					String v = variable(var++);
+					GenerationASML.hautf += String.format("\nlet _%s = %s",v,e.e1.accept(this));
+					GenerationASML.haut += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in",v,v, variable(var),v);
+    				retour += String.format("fdiv %s %s",variable(var),e.e2.accept(this));
+					var++;
+			} else {
+    				String v1=variable(var++);
+        			var++;
+        			String v2 = variable(var);
+    				GenerationASML.hautf += String.format("\nlet _%s = %s \nlet _%s = %s",v1,e.e2.accept(this), v2,e.e1.accept(this));
+					GenerationASML.haut += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in \n\tlet %s = _%s in \n\tlet %s = mem(%s + 0) in",v1,v1, variable(var),v1,v2,v2,variable(var++),v2);
+    				retour += String.format("fdiv %s %s",variable(var),variable(var--));
+					var++;
 			}
+    			
 		}
-		return retour ;
+		return retour ;}
     }
 
     public String visit(Eq e){ 
@@ -634,10 +728,10 @@ public class GenerationASML implements ObjVisitor<String> {
     			String v1 ="";
     			String v2="";
     			v1 = String.format("_z%s",cp++);
-    			GenerationASML.haut = String.format("let %s = %s \n%s",v1,e.e2.accept(this),GenerationASML.haut);
+    			GenerationASML.haut = String.format("\nlet %s = %s \n%s",v1,e.e2.accept(this),GenerationASML.haut);
     			if(e.e3 instanceof Float) {
         			v2 = String.format("_z%s",cp);
-    				GenerationASML.haut  = String.format("let %s = %s \n%s",v2,e.e3.accept(this),GenerationASML.haut);
+    				GenerationASML.haut  = String.format("\nlet %s = %s \n%s",v2,e.e3.accept(this),GenerationASML.haut);
     			} else {
     				v2 = e.e3.accept(this);
     			}
@@ -685,7 +779,7 @@ public class GenerationASML implements ObjVisitor<String> {
         if(!def){
         	if((e.e1).isFloat())
             {
-        		GenerationASML.haut += String.format("\nlet _%s = %s",e.id,e.e1.accept(this));
+        		GenerationASML.hautf += String.format("\nlet _%s = %s",e.id,e.e1.accept(this));
                 retour += String.format("let %s = _%s in \n\tlet %s = mem(%s +0) in ", e.id,e.id,variable(var),e.id);
 				
                 if(e.e1.isVIFB() || e.e1 instanceof If){
@@ -718,7 +812,7 @@ public class GenerationASML implements ObjVisitor<String> {
         } else {
         	if((e.e1).isFloat())
             {
-            	GenerationASML.haut += String.format("let _%s = %s \n", e.id,e.e1.accept(this)) ;
+            	GenerationASML.hautf += String.format("\nlet _%s = %s \n", e.id,e.e1.accept(this)) ;
                 retour += String.format("let %s = _%s in \n\tlet %s = mem(%s +0) in ", e.id,e.id,variable(var),e.id);
                 if(e.e2.isVar()) {
                     retour += String.format("%s \n", e.e2.accept(this));
@@ -789,7 +883,7 @@ public class GenerationASML implements ObjVisitor<String> {
             		t += e + " ";  
     			} else if (e instanceof Float) {
     				String v = variable(var++) ;
-    				GenerationASML.haut += String.format("\nlet _%s = %s",v,((Float)e).f);
+    				GenerationASML.hautf += String.format("\nlet _%s = %s",v,((Float)e).f);
     				GenerationASML.inter += String.format("\n\tlet %s = _%s in \n\tlet %s = mem(%s +0) in",v,v,variable(var),v);
     				t += variable(var++) ;
     			} else if (e instanceof App || e instanceof OpBin || e instanceof OpUn || e instanceof If) {
@@ -912,7 +1006,7 @@ public class GenerationASML implements ObjVisitor<String> {
 			v1 = variable(var++);
 			String v3 = variable(var++);
 			GenerationASML.inter += String.format("\n\tlet %s = _%s in\n\tlet %s = mem(%s + 0) in",v1,v1,v3,v1);
-			GenerationASML.haut += String.format("\nlet _%s = %s",v1,e.e2.accept(this));
+			GenerationASML.hautf += String.format("\nlet _%s = %s",v1,e.e2.accept(this));
         	retour += String.format(" call _min_caml_create_float_array %s %s",v,v2,v1);
     	} 
     	return retour;
