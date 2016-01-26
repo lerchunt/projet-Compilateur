@@ -1233,10 +1233,10 @@ public class GenerationS implements ObjVisitor<String> {
 		if (e.e2 instanceof Int){
 			retour+=String.format("\tmov\tr10,%s\n",e.e2.accept(this));
 		}else if (e.e2 instanceof Var){
-			String regVar2 = RegistreAllocation.getRegistre(((Var)(e.e1)).id); 
+			String regVar2 = RegistreAllocation.getRegistre(((Var)(e.e2)).id); 
 			if (regVar2 == null) {
 				isSpill = true;
-				regVar2 = RegistreAllocation.spillInit(((Var)(e.e1)).id);
+				regVar2 = RegistreAllocation.spillInit(((Var)(e.e2)).id);
 				retour += RegistreAllocation.spillStart(regVar2);
 			}
 			retour+=String.format("\tmov\tr10,%s\n",regVar2);
