@@ -708,7 +708,7 @@ public class GenerationASML implements ObjVisitor<String> {
         			} else if(e instanceof OpBin ){
         				opbin = true;
         				txt += String.format(" in call _min_caml_%s %s ",id,t) ;
-        				t = String.format("\n\tlet %s = %s ",txt);
+        				t = String.format("\n\tlet %s = %s ",variable(var),txt);
         			} else if(e instanceof OpUn) {
         				opbin = true;
         				String v = variable(var++);
