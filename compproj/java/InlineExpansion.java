@@ -171,10 +171,28 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 				Id varId = x.id;
 				for(LetRec lt : listeLetRec){
 					if(lt.fd.id.equals(varId)){
-						Exp exp=(Exp)lt.fd.e.clone();
-						exp = new App(exp,e.es);
-						exp.accept(this);
-						return exp;
+						if(lt.fd.e instanceof LetRec){
+							int cmp = 0 ;
+							Exp exp=(Exp)lt.fd.e.clone();
+							for(Id i :lt.fd.args){
+								Id newId2 = Id.gen();
+								TVar z2 = new TVar(newId2.id) ;
+								exp = new Let(i,z2,((App)e.e).es.get(cmp),((LetRec)lt.fd.e).fd.e);
+							}for(Id i :((LetRec)lt.fd.e).fd.args){
+								Id newId = Id.gen();
+								TVar z = new TVar(newId.id) ;
+								exp = new Let(i, z, e.es.get(cmp),exp);
+								cmp ++;
+							}
+							exp.accept(this);
+							return exp;
+						} else {
+							Exp exp=(Exp)lt.fd.e.clone();
+							exp = new App(exp,e.es);
+							exp.accept(this);
+							return exp;
+						}
+						
 					}			
 				}
 			}
