@@ -476,7 +476,7 @@ public class GenerationS implements ObjVisitor<String> {
 			s2 = e.e2.accept(this);
 			retour += s2;
 			s2 = "r10";
-		} else if (e.e1 instanceof Int && ((Int)(e.e1)).i > 121 ) {
+		} else if (e.e2 instanceof Int && ((Int)(e.e2)).i > 121 ) {
 			s2 = "r10";
 			retour += String.format("\tldr\t%s,=%d\n",s2,((Int)(e.e2)).i);
 		} else if (e.e2 instanceof Var) {
@@ -533,7 +533,7 @@ public class GenerationS implements ObjVisitor<String> {
 			s2 = e.e2.accept(this);
 			retour += s2;
 			s2 = "r10";
-		} else if (e.e1 instanceof Int && ((Int)(e.e1)).i > 121 ) {
+		} else if (e.e2 instanceof Int && ((Int)(e.e2)).i > 121 ) {
 			s2 = "r10";
 			retour += String.format("\tldr\t%s,=%d\n","r10",((Int)(e.e2)).i);
 		} else if (e.e2 instanceof Var) {
