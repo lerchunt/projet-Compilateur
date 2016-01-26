@@ -85,7 +85,7 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
 			float test = ((Float)newExp.e1).f - ((Float)newExp.e2).f ;
 			if(test < 0) {
-				return new Neg(new Float(-test));
+				return new FNeg(new Float(-test));
 			}
 			return new Float(((Float)newExp.e1).f - ((Float)newExp.e2).f);
 		}
