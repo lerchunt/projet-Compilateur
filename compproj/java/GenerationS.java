@@ -95,7 +95,7 @@ public class GenerationS implements ObjVisitor<String> {
 			} 
 			e.e.registreDeRetour = e.registreDeRetour ; 
 			return String.format("\tldr\t%s,=-%d\n",e.registreDeRetour,((Int)(e.e)).i);
-		} else {
+		}else{
 			System.err.println("internal error -- GenerationS -- Neg");
 			System.exit(1);
 			return null;
@@ -215,6 +215,9 @@ public class GenerationS implements ObjVisitor<String> {
 			} 
 			e.e.registreDeRetour = e.registreDeRetour ; 
 			return e.e.accept(this);
+		} else if (e.e instanceof Float){ 
+			return String.format("\tmov\t%s,%s\n\tbl\t");
+			
 		} else {
 			System.err.println("internal error -- GenerationS -- FNeg");
 			System.exit(1);
