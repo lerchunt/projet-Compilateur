@@ -202,8 +202,8 @@ public class ClosureConversion implements ObjVisitor<Exp> {
 			}
 			// liaison avec le nouveau fils
 			Exp E2Prec = (Exp)newLetRec.e.clone();
-			newLetRec.e = (LetRec)e.clone();
-			((LetRec)newLetRec.e).fd.e = e.fd.e;
+			//newLetRec.e = (LetRec)e.clone();
+			newLetRec.e = e;
 			if (E2Prec instanceof Var) {
 				List<Exp> newArgs = new LinkedList<Exp>();
 				for (Id id : e.fd.args) {
@@ -215,8 +215,8 @@ public class ClosureConversion implements ObjVisitor<Exp> {
 			}
 			newLetRec.env = e.env;
 			newLetRec.fd.e.env = e.env;
-			newLetRec.fd.e = newLetRec.fd.e.accept(this);
-			newLetRec.e = newLetRec.e.accept(this);
+			//newLetRec.fd.e = newLetRec.fd.e.accept(this);
+			//newLetRec.e = newLetRec.e.accept(this);
 	
 			return newLetRec;
 		}
