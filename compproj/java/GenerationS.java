@@ -773,13 +773,13 @@ public class GenerationS implements ObjVisitor<String> {
 			retour += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e2)).i);	
 
 		}else if(e.e2 instanceof LetTuple){
-			/*for (Id id : ((LetTuple)(e.e2)).ids){
+			for (Id id : ((LetTuple)(e.e2)).ids){
 				regVar = RegistreAllocation.getRegistre(id);
 				//retour += regVar + " "+id+ "\n";
 				retour += "\tmov\tr10,#"+cpt+"\n";
-				retour += "\tldr\t"+regVar+",[r4,r10,LSL #2]\n";
+				retour += "\tldr\t"+regVar+",["+registre+",r10,LSL #2]\n";
 				cpt++;
-			}*/
+			}
 			e.e2.registreDeRetour = e.registreDeRetour ;
 			retour += e.e2.accept(this);
 		}else {
