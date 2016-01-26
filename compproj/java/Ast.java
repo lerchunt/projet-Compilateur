@@ -673,7 +673,12 @@ class LetRec extends Exp {
     	// On récupère l'instance à renvoyer par l'appel de la 
 		// méthode super.clone()
 		o = super.clone();
-		((LetRec)o).fd.e = (Exp)fd.e.clone();
+		List<Id> newargs = new LinkedList<Id>();
+		for (Id id : fd.args) {
+			Id newId = new Id(id.id);
+			newargs.add(newId);
+		}
+		((LetRec)o).fd = new FunDef(new Id(fd.id.id), fd.type, newargs, (Exp)fd.e.clone());
 		((LetRec)o).e = (Exp)e.clone();
 	    // on renvoie le clone
 	    return o;
