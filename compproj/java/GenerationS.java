@@ -449,6 +449,7 @@ public class GenerationS implements ObjVisitor<String> {
 		String retour = "";
 		String s1 = "";
 		String s2 = "";
+		String regGet = "";
 		if (e.e1 instanceof App) {
 			e.e1.registreDeRetour = "r11";
 			s1 = e.e1.accept(this);
@@ -463,7 +464,11 @@ public class GenerationS implements ObjVisitor<String> {
 				retour += String.format("\tldr\t%s,%s\n","r11",s1);
 				s1 = "r11";
 			} 
-		} else  {
+		} else if (e.e1 instanceof Get) {
+			e.e1.registreDeRetour = e.registreDeRetour;
+			regGet = e.e1.registreDeRetour;
+			s1 += e.e1.accept(this);
+		}else{
 			s1 = e.e1.accept(this);
 		}
 		if (e.e2 instanceof App) {
@@ -483,7 +488,12 @@ public class GenerationS implements ObjVisitor<String> {
 		} else {
 			s2 = e.e2.accept(this);
 		}
-		retour += String.format("\tcmp\t%s,%s\n", s1,s2);
+		if(!(e.e1 instanceof Get)){
+			retour += String.format("\tcmp\t%s,%s\n", s1,s2);
+		}else{
+			retour += s1;
+			retour += String.format("\tcmp\t%s,%s\n", regGet,s2);
+		}
 		retour += "\tbne\tifFalse"+cmpIf+"\n";
 		return retour;
 	}
@@ -493,6 +503,7 @@ public class GenerationS implements ObjVisitor<String> {
 		String retour = "";
 		String s1 = "";
 		String s2 = "";
+		String regGet = "";
 		if (e.e1 instanceof App) {
 			e.e1.registreDeRetour = "r11";
 			s1 = e.e1.accept(this);
@@ -510,6 +521,10 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e1 instanceof Int){
 			retour+= String.format("\tmov\tr10,%s\n", e.e1.accept(this)); 
 			s1 = "r10";
+		} else if (e.e1 instanceof Get) {
+			e.e1.registreDeRetour = e.registreDeRetour;
+			regGet = e.e1.registreDeRetour;
+			s1 += e.e1.accept(this);
 		}else{
 			s1 = e.e1.accept(this);
 		}
@@ -530,7 +545,13 @@ public class GenerationS implements ObjVisitor<String> {
 		} else {
 			s2 = e.e2.accept(this);
 		}
-		retour +=String.format("\tcmp\t%s,%s\n", s1,s2);
+		
+		if(!(e.e1 instanceof Get)){
+			retour += String.format("\tcmp\t%s,%s\n", s1,s2);
+		}else{
+			retour += s1;
+			retour += String.format("\tcmp\t%s,%s\n", regGet,s2);
+		}
 		retour += "\tbgt\tifFalse"+cmpIf+"\n";
 		return retour;
 	}
@@ -560,6 +581,9 @@ public class GenerationS implements ObjVisitor<String> {
 			retour += String.format("\tcmp\t%s,#1\n", r1);
 			retour += "\tbne\tifFalse"+IdIf+"\n";
 		}else if (e.e1 instanceof Not){
+			e.e1.accept(this);
+		}else if (e.e1 instanceof Get){
+			retour+="ici";
 			e.e1.accept(this);
 		} else {
 			System.err.println("internal error - If e1 (GenerationS)");
@@ -754,6 +778,7 @@ public class GenerationS implements ObjVisitor<String> {
 			retour += e.e2.accept(this);
 			
 		}else{
+
 			e.e2.registreDeRetour = e.registreDeRetour ; 
 			retour += e.e2.accept(this);
 		}
@@ -948,10 +973,10 @@ public class GenerationS implements ObjVisitor<String> {
 					nbParam++;
 				} else {
 					if (e.e instanceof Var){
-						if (strP.contains("[sp,")) {
+						/*if (strP.contains("[sp,")) {
 							retour += String.format("\tldr\tr10,%s\n",strP);
 							retour +=String.format("\tmov\t%s,%s\n",param.registreDeRetour,  "r10");
-						} else {
+						} else {*/
 							if(param instanceof Float){
 								retour +=String.format("%s",strP);
 							}else if (param instanceof Int && ((Int)param).i > 121) {
@@ -968,10 +993,12 @@ public class GenerationS implements ObjVisitor<String> {
 								retour+=strP;
 							}else if (param instanceof FNeg) {
 								retour+=strP;
+							}else if (param instanceof If) {
+								retour+=strP;
 							}else{
 								retour +=String.format("\tmov\t%s,%s\n", param.registreDeRetour, strP);
 							}
-						}
+						//}
 						nbParam++;
 					} else if (e.e instanceof App){
 						retour +=String.format("\tmov\tr%d,%s\n", nbParam, strP);
@@ -1067,7 +1094,6 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(LetTuple e) { 
 		boolean isSpill = false; 
 		String retour ="";
-		
 		if (e.e1 instanceof Tuple) {
 			for (int i=0;i<((Tuple)(e.e1)).es.size();i++){
 				if (((Tuple)(e.e1)).es.get(i) instanceof Int){
@@ -1101,8 +1127,7 @@ public class GenerationS implements ObjVisitor<String> {
 		}else{
 			e.e1.registreDeRetour = e.registreDeRetour;
 			retour+=e.e1.accept(this);
-		}
-		
+		}		
 		if (e.e2 instanceof OpBin){
 			e.e2.registreDeRetour = e.registreDeRetour;
 			retour += e.e2.accept(this);
@@ -1208,6 +1233,10 @@ public class GenerationS implements ObjVisitor<String> {
 				isSpill = true;
 				regVar = RegistreAllocation.spillInit(((Var)(e.e1)).id);
 				retour += RegistreAllocation.spillStart(regVar);
+			} 
+			if (regVar.contains("[sp,")) {
+				retour += String.format("\tldr\tr11,%s\n",regVar);
+				regVar="r11";
 			}
 			retour+=String.format("\tldr\t%s,[%s,r10,LSL #2]\n",e.registreDeRetour,regVar);
 
