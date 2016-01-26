@@ -713,6 +713,9 @@ public class GenerationS implements ObjVisitor<String> {
 		}else if (e.e1 instanceof FNeg){
 			e.e1.registreDeRetour = registre;
 			retour+=e.e1.accept(this);
+		}else if (e.e1 instanceof LetTuple){
+			e.e1.registreDeRetour = registre;
+			retour += e.e1.accept(this);
 		}else{
 			retour += String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		}
@@ -731,7 +734,11 @@ public class GenerationS implements ObjVisitor<String> {
 		}  else if (e.e2 instanceof Int && ((Int)(e.e2)).i > 121){
 			e.e2.registreDeRetour = e.registreDeRetour ; 
 			retour += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e2)).i);	
-		}else {
+		}else if (e.e2 instanceof LetTuple) {
+			retour+="ici";
+			e.e2.registreDeRetour = e.registreDeRetour ; 
+			retour += "-----"+e.e2.accept(this)+"----------";
+		}else{
 			e.e2.registreDeRetour = e.registreDeRetour ; 
 			retour += e.e2.accept(this);
 		}
