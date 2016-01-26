@@ -113,7 +113,7 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	@Override
 	public Exp visit(FDiv e) {
 		OpBin newExp = (OpBin)CFolding(e);
-		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
+		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {					
 			return new Float(((Float)newExp.e1).f / ((Float)newExp.e2).f);
 		}
 		return newExp;
@@ -203,6 +203,9 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 			}
 		} else {
 			e.e2 = e.e2.accept(this);
+		}
+		if (e.e2 instanceof Var && e.id.equals(((Var)(e.e2)).id)) {
+			return e.e1;
 		}
 		return e;      
 	}
