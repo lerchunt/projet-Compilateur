@@ -143,21 +143,21 @@ min_caml_print_int:
 
 min_caml_cos:
 	stmfd	sp!, {lr}
-	bl	cos
+	bl	cosf
 	ldmfd	sp!, {lr}
         bx	lr
         .size min_caml_cos, .-min_caml_cos
 
 min_caml_sin:
 	stmfd	sp!, {lr}
-	bl	sin
+	bl	sinf
 	ldmfd	sp!, {lr}
         bx	lr
         .size min_caml_sin, .-min_caml_sin
 
 min_caml_sqrt:
 	stmfd	sp!, {lr}
-	bl	sqrt
+	bl	sqrtf
 	ldmfd	sp!, {lr}
         bx	lr
         .size min_caml_sqrt, .-min_caml_sqrt
