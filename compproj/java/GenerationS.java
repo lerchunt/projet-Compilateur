@@ -626,7 +626,6 @@ public class GenerationS implements ObjVisitor<String> {
 		retour+=ifFalse;
 		retour+="endIf"+cmpIf+":\n";
 
-		cmpIf --;
 		return retour;
 	}
 
