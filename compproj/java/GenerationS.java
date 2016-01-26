@@ -530,16 +530,17 @@ public class GenerationS implements ObjVisitor<String> {
 	@Override
 	public String visit(If e) {
 		cmpIf ++;
+		int IdIf = cmpIf;
 		String retour ="";		
-		String ifTrue="ifTrue"+cmpIf+":\n";
-		String ifFalse="ifFalse"+cmpIf+":\n";
+		String ifTrue="ifTrue"+IdIf+":\n";
+		String ifFalse="ifFalse"+IdIf+":\n";
 
 		if(e.e1 instanceof OpBin || e.e1 instanceof OpUn){
 			e.e1.registreDeRetour = e.registreDeRetour;
 			retour += e.e1.accept(this);
 		} else if (e.e1 instanceof Bool) {
 			if (!((Bool)e.e1).b) {
-				retour += "\tb\tifFalse"+cmpIf+"\n";
+				retour += "\tb\tifFalse"+IdIf+"\n";
 			}
 		} else if (e.e1 instanceof Var) {
 			e.e1.registreDeRetour = e.registreDeRetour;
@@ -549,7 +550,7 @@ public class GenerationS implements ObjVisitor<String> {
 				r1 = "r11";
 			} 
 			retour += String.format("\tcmp\t%s,#1\n", r1);
-			retour += "\tbne\tifFalse"+cmpIf+"\n";
+			retour += "\tbne\tifFalse"+IdIf+"\n";
 		} else {
 			System.err.println("internal error - If e1 (GenerationS)");
 			System.exit(1);
@@ -620,11 +621,11 @@ public class GenerationS implements ObjVisitor<String> {
 			ifFalse+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e3.accept(this));
 		}		
 
-		ifFalse+="\tb\tendIf"+cmpIf+"\n";
-		ifTrue+="\tb\tendIf"+cmpIf+"\n";
+		ifFalse+="\tb\tendIf"+IdIf+"\n";
+		ifTrue+="\tb\tendIf"+IdIf+"\n";
 		retour+=ifTrue;			
 		retour+=ifFalse;
-		retour+="endIf"+cmpIf+":\n";
+		retour+="endIf"+IdIf+":\n";
 
 		return retour;
 	}

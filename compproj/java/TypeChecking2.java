@@ -367,8 +367,20 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 		LinkedList<Equations> retour = new LinkedList<Equations>();
 		if(!(e.e1 instanceof Tuple)){
 			if(e.e1 instanceof App){
-				
-				
+				e.e1.typeAttendu = new TTuple(Type.gen().toString());
+				e.e1.env = e.env;
+				e.e2.typeAttendu = e.typeAttendu;
+				e.e2.env.addAll(e.env);
+				int cpt = 0;
+				LinkedList<Type> Ttype = new LinkedList<Type>();
+				for (Id param : e.ids) {
+					Ttype.add(Type.gen());
+				}	
+				e.ts = Ttype;
+				for (Id param : e.ids) {
+					e.e2.addEnv(param, e.ts.get(cpt));
+					cpt++;
+				}
 			} else if (e.e1 instanceof Var){
 				Type ts = Type.gen();
 				e.e1.typeAttendu = ts ;
