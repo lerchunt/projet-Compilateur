@@ -79,14 +79,14 @@ public class Main {
 
 					expression.initiateEnv();
 					expression.typeAttendu = new TUnit();
-					LinkedList<Equations> retour = expression.accept(new TypeChecking());
+					LinkedList<Equations> retour = expression.accept(new TypeChecking2());
 					if (verbose) {
 						for (Equations e : retour) {
 							System.out.println(e.toString());
 						}
 					}
 					
-					TypeChecking.resolution(retour);
+					TypeChecking2.resolution(retour);
 					if (verbose) {
 						System.out.println("------ resol -----------");
 						for (Equations e : retour) {
