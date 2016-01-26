@@ -646,11 +646,9 @@ public class GenerationS implements ObjVisitor<String> {
 	@Override
 	public String visit(Let e) {
 		boolean isSpill1 = false;
+		boolean isSpill2 = false;
 		String retour ="";
 		String registre = RegistreAllocation.getRegistre(e.id);
-		String regVar = "";
-		int cpt = 0;
-		
 		if (registre == null) {
 			isSpill1 = true;
 			registre = RegistreAllocation.spillInit(e.id);
@@ -717,7 +715,6 @@ public class GenerationS implements ObjVisitor<String> {
 			e.e1.registreDeRetour = registre;
 			retour+=e.e1.accept(this);
 		}else if (e.e1 instanceof LetTuple){
-			e.e1.registreDeRetour = registre;
 			retour += e.e1.accept(this);
 		}else{
 			retour += String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
@@ -737,18 +734,24 @@ public class GenerationS implements ObjVisitor<String> {
 		}  else if (e.e2 instanceof Int && ((Int)(e.e2)).i > 121){
 			e.e2.registreDeRetour = e.registreDeRetour ; 
 			retour += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e2)).i);	
-
-		}else if(e.e2 instanceof LetTuple){
-			/*for (Id id : ((LetTuple)(e.e2)).ids){
-				regVar = RegistreAllocation.getRegistre(id);
-				retour += regVar + " "+id+ "\n";
-				retour += "\tmov\tr10,#"+cpt+"\n";
-				retour += "\tldr\t"+regVar+",[r4,r10,LSL #2]\n";
-				cpt++;
-			}*/
-			//e.e2.registreDeRetour = e.registreDeRetour ;
-			retour+=e.e2.accept(this);
-		}else {
+		}else if (e.e2 instanceof LetTuple){
+			for (int i =0; i<((LetTuple)e.e2).ids.size();i++){
+				String regVar = RegistreAllocation.getRegistre(((LetTuple)e.e2).ids.get(i)); 
+				if (regVar == null) {
+					isSpill2 = true;
+					regVar = RegistreAllocation.spillInit(((LetTuple)e.e2).ids.get(i));
+					retour += RegistreAllocation.spillStart(regVar);
+				}
+				((LetTuple)e.e2).e1.registreDeRetour = regVar;
+				retour +=((LetTuple)e.e2).e1.accept(this);
+				if (isSpill2) {
+					retour += RegistreAllocation.spillEnd(registre);
+					isSpill2 = false;
+				}
+				
+			}
+			
+		}else{
 			e.e2.registreDeRetour = e.registreDeRetour ; 
 			retour += e.e2.accept(this);
 		}
@@ -955,6 +958,8 @@ public class GenerationS implements ObjVisitor<String> {
 								retour+=strP;
 							}else if(param instanceof Tuple){
 								retour+=strP;
+							}else if (param instanceof LetTuple){
+								retour+=strP;
 							}else if(param instanceof Get){
 								retour+=strP;
 							}else if(param instanceof Put){
@@ -990,7 +995,7 @@ public class GenerationS implements ObjVisitor<String> {
 				retour += String.format("\tLDMFD\tsp!, {%s}\n","r1");
 				RegistreAllocation.UnSpillTabVar();
 			}
-		} else if (e.e instanceof App){
+		} else if (e.e instanceof App){			
 			retour+=e.e.accept(this);
 		}else{
 			System.err.println("internal error - definition function (GenerationS)");
@@ -1015,7 +1020,6 @@ public class GenerationS implements ObjVisitor<String> {
 		String retour = "";
 		boolean isSpill1 = false;
 		String reg = e.registreDeRetour;
-		
 		//Create array composed to the element of Tuple : 
 		int nbTuple = e.es.size();
 		if(!data){
@@ -1093,19 +1097,17 @@ public class GenerationS implements ObjVisitor<String> {
 			}
 			retour += e.e1.accept(this);
 		}else if (e.e1 instanceof Var){
-			String regVar = RegistreAllocation.getRegistre(((Var)(e.e1)).id); 		
+			String regVar = RegistreAllocation.getRegistre(((Var)(e.e1)).id); 			
 			if (regVar == null) {
 				isSpill = true;
 				regVar = RegistreAllocation.spillInit(((Var)(e.e1)).id);
 				retour += RegistreAllocation.spillStart(regVar);
 			}
-			
-			retour+=String.format("\tmov\t%s,%s\n",regVar,e.e1.registreDeRetour);
-			
+			e.e1.registreDeRetour = regVar;
+			retour+=String.format("\tmov\t%s,%s\n",e.e1.registreDeRetour,regVar);			
 			if (isSpill){
 				RegistreAllocation.spillEnd(regVar);
-			}
-			
+			}	
 		}
 		
 		if (e.e2 instanceof OpBin){
@@ -1126,9 +1128,7 @@ public class GenerationS implements ObjVisitor<String> {
 			retour += e.e2.accept(this);
 		}else if (e.e2 instanceof Let){			
 			retour += e.e2.accept(this);
-			
-		} else {		
-			
+		} else {			
 			retour += e.e2.accept(this);
 		}
 		return retour;
