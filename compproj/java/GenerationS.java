@@ -217,7 +217,7 @@ public class GenerationS implements ObjVisitor<String> {
 			return e.e.accept(this);
 		} else if (e.e instanceof Float){ 
 			e.e.registreDeRetour = "r1";
-			return String.format("\tmov\tr0,#0\n%s\tbl\tmin_caml_fsub\n",e.e.accept(this));
+			return String.format("\tmov\tr0,#0\n%s\tbl\tmin_caml_fsub\n\tmov\t%s,r0\n",e.e.accept(this),e.registreDeRetour);
 			
 		} else {
 			System.err.println("internal error -- GenerationS -- FNeg");
@@ -704,6 +704,7 @@ public class GenerationS implements ObjVisitor<String> {
 			e.e1.registreDeRetour = registre;
 			retour +=e.e1.accept(this);
 		}else if (e.e1 instanceof FNeg){
+			e.e1.registreDeRetour = registre;
 			retour+=e.e1.accept(this);
 		}else{
 			retour += String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
