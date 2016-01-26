@@ -150,23 +150,60 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 	@Override
 	public Exp visit(App e) {
 		if(e.e instanceof Var) {
-			Id varId = ((Var)e.e).id;
-			for(LetRec lt : listeLetRec){
+			Id varId = new Id(((Var)e.e).id.id);
+			for(LetRec let : listeLetRec){
+				LetRec lt = (LetRec)let.clone();
 				if(lt.fd.id.equals(varId)){
 					int cmp =0;
 					Exp exp=(Exp)lt.fd.e.clone();
 					for(Id i :lt.fd.args){
-						Id newId = Id.gen();
+						Id newId = new Id(i.id);
 						TVar z = new TVar(newId.id) ;
-						exp = new Let(i, z, e.es.get(cmp),exp);
+						exp = new Let(newId, z, (Exp)e.es.get(cmp).clone(),(Exp)exp.clone());
 						cmp ++;
 					}
-					exp.accept(this);
+					exp = exp.accept(this);
 					return exp;
-				}
+				}			
+			}
+		} else if(e.e instanceof App){
+			if(((App)e.e).e instanceof Var) {
+				Var x = (Var) ((App)e.e).e.clone();
+				Id varId = new Id(x.id.id);
+				for(LetRec lt : listeLetRec){
+					if(lt.fd.id.equals(varId)){
+						if(lt.fd.e instanceof LetRec){
+							int cmp = 0 ;
+							Exp exp=(Exp)lt.fd.e.clone();
+							for(Id i :lt.fd.args){
+								Id newId2 = new Id(i.id);
+								TVar z2 = new TVar(newId2.id) ;
+								exp = new Let(newId2,z2,(Exp)((App)e.e).es.get(cmp).clone(),(Exp)((LetRec)lt.fd.e).fd.e.clone());
+							}for(Id i :((LetRec)lt.fd.e).fd.args){
+								Id newId = new Id(i.id);
+								TVar z = new TVar(newId.id) ;
+								exp = new Let(newId, z, (Exp)e.es.get(cmp).clone(),(Exp)exp.clone());
+								cmp ++;
+							}
+							exp.accept(this);
+							return exp;
+						} else {
+							Exp exp=(Exp)lt.fd.e.clone();
+							exp = new App(exp,e.es);
+							exp.accept(this);
+							return exp;
+						}
 						
-			}		
-		}		
+					}			
+				}
+			}
+		}
+		int cpt = 0 ;
+		for(Exp t : e.es){
+			t = t.accept(this);
+			e.es.set(cpt, t);
+			cpt++;
+		}
 			return e;
 	}
 

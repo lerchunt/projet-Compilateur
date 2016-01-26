@@ -659,11 +659,19 @@ public class GenerationS implements ObjVisitor<String> {
 			retour += e.e1.accept(this);
 		} else if (e.e1 instanceof Var) {
 			String regE1 = e.e1.accept(this);
-			if (regE1.contains("[sp,")) {
-				retour += String.format("\tldr\t%s,%s\n","r11",regE1);
-				regE1 = "r11";
-			} 
-			retour += String.format("\tmov\t%s,%s\n",registre,regE1);
+			if (regE1.contains("bl")) {		
+				defFunc +=String.format("\nmin_caml_%s:\n",e.id);
+				RegistreAllocation.startDefFunc();
+				defFunc += regE1+"\n";
+				defFunc += "\n\tbx\tlr\n";
+				RegistreAllocation.endDefFunc();
+			} else {
+				if (regE1.contains("[sp,")) {
+					retour += String.format("\tldr\t%s,%s\n","r11",regE1);
+					regE1 = "r11";
+				} 
+				retour += String.format("\tmov\t%s,%s\n",registre,regE1);
+			}
 		} else if (e.e1 instanceof If){
 			e.e1.registreDeRetour = registre;
 			retour+=e.e1.accept(this);
@@ -975,7 +983,7 @@ public class GenerationS implements ObjVisitor<String> {
 		}
 
 
-		while (nbParam>3) {
+		while (nbParam>4) {
 			retour += String.format("\tLDMFD\tsp!, {%s}\n","r1");
 			nbParam--;
 		}
