@@ -742,8 +742,7 @@ public class GenerationS implements ObjVisitor<String> {
 				retour += "\tldr\t"+regVar+",[r4,r10,LSL #2]\n";
 				cpt++;
 			}*/
-			e.e2.registreDeRetour = e.registreDeRetour ;
-			e.e2.accept(this);
+			retour += e.e2.accept(this);
 		}else {
 			e.e2.registreDeRetour = e.registreDeRetour ; 
 			retour += e.e2.accept(this);
@@ -1065,7 +1064,9 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(LetTuple e) { 
 		boolean isSpill = false; 
 		String retour ="";
+		int cpt=0;
 		if (e.e1 instanceof Tuple) {
+			retour += "retour";
 			for (int i=0;i<((Tuple)(e.e1)).es.size();i++){
 				if (((Tuple)(e.e1)).es.get(i) instanceof Int){
 					String regVarTuple = RegistreAllocation.getRegistre(e.ids.get(i)); 
@@ -1093,7 +1094,7 @@ public class GenerationS implements ObjVisitor<String> {
 			retour+=String.format("\tmov\t%s,%s\n",regVar,e.e1.registreDeRetour);
 			if (isSpill){
 				RegistreAllocation.spillEnd(regVar);
-			}			
+			}	
 		}
 		if (e.e2 instanceof OpBin){
 			e.e2.registreDeRetour = e.registreDeRetour;
