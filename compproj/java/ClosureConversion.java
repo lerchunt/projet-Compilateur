@@ -121,6 +121,13 @@ public class ClosureConversion implements ObjVisitor<Exp> {
 		e.e2.env = e.env;
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
+		
+		if(e.e2 instanceof Float){
+			if(((Float)e.e2).f==0.0){
+				System.err.println("Warning : division by 0");
+			}
+			
+		}
 
 		return e;
 	}
