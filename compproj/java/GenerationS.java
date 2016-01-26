@@ -366,6 +366,7 @@ public class GenerationS implements ObjVisitor<String> {
 		String r2 = "";
 		String retour = "";
 		if(e.e1 instanceof Int){
+			r1 = e.e1.accept(this);
 			retour += String.format("\tmov\tr11,%s\n",r1);
 			r1 = "r11";
 		}
@@ -378,6 +379,7 @@ public class GenerationS implements ObjVisitor<String> {
 			return null;
 		}
 		if(e.e2 instanceof Int){
+			r2 = e.e2.accept(this);
 			retour += String.format("\tmov\tr10,%s\n",r2);
 			r2 = "r10";
 		}
