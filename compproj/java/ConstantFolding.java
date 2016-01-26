@@ -85,7 +85,7 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
 			float test = ((Float)newExp.e1).f - ((Float)newExp.e2).f ;
 			if(test < 0) {
-				return new Neg(new Float(-test));
+				return new FNeg(new Float(-test));
 			}
 			return new Float(((Float)newExp.e1).f - ((Float)newExp.e2).f);
 		}
@@ -180,9 +180,12 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 			if(e.e1 instanceof Var){
 				if(tabSym.containsKey(((Var)e.e1).id.toString())){
 					tabVar.put(((Var)e.e1).id.toString(), true) ;
-					e.e1 = tabSym.get(((Var)e.e1).id.toString());
+					Exp retour = tabSym.get(((Var)e.e1).id.toString());
+					if (retour instanceof Var) {
+						e.e1 = retour;
+					} 
 				}
-			}
+			} 
 			e.e1 = e.e1.accept(this) ; 
 			if (e.e1 instanceof Int || e.e1 instanceof Float || e.e1 instanceof Bool || e.e1 instanceof Var || e.e1 instanceof Unit) {
 				tabSym.put(e.id.toString(), e.e1);
