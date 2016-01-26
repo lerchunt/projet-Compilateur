@@ -133,7 +133,7 @@ public class GenerationS implements ObjVisitor<String> {
 				r2 = "r10" ;
 				retour+= String.format("\tldr\t%s,=%d\n",r2,((Int)(e.e2)).i);	
 			}	
-			
+
 		}
 		else if (e.e2 instanceof Var) {
 			r2 = e.e2.accept(this);
@@ -141,7 +141,7 @@ public class GenerationS implements ObjVisitor<String> {
 				retour += String.format("\tldr\t%s,%s\n","r10",r2);
 				r2 = "r10";
 			} 
-			
+
 		} else {
 			System.err.println("internal error -- GenerationS -- add");
 			System.exit(1);
@@ -218,7 +218,7 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e instanceof Float){ 
 			e.e.registreDeRetour = "r1";
 			return String.format("\tmov\tr0,#0\n%s\tbl\tmin_caml_fsub\n\tmov\t%s,r0\n",e.e.accept(this),e.registreDeRetour);
-			
+
 		} else {
 			System.err.println("internal error -- GenerationS -- FNeg");
 			System.exit(1);
@@ -674,7 +674,6 @@ public class GenerationS implements ObjVisitor<String> {
 		String registre = RegistreAllocation.getRegistre(e.id);
 		String regVar = "";
 		int cpt = 0;
-		
 		if (registre == null) {
 			isSpill1 = true;
 			registre = RegistreAllocation.spillInit(e.id);
@@ -687,8 +686,10 @@ public class GenerationS implements ObjVisitor<String> {
 			String regE1 = e.e1.accept(this);
 			if (regE1.contains("bl")) {		
 				defFunc +=String.format("\nmin_caml_%s:\n",e.id);
+				defFunc += String.format("\t@prologue\n%s\n",prologue(0));
 				RegistreAllocation.startDefFunc();
 				defFunc += regE1+"\n";
+				defFunc +=String.format("\n\t@epilogue:\n%s\n",epilogue());
 				defFunc += "\n\tbx\tlr\n";
 				RegistreAllocation.endDefFunc();
 			} else {
@@ -740,9 +741,18 @@ public class GenerationS implements ObjVisitor<String> {
 		}else if (e.e1 instanceof FNeg){
 			e.e1.registreDeRetour = registre;
 			retour+=e.e1.accept(this);
-		/*}else if (e.e1 instanceof LetTuple){
+		} else if (e.e1 instanceof LetRec) {
+			String regE1 = e.e1.accept(this);
+			defFunc +=String.format("\nmin_caml_%s:\n",e.id);
+			defFunc += String.format("\t@prologue\n%s\n",prologue(0));
+			RegistreAllocation.startDefFunc();
+			defFunc += regE1+"\n";
+			defFunc +=String.format("\n\t@epilogue:\n%s\n",epilogue());
+			defFunc += "\n\tbx\tlr\n";
+			RegistreAllocation.endDefFunc();
+		}else if (e.e1 instanceof LetTuple){
 			e.e1.registreDeRetour = registre;
-			retour += e.e1.accept(this);*/
+			retour += e.e1.accept(this);
 		}else{
 			retour += String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		}
@@ -750,7 +760,7 @@ public class GenerationS implements ObjVisitor<String> {
 		if (e.e2 instanceof OpBin){
 			e.e2.registreDeRetour = e.registreDeRetour;
 			retour += e.e2.accept(this);
-			
+
 		} else if (e.e2 instanceof Var) {
 			String regE1 = e.e2.accept(this);
 			if (regE1.contains("[sp,")) {
@@ -762,16 +772,16 @@ public class GenerationS implements ObjVisitor<String> {
 			e.e2.registreDeRetour = e.registreDeRetour ; 
 			retour += String.format("\tldr\t%s,=%d\n",e.registreDeRetour,((Int)(e.e2)).i);	
 
-		/*}else if(e.e2 instanceof LetTuple){
-			for (Id id : ((LetTuple)(e.e2)).ids){
+		}else if(e.e2 instanceof LetTuple){
+			/*for (Id id : ((LetTuple)(e.e2)).ids){
 				regVar = RegistreAllocation.getRegistre(id);
-				retour += regVar + " "+id+ "\n";
+				//retour += regVar + " "+id+ "\n";
 				retour += "\tmov\tr10,#"+cpt+"\n";
 				retour += "\tldr\t"+regVar+",[r4,r10,LSL #2]\n";
 				cpt++;
-			}
-			e.e2.registreDeRetour = e.registreDeRetour ; 
-			retour += e.e2.accept(this);*/
+			}*/
+			e.e2.registreDeRetour = e.registreDeRetour ;
+			retour += e.e2.accept(this);
 		}else {
 			e.e2.registreDeRetour = e.registreDeRetour ; 
 			retour += e.e2.accept(this);
@@ -806,7 +816,7 @@ public class GenerationS implements ObjVisitor<String> {
 		String retour = "";
 		int nbreg = e.fd.args.size()-1;
 		envFunc.add(new Closure(e.fd.id,e.fd.args));
-		
+
 		RegistreAllocation.startDefFunc();
 		defFunc +=String.format("\nmin_caml_%s:\n",e.fd.id);
 		defFunc += String.format("\t@prologue\n%s\n",prologue(0));
@@ -909,7 +919,7 @@ public class GenerationS implements ObjVisitor<String> {
 					data = true;
 				}
 			}
-			
+
 			String strP = param.accept(this);
 			if(strP!=null){
 				if (param instanceof Var){
@@ -1100,7 +1110,6 @@ public class GenerationS implements ObjVisitor<String> {
 	public String visit(LetTuple e) { 
 		boolean isSpill = false; 
 		String retour ="";
-		int cpt=0;
 		if (e.e1 instanceof Tuple) {
 			for (int i=0;i<((Tuple)(e.e1)).es.size();i++){
 				if (((Tuple)(e.e1)).es.get(i) instanceof Int){
@@ -1119,7 +1128,7 @@ public class GenerationS implements ObjVisitor<String> {
 			}
 			retour += e.e1.accept(this);
 		}else if (e.e1 instanceof Var){
-			String regVar = RegistreAllocation.getRegistre(((Var)(e.e1)).id); 		
+			String regVar = RegistreAllocation.getRegistre(((Var)(e.e1)).id); 
 			if (regVar == null) {
 				isSpill = true;
 				regVar = RegistreAllocation.spillInit(((Var)(e.e1)).id);
@@ -1238,9 +1247,13 @@ public class GenerationS implements ObjVisitor<String> {
 				isSpill = true;
 				regVar = RegistreAllocation.spillInit(((Var)(e.e1)).id);
 				retour += RegistreAllocation.spillStart(regVar);
+			} 
+			if (regVar.contains("[sp,")) {
+				retour += String.format("\tldr\tr11,%s\n",regVar);
+				regVar="r11";
 			}
 			retour+=String.format("\tldr\t%s,[%s,r10,LSL #2]\n",e.registreDeRetour,regVar);
-			
+
 			if (isSpill){
 				RegistreAllocation.spillEnd(regVar);
 			}
@@ -1248,7 +1261,7 @@ public class GenerationS implements ObjVisitor<String> {
 			retour += e.e1.accept(this);
 			retour+=String.format("\tldr\t%s,[%s,r10,LSL #2]\n",e.registreDeRetour,e.e1.registreDeRetour);
 		}	
-		
+
 		return retour;
 	}
 
@@ -1263,10 +1276,10 @@ public class GenerationS implements ObjVisitor<String> {
 		if (e.e2 instanceof Int){
 			retour+=String.format("\tmov\tr10,%s\n",e.e2.accept(this));
 		}else if (e.e2 instanceof Var){
-			String regVar2 = RegistreAllocation.getRegistre(((Var)(e.e1)).id); 
+			String regVar2 = RegistreAllocation.getRegistre(((Var)(e.e2)).id); 
 			if (regVar2 == null) {
 				isSpill = true;
-				regVar2 = RegistreAllocation.spillInit(((Var)(e.e1)).id);
+				regVar2 = RegistreAllocation.spillInit(((Var)(e.e2)).id);
 				retour += RegistreAllocation.spillStart(regVar2);
 			}
 			retour+=String.format("\tmov\tr10,%s\n",regVar2);

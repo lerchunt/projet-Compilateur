@@ -121,6 +121,13 @@ public class ClosureConversion implements ObjVisitor<Exp> {
 		e.e2.env = e.env;
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
+		
+		if(e.e2 instanceof Float){
+			if(((Float)e.e2).f==0.0){
+				System.err.println("Warning : division by 0");
+			}
+			
+		}
 
 		return e;
 	}
@@ -169,12 +176,12 @@ public class ClosureConversion implements ObjVisitor<Exp> {
 		e.e2.addEnv(e.id, new TVar(e.id.id));
 		e.e2.accept(this);
 		e.e2.env.removeFirst();
-		
-		if(e.e2 instanceof Float){
+	
+		/*if(e.e2 instanceof Float){
 			if(Double.isInfinite( ((Float )e.e2).f)){
 				System.err.println ("Warning : division by 0");
 			}
-		}
+		}*/
 		return e;
 	}
 
@@ -202,8 +209,8 @@ public class ClosureConversion implements ObjVisitor<Exp> {
 			}
 			// liaison avec le nouveau fils
 			Exp E2Prec = (Exp)newLetRec.e.clone();
-			newLetRec.e = (LetRec)e.clone();
-			((LetRec)newLetRec.e).fd.e = e.fd.e;
+			//newLetRec.e = (LetRec)e.clone();
+			newLetRec.e = e;
 			if (E2Prec instanceof Var) {
 				List<Exp> newArgs = new LinkedList<Exp>();
 				for (Id id : e.fd.args) {
@@ -215,8 +222,8 @@ public class ClosureConversion implements ObjVisitor<Exp> {
 			}
 			newLetRec.env = e.env;
 			newLetRec.fd.e.env = e.env;
-			newLetRec.fd.e = newLetRec.fd.e.accept(this);
-			newLetRec.e = newLetRec.e.accept(this);
+			//newLetRec.fd.e = newLetRec.fd.e.accept(this);
+			//newLetRec.e = newLetRec.e.accept(this);
 	
 			return newLetRec;
 		}
@@ -237,13 +244,13 @@ public class ClosureConversion implements ObjVisitor<Exp> {
 
 	@Override
 	public Exp visit(App e) {
-		for(Exp t : e.es){
+		/*for(Exp t : e.es){
 			if(t instanceof Float){
 				if(Double.isInfinite( ((Float )t).f)){
 					System.err.println ("Warning : division by 0");
 				}
 			}
-		}
+		}*/
 		
 		return e;
 	}
