@@ -975,7 +975,7 @@ public class GenerationS implements ObjVisitor<String> {
 		}
 
 
-		while (nbParam>3) {
+		while (nbParam>4) {
 			retour += String.format("\tLDMFD\tsp!, {%s}\n","r1");
 			nbParam--;
 		}
