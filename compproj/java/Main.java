@@ -205,7 +205,7 @@ public class Main {
 					writer.close();
 
 					// supprimer le fichier asml créé.
-					//new File(pathAsml).delete();
+					new File(pathAsml).delete();
 				}
 
 				if (verbose) {
