@@ -204,6 +204,9 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		} else {
 			e.e2 = e.e2.accept(this);
 		}
+		if (e.e2 instanceof Var && e.id.equals(((Var)(e.e2)).id)) {
+			return e.e1;
+		}
 		return e;      
 	}
 
