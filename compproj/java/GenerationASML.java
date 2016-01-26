@@ -482,16 +482,16 @@ public class GenerationASML implements ObjVisitor<String> {
         		return txt ;
     		}else {
     			
-        		retour = String.format("\n\tif %s then ( \n\t%s ",e.e1.accept(this),e.e2.accept(this));
-;	    		if(!e.e2.isVIFB()){
-	                retour += " \n\t";
-	            }
-				retour += String.format(") else (\n\t%s ",e.e3.accept(this));
-	    		if(!e.e3.isVIFB()){
-	                retour += " \n\t)";
-	            } else {
-	            	retour += ") ";
-	            }
+    			if(e.e1 instanceof Bool){
+	            	GenerationASML.inter += String.format("\n\tlet %s = %s in ",variable(var),e.e1.accept(this));
+	                retour += String.format("\n\tif %s = %s ",variable(var),variable(var++));
+    			} else {
+                    retour += String.format("\n\tif %s ",e.e1.accept(this));
+                }if(iff){
+                	retour += String.format("then ( \n\t\tlet %s = %s in %s\n\t)else(\n\t\tlet %s = %s in %s\n\t)",asml,e.e2.accept(this),asml,asml,e.e3.accept(this),asml);
+                } else {
+                	retour += String.format("then ( \n\t\t%s \n\t)else(\n\t\t %s \n\t)",e.e2.accept(this),e.e3.accept(this));
+                }
 	    		return retour;
     		}
     	}
@@ -638,8 +638,8 @@ public class GenerationASML implements ObjVisitor<String> {
     }
 
     public String visit(LetRec e){
-    	GenerationASML.haut += String.format("let _%s %s = \n\t",e.fd.id,printInfix(e.fd.args, " "),printInfix(e.fd.args, " "));
-        def = true ; 
+        GenerationASML.haut += String.format("\nlet _%s %s = \n\t",e.fd.id,printInfix(e.fd.args, " "),printInfix(e.fd.args, " "));
+        def = true ;
         String a = e.fd.e.accept(this);
         GenerationASML.haut += String.format ("%s",a);
 	    def = false ;
@@ -664,14 +664,20 @@ public class GenerationASML implements ObjVisitor<String> {
     	    		retour += String.format("call _min_caml_%s %s ",e.e.accept(this),printInfix2(e.es, " ",e.e.accept(this)));
     		} else {
     			for(Exp r : e.es){
-    	    		if (!(r instanceof Var) && !(r instanceof Int)){
+    	    		if ((!(r instanceof Var) && !(r instanceof Int) )){
     	    			app = true ;
     	    			retour += printInfix2(e.es, " ",e.e.accept(this));
-    	    			//app = false ;
+    	    			app = true ;
     	    		}
     			}
     			if(!app) {
-        			retour += String.format("call _%s %s ",e.e.accept(this),printInfix2(e.es, " ",e.e.accept(this)));
+    				String txt = e.e.accept(this);
+    				String str2 = "call";
+    				if(txt.toLowerCase().contains(str2.toLowerCase())){
+    					GenerationASML.inter += String.format("let %s = %s in",variable(var),txt);
+            			retour += String.format("call _%s %s ",variable(var++),printInfix2(e.es, " ",e.e.accept(this)));
+    				} else
+        			retour += String.format("call _%s %s ",txt,printInfix2(e.es, " ",e.e.accept(this)));
 
     	    		}
     			app = false;

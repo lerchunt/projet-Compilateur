@@ -163,10 +163,28 @@ public class InlineExpansion implements ObjVisitor<Exp> {
 					}
 					exp.accept(this);
 					return exp;
+				}			
+			}
+		} else if(e.e instanceof App){
+			if(((App)e.e).e instanceof Var) {
+				Var x = (Var)((App)e.e).e;
+				Id varId = x.id;
+				for(LetRec lt : listeLetRec){
+					if(lt.fd.id.equals(varId)){
+						Exp exp=(Exp)lt.fd.e.clone();
+						exp = new App(exp,e.es);
+						exp.accept(this);
+						return exp;
+					}			
 				}
-						
-			}		
-		}		
+			}
+		}
+		int cpt = 0 ;
+		for(Exp t : e.es){
+			t = t.accept(this);
+			e.es.set(cpt, t);
+			cpt++;
+		}
 			return e;
 	}
 
