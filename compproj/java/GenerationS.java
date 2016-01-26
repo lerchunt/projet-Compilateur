@@ -216,7 +216,8 @@ public class GenerationS implements ObjVisitor<String> {
 			e.e.registreDeRetour = e.registreDeRetour ; 
 			return e.e.accept(this);
 		} else if (e.e instanceof Float){ 
-			return String.format("\tmov\t%s,%s\n\tbl\t");
+			e.e.registreDeRetour = "r1";
+			return String.format("\tmov\tr0,#0\n%s\tbl\tmin_caml_fsub\n",e.e.accept(this));
 			
 		} else {
 			System.err.println("internal error -- GenerationS -- FNeg");
@@ -558,12 +559,11 @@ public class GenerationS implements ObjVisitor<String> {
 			} 
 			retour += String.format("\tcmp\t%s,#1\n", r1);
 			retour += "\tbne\tifFalse"+IdIf+"\n";
+		}else if (e.e1 instanceof Not){
+			e.e1.accept(this);
 		} else {
 			System.err.println("internal error - If e1 (GenerationS)");
-			System.exit(1);
-		}
-		if (e.e1 instanceof Not){
-			e.e1.accept(this);
+			System.exit(1);		
 		}
 
 
@@ -595,7 +595,10 @@ public class GenerationS implements ObjVisitor<String> {
 		}else if (e.e2 instanceof Float){
 			e.e2.registreDeRetour = e.registreDeRetour;
 			ifTrue += e.e2.accept(this);
-		} else { // entier  +bool
+		} else if (e.e2 instanceof FNeg){
+			e.e2.registreDeRetour = e.registreDeRetour;
+			ifTrue += e.e2.accept(this);
+		}else{// entier  +bool
 			ifTrue+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e2.accept(this));	
 		}
 
@@ -624,6 +627,9 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if(e.e3 instanceof Int && ((Int)(e.e3)).i > 121){
 			e.e3.registreDeRetour = e.registreDeRetour ; 
 			ifFalse += e.e3.accept(this);	
+		} else if (e.e3 instanceof FNeg){
+			e.e3.registreDeRetour = e.registreDeRetour;
+			ifFalse += e.e3.accept(this);
 		} else {  //entier +float +bool
 			ifFalse+=String.format("\tmov\t%s,%s\n",e.registreDeRetour,e.e3.accept(this));
 		}		
@@ -697,6 +703,8 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e1 instanceof Put){
 			e.e1.registreDeRetour = registre;
 			retour +=e.e1.accept(this);
+		}else if (e.e1 instanceof FNeg){
+			retour+=e.e1.accept(this);
 		}else{
 			retour += String.format("\tmov\t%s,%s\n", registre,e.e1.accept(this));
 		}
@@ -927,7 +935,9 @@ public class GenerationS implements ObjVisitor<String> {
 								retour+=strP;
 							}else if(param instanceof Put){
 								retour+=strP;
-							}else {
+							}else if (param instanceof FNeg) {
+								retour+=strP;
+							}else{
 								retour +=String.format("\tmov\t%s,%s\n", param.registreDeRetour, strP);
 							}
 						}
@@ -1086,6 +1096,8 @@ public class GenerationS implements ObjVisitor<String> {
 		} else if (e.e2 instanceof App){
 			retour += e.e2.accept(this);
 		}else if (e.e2 instanceof Let){
+			retour += e.e2.accept(this);
+		} else {
 			retour += e.e2.accept(this);
 		}
 		return retour;
