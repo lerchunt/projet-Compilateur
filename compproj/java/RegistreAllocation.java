@@ -389,14 +389,14 @@ public class RegistreAllocation implements Visitor {
 
 		public void startDefFunc() {
 			if (regCour != null && !regCour.isEmpty() && regCour.contains("[sp,")){
-				cmpPile += 52;
+				cmpPile += 28;
 				regCour = String.format("[sp, #%d]",cmpPile);
 			}
 		}
 
 		public void endDefFunc() {
 			if (regCour != null && !regCour.isEmpty() && regCour.contains("[sp,")){
-				cmpPile -= 52;
+				cmpPile -= 28;
 				regCour = String.format("[sp, #%d]",cmpPile);
 			}
 		}
