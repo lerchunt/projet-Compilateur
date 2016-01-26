@@ -79,14 +79,14 @@ public class Main {
 
 					expression.initiateEnv();
 					expression.typeAttendu = new TUnit();
-					LinkedList<Equations> retour = expression.accept(new TypeChecking2());
+					LinkedList<Equations> retour = expression.accept(new TypeChecking());
 					if (verbose) {
 						for (Equations e : retour) {
 							System.out.println(e.toString());
 						}
 					}
 					
-					TypeChecking2.resolution(retour);
+					TypeChecking.resolution(retour);
 					if (verbose) {
 						System.out.println("------ resol -----------");
 						for (Equations e : retour) {
@@ -94,11 +94,6 @@ public class Main {
 						}
 					}
 					
-					/*if (!(expression.accept(new TypeChecking()) instanceof TUnit)) {
-						throw new Exception();
-					} else { 
-						if (verbose) {System.out.println("OK");}
-					}*/
 				} catch(Exception e) {
 					System.err.println("Type error, expected a final type unit");
 					System.exit(1);					

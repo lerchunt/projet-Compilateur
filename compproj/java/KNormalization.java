@@ -3,7 +3,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class KNormalization implements ObjVisitor<Exp> {
-	FrontEnd fe;
 	Var affectation;
 	public KNormalization(){
 

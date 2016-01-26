@@ -180,7 +180,7 @@ public class ReductionOfNestedLet implements ObjVisitor<Exp> {
 	public Exp visit(LetTuple e) {
 		e.e1 = e.e1.accept(this);
 		e.e2 = e.e2.accept(this);
-		return e;
+		return ReducLetTuple(e);
 	}
 
 	@Override
@@ -213,6 +213,26 @@ public class ReductionOfNestedLet implements ObjVisitor<Exp> {
 
 	private Exp ReducLet(Let e) {
 		if (!e.e1.isVar()) {
+			if (e.e1 instanceof Let) {
+				Let cour = (Let)e.e1;
+				while (cour.e2 instanceof Let) {
+					cour = (Let)cour.e2;
+				}
+				Let newExp = (Let)e.e1.clone();
+				e.e1 = cour.e2;
+				cour = newExp;
+				while (cour.e2 instanceof Let) {
+					cour = (Let)cour.e2;
+				}
+				cour.e2 = e;
+				return newExp;
+			} 
+		}
+		return e;
+	}
+	
+	private Exp ReducLetTuple(LetTuple e) {
+		if (!(e.e1 instanceof Tuple)) {
 			if (e.e1 instanceof Let) {
 				Let cour = (Let)e.e1;
 				while (cour.e2 instanceof Let) {
