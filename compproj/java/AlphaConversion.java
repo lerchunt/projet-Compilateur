@@ -208,6 +208,7 @@ public class AlphaConversion implements ObjVisitor<Exp> {
 			envVariables.removeLast();
 		}
 		e.e = e.e.accept(this);
+		envProcedures.removeLast();
 		
 		return e;
 
