@@ -234,7 +234,5 @@ public class Main {
 		}
 		buffer.close(); 
 	}
-
-
 }
 
