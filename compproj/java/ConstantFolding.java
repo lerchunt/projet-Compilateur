@@ -113,7 +113,7 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 	@Override
 	public Exp visit(FDiv e) {
 		OpBin newExp = (OpBin)CFolding(e);
-		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {
+		if (newExp.e1 instanceof Float && newExp.e2 instanceof Float) {					
 			return new Float(((Float)newExp.e1).f / ((Float)newExp.e2).f);
 		}
 		return newExp;
@@ -274,6 +274,10 @@ public class ConstantFolding implements ObjVisitor<Exp> {
 		if (e.e instanceof Var) {
 			if(tabSym.containsKey(((Var)e.e).id.toString())){
 				tabVar.remove(((Var)e.e).id.toString()) ;
+				Exp newExp = tabSym.get(((Var)e.e).id.toString());
+				if (newExp instanceof Var) {
+					e.e = newExp;
+				}
 			}
 			String ap = ((Var)e.e).id.toString();
 			if(!ap.equals("print_int") && !ap.equals("print_float")) {
