@@ -640,10 +640,7 @@ public class TypeChecking2 implements ObjVisitor<LinkedList<Equations>> {
 						Equations eq = new Equations(s, r,e.toString());
 						retour.add(eq);
 					}
-				} else {
-					System.err.println("expected similar size of tuple");
-					System.exit(1);
-				}
+				} 
 			}
 		}
 		if(e.e3 instanceof Var && e.e1 instanceof Array && ((Array)e.e1).e2 instanceof Tuple){
